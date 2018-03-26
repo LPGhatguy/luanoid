@@ -41,6 +41,8 @@ local function getModelMass(model)
 	for _, child in ipairs(model:GetChildren()) do
 		if child:IsA("BasePart") then
 			mass = mass + child:GetMass()
+		else
+			mass = mass + getModelMass(child)
 		end
 	end
 
