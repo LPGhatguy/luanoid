@@ -34,26 +34,26 @@
 		<Item class="Camera" referent="RBX3756E04643664949B917E8F0A9963824">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-118.618484</X>
-					<Y>26.191349</Y>
-					<Z>14.7887039</Z>
-					<R00>0.146136612</R00>
-					<R01>0.435294271</R01>
-					<R02>-0.88834846</R02>
-					<R10>3.72529074e-09</R10>
-					<R11>0.897988915</R11>
-					<R12>0.440018117</R12>
-					<R20>0.989264429</R20>
-					<R21>-0.0643027574</R21>
-					<R22>0.131229043</R22>
+					<X>-45.549202</X>
+					<Y>29.6387329</Y>
+					<Z>23.2928753</Z>
+					<R00>-0.228315651</R00>
+					<R01>0.61678642</R01>
+					<R02>-0.753290474</R02>
+					<R10>-0</R10>
+					<R11>0.773726881</R11>
+					<R12>0.633519411</R12>
+					<R20>0.973587275</R20>
+					<R21>0.144642398</R21>
+					<R22>-0.176653922</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<CoordinateFrame name="Focus">
-					<X>-116.841789</X>
-					<Y>25.3113136</Y>
-					<Z>14.5262461</Z>
+					<X>-44.0426216</X>
+					<Y>28.3716946</Y>
+					<Z>23.646183</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -143,6 +143,27 @@
 					<Z>512</Z>
 				</Vector3>
 			</Properties>
+			<Item class="Attachment" referent="RBX66AB1F92F3CD4A46893AECD39989DBD6">
+				<Properties>
+					<CoordinateFrame name="CFrame">
+						<X>-3</X>
+						<Y>10</Y>
+						<Z>1</Z>
+						<R00>0</R00>
+						<R01>-1</R01>
+						<R02>0</R02>
+						<R10>1</R10>
+						<R11>0</R11>
+						<R12>-0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<string name="Name">Attachment1</string>
+					<BinaryString name="Tags"></BinaryString>
+					<bool name="Visible">false</bool>
+				</Properties>
+			</Item>
 		</Item>
 		<Item class="Terrain" referent="RBX7EF6369DC87248D882A01FFC45FC9A6B">
 			<Properties>
@@ -692,7 +713,7 @@ gcLgc4RKxr21zq2UlJSM]]></BinaryString>
 				<Properties>
 					<token name="ActuatorType">1</token>
 					<float name="AngularSpeed">0</float>
-					<float name="AngularVelocity">10</float>
+					<float name="AngularVelocity">1</float>
 					<Ref name="Attachment0">RBXEDA393FC89A94961B8437B8A5A9B1DB4</Ref>
 					<Ref name="Attachment1">RBX6D3845F1423E46E3971A72EFC65EE689</Ref>
 					<int name="Color">1009</int>
@@ -724,7 +745,7 @@ gcLgc4RKxr21zq2UlJSM]]></BinaryString>
 				<token name="BottomSurface">0</token>
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
-					<X>-41.5</X>
+					<X>-39</X>
 					<Y>16</Y>
 					<Z>38</Z>
 					<R00>1</R00>
@@ -780,7 +801,7 @@ gcLgc4RKxr21zq2UlJSM]]></BinaryString>
 				<token name="formFactorRaw">1</token>
 				<token name="shape">1</token>
 				<Vector3 name="size">
-					<X>19</X>
+					<X>24</X>
 					<Y>4</Y>
 					<Z>4</Z>
 				</Vector3>
@@ -802,6 +823,183 @@ gcLgc4RKxr21zq2UlJSM]]></BinaryString>
 						<R22>0</R22>
 					</CoordinateFrame>
 					<string name="Name">Attachment1</string>
+					<BinaryString name="Tags"></BinaryString>
+					<bool name="Visible">false</bool>
+				</Properties>
+			</Item>
+			<Item class="Attachment" referent="RBX42DFE25FB6954C6A96244F2725D95DB2">
+				<Properties>
+					<CoordinateFrame name="CFrame">
+						<X>10.1052628</X>
+						<Y>0</Y>
+						<Z>-2</Z>
+						<R00>0</R00>
+						<R01>0</R01>
+						<R02>1</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>-0</R12>
+						<R20>-1</R20>
+						<R21>0</R21>
+						<R22>0</R22>
+					</CoordinateFrame>
+					<string name="Name">Attachment0</string>
+					<BinaryString name="Tags"></BinaryString>
+					<bool name="Visible">false</bool>
+				</Properties>
+			</Item>
+			<Item class="HingeConstraint" referent="RBXC350E934D36A4FE286D9B87C4BE9646E">
+				<Properties>
+					<token name="ActuatorType">0</token>
+					<float name="AngularSpeed">0</float>
+					<float name="AngularVelocity">0</float>
+					<Ref name="Attachment0">RBX42DFE25FB6954C6A96244F2725D95DB2</Ref>
+					<Ref name="Attachment1">RBXD873190AB8234EE7943A062460BE630C</Ref>
+					<int name="Color">1009</int>
+					<bool name="Enabled">true</bool>
+					<bool name="LimitsEnabled">false</bool>
+					<float name="LowerAngle">-45</float>
+					<float name="MotorMaxAcceleration">INF</float>
+					<float name="MotorMaxTorque">0</float>
+					<string name="Name">HingeConstraint</string>
+					<float name="Radius">0.150000006</float>
+					<float name="Restitution">0</float>
+					<float name="ServoMaxTorque">0</float>
+					<BinaryString name="Tags"></BinaryString>
+					<float name="TargetAngle">0</float>
+					<float name="UpperAngle">45</float>
+					<bool name="Visible">false</bool>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="Part" referent="RBX2B1F459D33FB410AB40E9A70B0F342C6">
+			<Properties>
+				<bool name="Anchored">false</bool>
+				<float name="BackParamA">-0.5</float>
+				<float name="BackParamB">0.5</float>
+				<token name="BackSurface">0</token>
+				<token name="BackSurfaceInput">0</token>
+				<float name="BottomParamA">-0.5</float>
+				<float name="BottomParamB">0.5</float>
+				<token name="BottomSurface">0</token>
+				<token name="BottomSurfaceInput">0</token>
+				<CoordinateFrame name="CFrame">
+					<X>-31</X>
+					<Y>16.5</Y>
+					<Z>30.5</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<bool name="CanCollide">true</bool>
+				<int name="CollisionGroupId">0</int>
+				<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+				<PhysicalProperties name="CustomPhysicalProperties">
+					<CustomPhysics>false</CustomPhysics>
+				</PhysicalProperties>
+				<float name="Elasticity">0.5</float>
+				<float name="Friction">0.300000012</float>
+				<float name="FrontParamA">-0.5</float>
+				<float name="FrontParamB">0.5</float>
+				<token name="FrontSurface">0</token>
+				<token name="FrontSurfaceInput">0</token>
+				<float name="LeftParamA">-0.5</float>
+				<float name="LeftParamB">0.5</float>
+				<token name="LeftSurface">0</token>
+				<token name="LeftSurfaceInput">0</token>
+				<bool name="Locked">false</bool>
+				<token name="Material">256</token>
+				<string name="Name">MagicCarpet</string>
+				<float name="Reflectance">0</float>
+				<float name="RightParamA">-0.5</float>
+				<float name="RightParamB">0.5</float>
+				<token name="RightSurface">0</token>
+				<token name="RightSurfaceInput">0</token>
+				<Vector3 name="RotVelocity">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<BinaryString name="Tags"></BinaryString>
+				<float name="TopParamA">-0.5</float>
+				<float name="TopParamB">0.5</float>
+				<token name="TopSurface">0</token>
+				<token name="TopSurfaceInput">0</token>
+				<float name="Transparency">0</float>
+				<Vector3 name="Velocity">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<token name="formFactorRaw">1</token>
+				<token name="shape">1</token>
+				<Vector3 name="size">
+					<X>6</X>
+					<Y>1</Y>
+					<Z>9</Z>
+				</Vector3>
+			</Properties>
+			<Item class="Attachment" referent="RBXD873190AB8234EE7943A062460BE630C">
+				<Properties>
+					<CoordinateFrame name="CFrame">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>4.5</Z>
+						<R00>0</R00>
+						<R01>0</R01>
+						<R02>1</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>-0</R12>
+						<R20>-1</R20>
+						<R21>0</R21>
+						<R22>0</R22>
+					</CoordinateFrame>
+					<string name="Name">Attachment1</string>
+					<BinaryString name="Tags"></BinaryString>
+					<bool name="Visible">false</bool>
+				</Properties>
+			</Item>
+			<Item class="Attachment" referent="RBX671487CBEDC447B888326AE93AA0DA96">
+				<Properties>
+					<CoordinateFrame name="CFrame">
+						<X>0</X>
+						<Y>0.5</Y>
+						<Z>0</Z>
+						<R00>0</R00>
+						<R01>-1</R01>
+						<R02>0</R02>
+						<R10>1</R10>
+						<R11>0</R11>
+						<R12>-0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<string name="Name">Attachment0</string>
+					<BinaryString name="Tags"></BinaryString>
+					<bool name="Visible">false</bool>
+				</Properties>
+			</Item>
+			<Item class="AlignOrientation" referent="RBXC30F3242F63B497C821E5353E9B543AB">
+				<Properties>
+					<Ref name="Attachment0">RBX671487CBEDC447B888326AE93AA0DA96</Ref>
+					<Ref name="Attachment1">RBX66AB1F92F3CD4A46893AECD39989DBD6</Ref>
+					<int name="Color">23</int>
+					<bool name="Enabled">true</bool>
+					<float name="MaxAngularVelocity">INF</float>
+					<float name="MaxTorque">10000</float>
+					<string name="Name">AlignOrientation</string>
+					<bool name="PrimaryAxisOnly">false</bool>
+					<bool name="ReactionTorqueEnabled">false</bool>
+					<float name="Responsiveness">10</float>
+					<bool name="RigidityEnabled">true</bool>
 					<BinaryString name="Tags"></BinaryString>
 					<bool name="Visible">false</bool>
 				</Properties>
@@ -988,6 +1186,208 @@ return ApiSpec]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
+			<Item class="ModuleScript" referent="RBXDDD54FD19F8244A2BE0322CF8CC06BD0">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">makeCharacter</string>
+					<string name="ScriptGuid">{87CF7304-5B24-461D-BF64-0AF143CAA575}</string>
+					<ProtectedString name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
+
+local function makeCharacter(name)
+	name = name or "Unnamed Character"
+
+	local instance = StarterPlayer.StarterCharacter:Clone()
+	instance.Name = name
+
+	local targetOrientPart = Instance.new("Part")
+	targetOrientPart.Name = "OrientationTarget"
+	targetOrientPart.Anchored = true
+	targetOrientPart.Size = Vector3.new(1, 1, 1)
+	targetOrientPart.Color = Color3.new(1, 1, 0)
+	targetOrientPart.CanCollide = false
+	targetOrientPart.Transparency = 0.95
+	targetOrientPart.Parent = instance
+
+	local orient0 = Instance.new("Attachment")
+	orient0.Name = "Align0"
+	orient0.Axis = Vector3.new(0, 1, 0)
+	orient0.SecondaryAxis = Vector3.new(-1, 0, 0)
+	orient0.Parent = instance.PrimaryPart
+
+	local orient1 = Instance.new("Attachment")
+	orient1.Name = "Align1"
+	orient1.Parent = targetOrientPart
+
+	local aligner = Instance.new("AlignOrientation")
+	aligner.RigidityEnabled = true
+	aligner.Attachment0 = orient0
+	aligner.Attachment1 = orient1
+	aligner.Parent = instance.PrimaryPart
+
+	local velocity0 = Instance.new("Attachment")
+	velocity0.Name = "Velocity0"
+	velocity0.Parent = instance.PrimaryPart
+
+	local vectorForce = Instance.new("VectorForce")
+	vectorForce.ApplyAtCenterOfMass = true
+	vectorForce.Force = Vector3.new(0, 0, 0)
+	vectorForce.RelativeTo = Enum.ActuatorRelativeTo.World
+	vectorForce.Attachment0 = velocity0
+	vectorForce.Parent = instance.PrimaryPart
+
+	local avatarModel = instance:WaitForChild("Avatar")
+	local avatarRoot = avatarModel.PrimaryPart
+
+	return {
+		instance = instance,
+		vectorForce = vectorForce,
+		targetOrientPart = targetOrientPart,
+		avatarModel = avatarModel,
+		avatarRoot = avatarRoot
+	}
+end
+
+return makeCharacter]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX73A15BDF94074268A052D4BF3577CD66">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">getModelMass</string>
+					<string name="ScriptGuid">{0A720223-C16F-488C-A281-CCD6273992BA}</string>
+					<ProtectedString name="Source"><![CDATA[local function getModelMass(model)
+	local mass = 0
+
+	for _, child in ipairs(model:GetChildren()) do
+		if child:IsA("BasePart") then
+			mass = mass + child:GetMass()
+		else
+			mass = mass + getModelMass(child)
+		end
+	end
+
+	return mass
+end
+
+return getModelMass]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX39E64DD59FBE439489D2D141B0C5677D">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Simulation</string>
+					<string name="ScriptGuid">{82E3DC83-D169-4984-911B-1D4A7487F6BF}</string>
+					<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+
+local stepSpring = require(script.Parent.stepSpring)
+local getModelMass = require(script.Parent.getModelMass)
+
+local TARGET_SPEED = 24
+local FRAMERATE = 1 / 240
+local STIFFNESS = 170
+local DAMPING = 26
+local PRECISION = 0.001
+local GROUND_TOLERANCE = 0.15
+
+local function isOnGround(characterInstance)
+	local startPos = characterInstance.PrimaryPart.Position
+	local offset = -Vector3.new(0, (characterInstance.PrimaryPart.Size.X / 2) + 1.5 + GROUND_TOLERANCE, 0)
+
+	local ray = Ray.new(startPos, offset)
+	local hit = Workspace:FindPartOnRayWithIgnoreList(ray, {characterInstance})
+
+	return not not hit
+end
+
+local Simulation = {}
+Simulation.__index = Simulation
+
+function Simulation.new(character)
+	local simulation = {
+		character = character,
+		accumulatedTime = 0,
+		currentAccelerationX = 0,
+		currentAccelerationY = 0,
+	}
+
+	setmetatable(simulation, Simulation)
+
+	return simulation
+end
+
+function Simulation:step(dt, inputX, inputY, inputJump)
+	local characterMass = getModelMass(self.character.instance)
+	local onGround = isOnGround(self.character.instance)
+
+	local targetX = TARGET_SPEED * inputX
+	local targetY = TARGET_SPEED * inputY
+
+	self.accumulatedTime = self.accumulatedTime + dt
+
+	local currentX = self.character.instance.PrimaryPart.Velocity.X
+	local currentY = self.character.instance.PrimaryPart.Velocity.Z
+
+	while self.accumulatedTime >= FRAMERATE do
+		self.accumulatedTime = self.accumulatedTime - FRAMERATE
+
+		currentX, self.currentAccelerationX = stepSpring(
+			FRAMERATE,
+			currentX,
+			self.currentAccelerationX,
+			targetX,
+			STIFFNESS,
+			DAMPING,
+			PRECISION
+		)
+
+		currentY, self.currentAccelerationY = stepSpring(
+			FRAMERATE,
+			currentY,
+			self.currentAccelerationY,
+			targetY,
+			STIFFNESS,
+			DAMPING,
+			PRECISION
+		)
+	end
+
+	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
+	self.character.instance.BottomSphere.Color = bottomColor
+
+	if onGround then
+		local up
+		if inputJump then
+			up = 5000 * characterMass
+		else
+			up = 0
+		end
+
+		self.character.vectorForce.Force = Vector3.new(
+			self.currentAccelerationX * characterMass,
+			up,
+			self.currentAccelerationY * characterMass
+		)
+	else
+		self.character.vectorForce.Force = Vector3.new(0, 0, 0)
+	end
+
+	local velocity = Vector3.new(currentX, 0, currentY)
+	local speed = velocity.Magnitude
+
+	self.character.targetOrientPart.CFrame = CFrame.new(self.character.instance.PrimaryPart.Position + velocity / 3)
+
+	if speed > 0.1 then
+		local velocityRot = CFrame.new(Vector3.new(), velocity)
+		self.character.avatarRoot.CFrame = velocityRot + self.character.avatarRoot.Position
+	end
+end
+
+return Simulation]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
 		</Item>
 	</Item>
 	<Item class="TweenService" referent="RBX4805826D746B439AA46044449E3F496D">
@@ -1076,7 +1476,7 @@ local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
-local stepSpring = require(ReplicatedFirst.CharacterControllerCore.stepSpring)
+local Simulation = require(ReplicatedFirst.CharacterControllerCore.Simulation)
 
 local Input = require(script.Input)
 local Api = require(script.Api)
@@ -1085,112 +1485,8 @@ while not Players.LocalPlayer do
 	wait()
 end
 
-local TARGET_SPEED = 24
-local FRAMERATE = 1 / 240
-
-local STIFFNESS = 170
-local DAMPING = 26
-local AIR_STIFFNESS = 5
-local AIR_DAMPING = 4
-
-local PRECISION = 0.001
-local GROUND_TOLERANCE = 0.15
-
-local accumulatedTime = 0
-local currentAccelerationX = 0
-local currentAccelerationY = 0
-
 local character = Api.requestMakeCharacter()
-
-local function isOnGround(characterInstance)
-	local startPos = characterInstance.PrimaryPart.Position
-	local offset = -Vector3.new(0, (characterInstance.PrimaryPart.Size.X / 2) + 1.5 + GROUND_TOLERANCE, 0)
-
-	local ray = Ray.new(startPos, offset)
-	local hit = Workspace:FindPartOnRayWithIgnoreList(ray, {characterInstance})
-
-	return not not hit
-end
-
-local function getModelMass(model)
-	local mass = 0
-
-	for _, child in ipairs(model:GetChildren()) do
-		if child:IsA("BasePart") then
-			mass = mass + child:GetMass()
-		end
-	end
-
-	return mass
-end
-
-local function updateCharacter(character, inputX, inputY, dt)
-	local characterMass = getModelMass(character.instance)
-	local onGround = isOnGround(character.instance)
-
-	local targetX = TARGET_SPEED * inputX
-	local targetY = TARGET_SPEED * inputY
-
-	accumulatedTime = accumulatedTime + dt
-
-	local currentX = character.instance.PrimaryPart.Velocity.X
-	local currentY = character.instance.PrimaryPart.Velocity.Z
-
-	while accumulatedTime >= FRAMERATE do
-		accumulatedTime = accumulatedTime - FRAMERATE
-
-		currentX, currentAccelerationX = stepSpring(
-			FRAMERATE,
-			currentX,
-			currentAccelerationX,
-			targetX,
-			STIFFNESS,
-			DAMPING,
-			PRECISION
-		)
-
-		currentY, currentAccelerationY = stepSpring(
-			FRAMERATE,
-			currentY,
-			currentAccelerationY,
-			targetY,
-			STIFFNESS,
-			DAMPING,
-			PRECISION
-		)
-	end
-
-	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
-	character.instance.BottomSphere.Color = bottomColor
-
-	if onGround then
-		local up
-		if Input.keysDown[Enum.KeyCode.Space] then
-			up = 5000 * characterMass
-		else
-			up = 0
-		end
-
-		character.vectorForce.Force = Vector3.new(
-			currentAccelerationX * characterMass,
-			up,
-			currentAccelerationY * characterMass
-		)
-	else
-		character.vectorForce.Force = Vector3.new(0, 0, 0)
-	end
-
-	local velocity = Vector3.new(currentX, 0, currentY)
-	local speed = velocity.Magnitude
-
-	character.targetOrientPart.CFrame = CFrame.new(character.instance.PrimaryPart.Position + velocity / 3)
-
-	if speed > 0.1 then
-		local velocityRot = CFrame.new(Vector3.new(), velocity)
-		character.avatarRoot.CFrame = velocityRot + character.avatarRoot.Position
-	end
-
-end
+local simulation = Simulation.new(character)
 
 Workspace.CurrentCamera.CameraSubject = character.instance.PrimaryPart
 Workspace.CurrentCamera.CameraType = Enum.CameraType.Track
@@ -1198,6 +1494,8 @@ Workspace.CurrentCamera.CameraType = Enum.CameraType.Track
 RunService.Heartbeat:Connect(function(dt)
 	local movementX = 0
 	local movementY = 0
+
+	local jump = not not Input.keysDown[Enum.KeyCode.Space]
 
 	if Input.keysDown[Enum.KeyCode.W] then
 		movementY = movementY + 1
@@ -1223,9 +1521,9 @@ RunService.Heartbeat:Connect(function(dt)
 
 		local direction = (CFrame.Angles(0, cameraAngle, 0) * CFrame.new(relativeDirection)).p.unit
 
-		updateCharacter(character, direction.X, direction.Z, dt)
+		simulation:step(dt, direction.X, direction.Z, jump)
 	else
-		updateCharacter(character, 0, 0, dt)
+		simulation:step(dt, 0, 0, jump)
 	end
 end)
 
@@ -5125,8 +5423,10 @@ return Api]]></ProtectedString>
 				<string name="Name">CharacterControllerServer</string>
 				<string name="ScriptGuid">{8E5F4BF9-62BB-4477-AB9E-F3237FAC7EB9}</string>
 				<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
-local makeCharacter = require(script.makeCharacter)
+local makeCharacter = require(ReplicatedFirst.CharacterControllerCore.makeCharacter)
+
 local Api = require(script.Api)
 
 local ApiImplementation = {}
@@ -5144,70 +5444,6 @@ end
 Api.implement(ApiImplementation)]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBX2B09E4291E6B4840A4733D9E4F8F0EE3">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">makeCharacter</string>
-					<string name="ScriptGuid">{843FB438-65C0-428A-B761-E23CD0511AE5}</string>
-					<ProtectedString name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
-
-local function makeCharacter(name)
-	name = name or "Unnamed Character"
-
-	local instance = StarterPlayer.StarterCharacter:Clone()
-	instance.Name = name
-
-	local targetOrientPart = Instance.new("Part")
-	targetOrientPart.Anchored = true
-	targetOrientPart.Size = Vector3.new(1, 1, 1)
-	targetOrientPart.Color = Color3.new(1, 1, 0)
-	targetOrientPart.CanCollide = false
-	targetOrientPart.Transparency = 0.95
-	targetOrientPart.Parent = instance
-
-	local orient0 = Instance.new("Attachment")
-	orient0.Name = "Align0"
-	orient0.Axis = Vector3.new(0, 1, 0)
-	orient0.SecondaryAxis = Vector3.new(-1, 0, 0)
-	orient0.Parent = instance.PrimaryPart
-
-	local orient1 = Instance.new("Attachment")
-	orient1.Name = "Align1"
-	orient1.Parent = targetOrientPart
-
-	local aligner = Instance.new("AlignOrientation")
-	aligner.RigidityEnabled = true
-	aligner.Attachment0 = orient0
-	aligner.Attachment1 = orient1
-	aligner.Parent = instance.PrimaryPart
-
-	local velocity0 = Instance.new("Attachment")
-	velocity0.Name = "Velocity0"
-	velocity0.Parent = instance.PrimaryPart
-
-	local vectorForce = Instance.new("VectorForce")
-	vectorForce.ApplyAtCenterOfMass = true
-	vectorForce.Force = Vector3.new(0, 0, 0)
-	vectorForce.RelativeTo = Enum.ActuatorRelativeTo.World
-	vectorForce.Attachment0 = velocity0
-	vectorForce.Parent = instance.PrimaryPart
-
-	local avatarModel = instance:WaitForChild("Avatar")
-	local avatarRoot = avatarModel.PrimaryPart
-
-	return {
-		instance = instance,
-		vectorForce = vectorForce,
-		targetOrientPart = targetOrientPart,
-		avatarModel = avatarModel,
-		avatarRoot = avatarRoot
-	}
-end
-
-return makeCharacter]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
 			<Item class="ModuleScript" referent="RBX4936A2C7631446F9969D8E25332BEC23">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
