@@ -12,6 +12,7 @@ while not Players.LocalPlayer do
 	wait()
 end
 
+local TARGET_SPEED = 24
 local FRAMERATE = 1 / 240
 local STIFFNESS = 170
 local DAMPING = 26
@@ -46,9 +47,12 @@ local function getModelMass(model)
 	return mass
 end
 
-local function updateCharacter(character, targetX, targetY, dt)
+local function updateCharacter(character, inputX, inputY, dt)
 	local characterMass = getModelMass(character.instance)
 	local onGround = isOnGround(character.instance)
+
+	local targetX = TARGET_SPEED * inputX
+	local targetY = TARGET_SPEED * inputY
 
 	accumulatedTime = accumulatedTime + dt
 
@@ -133,10 +137,9 @@ RunService.Heartbeat:Connect(function(dt)
 		local cameraLook = Workspace.CurrentCamera.CFrame.lookVector
 		local cameraAngle = math.atan2(cameraLook.x, cameraLook.z)
 
-		local absoluteDirection = (CFrame.Angles(0, cameraAngle, 0) * CFrame.new(relativeDirection)).p
-		local movement = absoluteDirection.unit * dt
+		local direction = (CFrame.Angles(0, cameraAngle, 0) * CFrame.new(relativeDirection)).p.unit
 
-		updateCharacter(character, movement.X * 2000, movement.Z * 2000, dt)
+		updateCharacter(character, direction.X, direction.Z, dt)
 	else
 		updateCharacter(character, 0, 0, dt)
 	end

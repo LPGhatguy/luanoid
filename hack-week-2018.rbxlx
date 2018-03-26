@@ -34,18 +34,18 @@
 		<Item class="Camera" referent="RBX3756E04643664949B917E8F0A9963824">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-121.345825</X>
-					<Y>27.2508926</Y>
-					<Z>15.1391087</Z>
-					<R00>0.275689512</R00>
-					<R01>0.493713617</R01>
-					<R02>-0.824767947</R02>
+					<X>-121.599274</X>
+					<Y>26.8318748</Y>
+					<Z>14.7591896</Z>
+					<R00>0.0489047468</R00>
+					<R01>0.303747773</R01>
+					<R02>-0.951496601</R02>
 					<R10>-0</R10>
-					<R11>0.858019114</R11>
-					<R12>0.513617933</R12>
-					<R20>0.961246848</R20>
-					<R21>-0.141599074</R21>
-					<R22>0.236546814</R22>
+					<R11>0.95263654</R11>
+					<R12>0.30411163</R12>
+					<R20>0.998803496</R20>
+					<R21>-0.0148725025</R21>
+					<R22>0.0465884432</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
@@ -1085,6 +1085,7 @@ while not Players.LocalPlayer do
 	wait()
 end
 
+local TARGET_SPEED = 24
 local FRAMERATE = 1 / 240
 local STIFFNESS = 170
 local DAMPING = 26
@@ -1119,9 +1120,12 @@ local function getModelMass(model)
 	return mass
 end
 
-local function updateCharacter(character, targetX, targetY, dt)
+local function updateCharacter(character, inputX, inputY, dt)
 	local characterMass = getModelMass(character.instance)
 	local onGround = isOnGround(character.instance)
+
+	local targetX = TARGET_SPEED * inputX
+	local targetY = TARGET_SPEED * inputY
 
 	accumulatedTime = accumulatedTime + dt
 
@@ -1206,10 +1210,9 @@ RunService.Heartbeat:Connect(function(dt)
 		local cameraLook = Workspace.CurrentCamera.CFrame.lookVector
 		local cameraAngle = math.atan2(cameraLook.x, cameraLook.z)
 
-		local absoluteDirection = (CFrame.Angles(0, cameraAngle, 0) * CFrame.new(relativeDirection)).p
-		local movement = absoluteDirection.unit * dt
+		local direction = (CFrame.Angles(0, cameraAngle, 0) * CFrame.new(relativeDirection)).p.unit
 
-		updateCharacter(character, movement.X * 2000, movement.Z * 2000, dt)
+		updateCharacter(character, direction.X, direction.Z, dt)
 	else
 		updateCharacter(character, 0, 0, dt)
 	end
