@@ -34,18 +34,18 @@
 		<Item class="Camera" referent="RBX3756E04643664949B917E8F0A9963824">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-121.166382</X>
-					<Y>27.3823605</Y>
-					<Z>15.3704615</Z>
-					<R00>0.432132959</R00>
-					<R01>0.522464275</R01>
-					<R02>-0.735045731</R02>
+					<X>-121.345825</X>
+					<Y>27.2508926</Y>
+					<Z>15.1391087</Z>
+					<R00>0.275689512</R00>
+					<R01>0.493713617</R01>
+					<R02>-0.824767947</R02>
 					<R10>-0</R10>
-					<R11>0.815078378</R11>
-					<R12>0.57935077</R12>
-					<R20>0.901809931</R20>
-					<R21>-0.250356555</R21>
-					<R22>0.352222204</R22>
+					<R11>0.858019114</R11>
+					<R12>0.513617933</R12>
+					<R20>0.961246848</R20>
+					<R21>-0.141599074</R21>
+					<R22>0.236546814</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
@@ -858,6 +858,137 @@ gcLgc4RKxr21zq2UlJSM]]></BinaryString>
 			<string name="Name">ReplicatedFirst</string>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
+		<Item class="Folder" referent="RBXD9E6F44205984D199440F9BE9975D54D">
+			<Properties>
+				<string name="Name">CharacterControllerCore</string>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+			<Item class="ModuleScript" referent="RBXC6CC3305EF394458B97DB6AADC6286D3">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">stepSpring</string>
+					<string name="ScriptGuid">{FAD96BEF-EBE2-454F-9434-38886BFE640D}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+	Steps forward a spring one step. Handles rounding errors for us.
+
+	This function is similar to React Motion's 'stepper' function:
+	https://github.com/chenglou/react-motion/blob/167c1d19c02c47af64c8c07aeee760d9b3c7559a/src/stepper.js
+
+	It's based off of the simple Damped Harmonic Motion equation:
+
+		x" + cx' + kx = 0
+		x" = -cx' - kx
+
+	We simplify objects to have a mass of 1.
+]]
+
+return function(framerate, position, velocity, destination, stiffness, damping, precision)
+	local displacement = position - destination
+	local springForce = -stiffness * displacement
+	local dampForce = -damping * velocity
+
+	local acceleration = springForce + dampForce
+	local newVelocity = velocity + acceleration * framerate
+	local newPosition = position + velocity * framerate
+
+	-- This allows us to put the simulation to sleep once it reaches its goal.
+	if math.abs(newVelocity) < precision and math.abs(destination - newPosition) < precision then
+		return destination, 0
+	end
+
+	return newPosition, newVelocity
+end]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXDD46CFB35A804F8AA31CF84427911BE7">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">DebugHandle</string>
+					<string name="ScriptGuid">{A7104B16-BBF0-491B-846B-2F5505F6C74D}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+	Renders points in the world for debugging things.
+
+	Usually used when dealing with finnicky 3D math.
+]]
+
+local anchorPoint
+local function init()
+	anchorPoint = Instance.new("Part")
+	anchorPoint.Name = "Graphical Debug Anchor"
+	anchorPoint.Anchored = true
+	anchorPoint.CanCollide = false
+	anchorPoint.Size = Vector3.new(1, 1, 1)
+	anchorPoint.CFrame = CFrame.new(Vector3.new(0, 0, 0))
+	anchorPoint.Transparency = 1
+	anchorPoint.Parent = game.Workspace
+end
+
+local DebugHandle = {}
+DebugHandle.__index = DebugHandle
+
+function DebugHandle.new(color)
+	color = color or Color3.new(0, 0, 1)
+
+	if not anchorPoint then
+		init()
+	end
+
+	local instance = Instance.new("SphereHandleAdornment")
+	instance.Color3 = color
+	instance.ZIndex = 1
+	instance.Name = "Debug Handle"
+	instance.AlwaysOnTop = true
+	instance.Radius = 0.3
+	instance.Adornee = anchorPoint
+	instance.Parent = anchorPoint
+
+	return setmetatable({
+		instance = instance,
+	}, DebugHandle)
+end
+
+function DebugHandle:move(pos)
+	if pos then
+		self.instance.Visible = true
+		self.instance.CFrame = CFrame.new(pos)
+	else
+		self.instance.Visible = false
+	end
+end
+
+function DebugHandle:destroy()
+	self.instance:Destroy()
+end
+
+return DebugHandle]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX569DB0F8119E477EACDDDE2360E9D1D7">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">ApiSpec</string>
+					<string name="ScriptGuid">{C4F3D9DC-DEF9-400A-99D7-610BFC514921}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+	Defines the objects that should be created (server) or to wait to exist
+	(client) for facilitating client-server communication.
+
+	The individual client/server code should handle actually interacting with
+	this file, which should just serve as a specification.
+]]
+
+local ApiSpec = {
+	clientMethods = {
+		"requestMakeCharacter",
+	},
+}
+
+return ApiSpec]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
 	</Item>
 	<Item class="TweenService" referent="RBX4805826D746B439AA46044449E3F496D">
 		<Properties>
@@ -939,16 +1070,20 @@ gcLgc4RKxr21zq2UlJSM]]></BinaryString>
 					<bool name="Disabled">false</bool>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">CharacterControllerClient</string>
-					<string name="ScriptGuid"></string>
+					<string name="ScriptGuid">{3686F631-6A95-4938-9B23-6AF755659F43}</string>
 					<ProtectedString name="Source"><![CDATA[local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
-local stepSpring = require(ReplicatedStorage.CharacterControllerCore.stepSpring)
+local stepSpring = require(ReplicatedFirst.CharacterControllerCore.stepSpring)
 
 local Input = require(script.Input)
-local makeCharacter = require(script.makeCharacter)
+local Api = require(script.Api)
+
+while not Players.LocalPlayer do
+	wait()
+end
 
 local FRAMERATE = 1 / 240
 local STIFFNESS = 170
@@ -960,28 +1095,7 @@ local accumulatedTime = 0
 local currentAccelerationX = 0
 local currentAccelerationY = 0
 
-local aligner = Instance.new("AlignOrientation")
-aligner.RigidityEnabled = true
-
-local attachment0 = Instance.new("Attachment")
-attachment0.Name = "Align0"
-attachment0.Axis = Vector3.new(0, 1, 0)
-attachment0.SecondaryAxis = Vector3.new(-1, 0, 0)
-
-local attachment1 = Instance.new("Attachment")
-attachment1.Name = "Align1"
-
-aligner.Attachment0 = attachment0
-aligner.Attachment1 = attachment1
-
-local targetOrientPart = Instance.new("Part")
-targetOrientPart.Anchored = true
-targetOrientPart.Size = Vector3.new(1, 1, 1)
-targetOrientPart.Color = Color3.new(1, 1, 0)
-targetOrientPart.CanCollide = false
-targetOrientPart.Transparency = 0.95
-
-attachment1.Parent = targetOrientPart
+local character = Api.requestMakeCharacter()
 
 local function isOnGround(characterInstance)
 	local startPos = characterInstance.PrimaryPart.Position
@@ -1005,14 +1119,14 @@ local function getModelMass(model)
 	return mass
 end
 
-local function updateCharacter(characterInstance, targetX, targetY, dt)
-	local characterMass = getModelMass(characterInstance)
-	local onGround = isOnGround(characterInstance)
+local function updateCharacter(character, targetX, targetY, dt)
+	local characterMass = getModelMass(character.instance)
+	local onGround = isOnGround(character.instance)
 
 	accumulatedTime = accumulatedTime + dt
 
-	local currentX = characterInstance.PrimaryPart.Velocity.X
-	local currentY = characterInstance.PrimaryPart.Velocity.Z
+	local currentX = character.instance.PrimaryPart.Velocity.X
+	local currentY = character.instance.PrimaryPart.Velocity.Z
 
 	while accumulatedTime >= FRAMERATE do
 		accumulatedTime = accumulatedTime - FRAMERATE
@@ -1039,7 +1153,7 @@ local function updateCharacter(characterInstance, targetX, targetY, dt)
 	end
 
 	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
-	characterInstance.BottomSphere.Color = bottomColor
+	character.instance.BottomSphere.Color = bottomColor
 
 	if onGround then
 		local up
@@ -1049,26 +1163,19 @@ local function updateCharacter(characterInstance, targetX, targetY, dt)
 			up = 0
 		end
 
-		characterInstance.PrimaryPart.VectorForce.Force = Vector3.new(
+		character.vectorForce.Force = Vector3.new(
 			currentAccelerationX * characterMass,
 			up,
 			currentAccelerationY * characterMass
 		)
 	else
-		characterInstance.PrimaryPart.VectorForce.Force = Vector3.new(0, 0, 0)
+		character.vectorForce.Force = Vector3.new(0, 0, 0)
 	end
 
 	local velocity = Vector3.new(currentX, 0, currentY)
 
-	targetOrientPart.CFrame = CFrame.new(characterInstance.PrimaryPart.Position + velocity / 3)
+	character.targetOrientPart.CFrame = CFrame.new(character.instance.PrimaryPart.Position + velocity / 3)
 end
-
-local character = makeCharacter(Players.LocalPlayer)
-character.instance.Parent = Workspace
-
-targetOrientPart.Parent = character.instance
-attachment0.Parent = character.instance.PrimaryPart
-aligner.Parent = character.instance.PrimaryPart
 
 Workspace.CurrentCamera.CameraSubject = character.instance.PrimaryPart
 Workspace.CurrentCamera.CameraType = Enum.CameraType.Track
@@ -1102,9 +1209,9 @@ RunService.Heartbeat:Connect(function(dt)
 		local absoluteDirection = (CFrame.Angles(0, cameraAngle, 0) * CFrame.new(relativeDirection)).p
 		local movement = absoluteDirection.unit * dt
 
-		updateCharacter(character.instance, movement.X * 2000, movement.Z * 2000, dt)
+		updateCharacter(character, movement.X * 2000, movement.Z * 2000, dt)
 	else
-		updateCharacter(character.instance, 0, 0, dt)
+		updateCharacter(character, 0, 0, dt)
 	end
 end)
 
@@ -1115,7 +1222,7 @@ Input.start()]]></ProtectedString>
 					<Properties>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">Input</string>
-						<string name="ScriptGuid"></string>
+						<string name="ScriptGuid">{E6F4518C-DE0D-42A4-B30C-97D68E7624B4}</string>
 						<ProtectedString name="Source"><![CDATA[local UserInputService = game:GetService("UserInputService")
 
 local Input = {
@@ -1144,25 +1251,29 @@ return Input]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBX32D59EA829124AD3A1FB60295E1C1E1F">
+				<Item class="ModuleScript" referent="RBX3F65CFE4EF7B41C69672602DE6B260E8">
 					<Properties>
 						<Content name="LinkedSource"><null></null></Content>
-						<string name="Name">makeCharacter</string>
-						<string name="ScriptGuid"></string>
-						<ProtectedString name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
+						<string name="Name">Api</string>
+						<string name="ScriptGuid">{E915CFAA-A63A-426C-85D8-913178E817AA}</string>
+						<ProtectedString name="Source"><![CDATA[local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local function makeCharacter(player)
-	local instance = StarterPlayer.StarterCharacter:Clone()
-	instance.Name = player.Name
+local ApiSpec = require(ReplicatedFirst.CharacterControllerCore.ApiSpec)
 
-	local character = {
-		instance = instance,
-	}
+local apiObjects = ReplicatedStorage:WaitForChild("CharacterControllerApi")
 
-	return character
+local Api = {}
+
+for _, methodName in ipairs(ApiSpec.clientMethods) do
+	local object = apiObjects:WaitForChild(methodName)
+
+	Api[methodName] = function(...)
+		return object:InvokeServer(...)
+	end
 end
 
-return makeCharacter]]></ProtectedString>
+return Api]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
@@ -1388,45 +1499,6 @@ return makeCharacter]]></ProtectedString>
 						<Z>3</Z>
 					</Vector3>
 				</Properties>
-				<Item class="VectorForce" referent="RBXA2C27CAE3E5B419BAF5EFC8D646C3E37">
-					<Properties>
-						<bool name="ApplyAtCenterOfMass">true</bool>
-						<Ref name="Attachment0">RBX3FD4E55275654478801BC380CCAE42CC</Ref>
-						<Ref name="Attachment1">null</Ref>
-						<int name="Color">23</int>
-						<bool name="Enabled">true</bool>
-						<Vector3 name="Force">
-							<X>0</X>
-							<Y>0</Y>
-							<Z>0</Z>
-						</Vector3>
-						<string name="Name">VectorForce</string>
-						<token name="RelativeTo">2</token>
-						<BinaryString name="Tags"></BinaryString>
-						<bool name="Visible">true</bool>
-					</Properties>
-				</Item>
-				<Item class="Attachment" referent="RBX3FD4E55275654478801BC380CCAE42CC">
-					<Properties>
-						<CoordinateFrame name="CFrame">
-							<X>0</X>
-							<Y>0</Y>
-							<Z>0</Z>
-							<R00>0</R00>
-							<R01>0</R01>
-							<R02>-1</R02>
-							<R10>0</R10>
-							<R11>1</R11>
-							<R12>0</R12>
-							<R20>1</R20>
-							<R21>0</R21>
-							<R22>0</R22>
-						</CoordinateFrame>
-						<string name="Name">Attachment0</string>
-						<BinaryString name="Tags"></BinaryString>
-						<bool name="Visible">false</bool>
-					</Properties>
-				</Item>
 			</Item>
 			<Item class="Part" referent="RBX039BD7745E8749789DA55B42FED71F7B">
 				<Properties>
@@ -1665,10 +1737,125 @@ return makeCharacter]]></ProtectedString>
 				<bool name="Disabled">false</bool>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">CharacterControllerServer</string>
-				<string name="ScriptGuid"></string>
-				<ProtectedString name="Source">-- There&apos;s no server component yet!</ProtectedString>
+				<string name="ScriptGuid">{8E5F4BF9-62BB-4477-AB9E-F3237FAC7EB9}</string>
+				<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+
+local makeCharacter = require(script.makeCharacter)
+local Api = require(script.Api)
+
+local ApiImplementation = {}
+
+function ApiImplementation.requestMakeCharacter(player)
+	-- TODO: Validation
+	-- TODO: Mark ownership of character to this player
+
+	local character = makeCharacter(player.Name)
+	character.instance.Parent = Workspace
+
+	return character
+end
+
+Api.implement(ApiImplementation)]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
+			<Item class="ModuleScript" referent="RBX2B09E4291E6B4840A4733D9E4F8F0EE3">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">makeCharacter</string>
+					<string name="ScriptGuid">{843FB438-65C0-428A-B761-E23CD0511AE5}</string>
+					<ProtectedString name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
+
+local function makeCharacter(name)
+	name = name or "Unnamed Character"
+
+	local instance = StarterPlayer.StarterCharacter:Clone()
+	instance.Name = name
+
+	local targetOrientPart = Instance.new("Part")
+	targetOrientPart.Anchored = true
+	targetOrientPart.Size = Vector3.new(1, 1, 1)
+	targetOrientPart.Color = Color3.new(1, 1, 0)
+	targetOrientPart.CanCollide = false
+	targetOrientPart.Transparency = 0.95
+	targetOrientPart.Parent = instance
+
+	local orient0 = Instance.new("Attachment")
+	orient0.Name = "Align0"
+	orient0.Axis = Vector3.new(0, 1, 0)
+	orient0.SecondaryAxis = Vector3.new(-1, 0, 0)
+	orient0.Parent = instance.PrimaryPart
+
+	local orient1 = Instance.new("Attachment")
+	orient1.Name = "Align1"
+	orient1.Parent = targetOrientPart
+
+	local aligner = Instance.new("AlignOrientation")
+	aligner.RigidityEnabled = true
+	aligner.Attachment0 = orient0
+	aligner.Attachment1 = orient1
+	aligner.Parent = instance.PrimaryPart
+
+	local velocity0 = Instance.new("Attachment")
+	velocity0.Name = "Velocity0"
+	velocity0.Parent = instance.PrimaryPart
+
+	local vectorForce = Instance.new("VectorForce")
+	vectorForce.ApplyAtCenterOfMass = true
+	vectorForce.Force = Vector3.new(0, 0, 0)
+	vectorForce.RelativeTo = Enum.ActuatorRelativeTo.World
+	vectorForce.Attachment0 = velocity0
+	vectorForce.Parent = instance.PrimaryPart
+
+	return {
+		instance = instance,
+		vectorForce = vectorForce,
+		targetOrientPart = targetOrientPart,
+	}
+end
+
+return makeCharacter]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX4936A2C7631446F9969D8E25332BEC23">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Api</string>
+					<string name="ScriptGuid">{6B5B89CB-8863-4147-AB5C-8140B21FE761}</string>
+					<ProtectedString name="Source"><![CDATA[local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local ApiSpec = require(ReplicatedFirst.CharacterControllerCore.ApiSpec)
+
+local apiObjects = Instance.new("Folder")
+apiObjects.Name = "CharacterControllerApi"
+apiObjects.Parent = ReplicatedStorage
+
+local Api = {}
+
+function Api.implement(implementation)
+	for _, methodName in ipairs(ApiSpec.clientMethods) do
+		local object = Instance.new("RemoteFunction")
+		object.Name = methodName
+
+		local serverMethod = implementation[methodName]
+
+		if not serverMethod then
+			error(string.format("Server is missing implementation for client method %q", methodName))
+		end
+
+		object.OnServerInvoke = function(...)
+			return serverMethod(...)
+		end
+
+		object.Parent = apiObjects
+	end
+end
+
+return Api]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
 		</Item>
 	</Item>
 	<Item class="ServerStorage" referent="RBX35F51B90CA404053A576419B6DC6F340">
@@ -1682,110 +1869,31 @@ return makeCharacter]]></ProtectedString>
 			<string name="Name">ReplicatedStorage</string>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Folder" referent="RBX33B47447ABA742448A1227B109325045">
+		<Item class="Folder" referent="RBXE287ECF2B919420E9E36636D18ED9544">
 			<Properties>
 				<string name="Name">CharacterControllerCore</string>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBX4F53019C53E344278DCAE6F48C793582">
+			<Item class="ModuleScript" referent="RBXCDF8DA4EB7744442A9A682D9B96EF01F">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">stepSpring</string>
-					<string name="ScriptGuid"></string>
+					<string name="Name">ApiSpec</string>
+					<string name="ScriptGuid">{C678347B-A5E0-48A7-8F00-A9FEA2B4AB4F}</string>
 					<ProtectedString name="Source"><![CDATA[--[[
-	Steps forward a spring one step. Handles rounding errors for us.
+	Defines the objects that should be created (server) or to wait to exist
+	(client) for facilitating client-server communication.
 
-	This function is similar to React Motion's 'stepper' function:
-	https://github.com/chenglou/react-motion/blob/167c1d19c02c47af64c8c07aeee760d9b3c7559a/src/stepper.js
-
-	It's based off of the simple Damped Harmonic Motion equation:
-
-		x" + cx' + kx = 0
-		x" = -cx' - kx
-
-	We simplify objects to have a mass of 1.
+	The individual client/server code should handle actually interacting with
+	this file, which should just serve as a specification.
 ]]
 
-return function(framerate, position, velocity, destination, stiffness, damping, precision)
-	local displacement = position - destination
-	local springForce = -stiffness * displacement
-	local dampForce = -damping * velocity
+local ApiSpec = {
+	clientMethods = {
+		"requestMakeCharacter",
+	},
+}
 
-	local acceleration = springForce + dampForce
-	local newVelocity = velocity + acceleration * framerate
-	local newPosition = position + velocity * framerate
-
-	-- This allows us to put the simulation to sleep once it reaches its goal.
-	if math.abs(newVelocity) < precision and math.abs(destination - newPosition) < precision then
-		return destination, 0
-	end
-
-	return newPosition, newVelocity
-end]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXAAC863A8F8DA45FE8470F47B99078E8E">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">DebugHandle</string>
-					<string name="ScriptGuid"></string>
-					<ProtectedString name="Source"><![CDATA[--[[
-	Renders points in the world for debugging things.
-
-	Usually used when dealing with finnicky 3D math.
-]]
-
-local anchorPoint
-local function init()
-	anchorPoint = Instance.new("Part")
-	anchorPoint.Name = "Graphical Debug Anchor"
-	anchorPoint.Anchored = true
-	anchorPoint.CanCollide = false
-	anchorPoint.Size = Vector3.new(1, 1, 1)
-	anchorPoint.CFrame = CFrame.new(Vector3.new(0, 0, 0))
-	anchorPoint.Transparency = 1
-	anchorPoint.Parent = game.Workspace
-end
-
-local DebugHandle = {}
-DebugHandle.__index = DebugHandle
-
-function DebugHandle.new(color)
-	color = color or Color3.new(0, 0, 1)
-
-	if not anchorPoint then
-		init()
-	end
-
-	local instance = Instance.new("SphereHandleAdornment")
-	instance.Color3 = color
-	instance.ZIndex = 1
-	instance.Name = "Debug Handle"
-	instance.AlwaysOnTop = true
-	instance.Radius = 0.3
-	instance.Adornee = anchorPoint
-	instance.Parent = anchorPoint
-
-	return setmetatable({
-		instance = instance,
-	}, DebugHandle)
-end
-
-function DebugHandle:move(pos)
-	if pos then
-		self.instance.Visible = true
-		self.instance.CFrame = CFrame.new(pos)
-	else
-		self.instance.Visible = false
-	end
-end
-
-function DebugHandle:destroy()
-	self.instance:Destroy()
-end
-
-return DebugHandle]]></ProtectedString>
+return ApiSpec]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>

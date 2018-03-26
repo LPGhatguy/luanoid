@@ -46,14 +46,14 @@ local function getModelMass(model)
 	return mass
 end
 
-local function updateCharacter(characterInstance, targetX, targetY, dt)
-	local characterMass = getModelMass(characterInstance)
-	local onGround = isOnGround(characterInstance)
+local function updateCharacter(character, targetX, targetY, dt)
+	local characterMass = getModelMass(character.instance)
+	local onGround = isOnGround(character.instance)
 
 	accumulatedTime = accumulatedTime + dt
 
-	local currentX = characterInstance.PrimaryPart.Velocity.X
-	local currentY = characterInstance.PrimaryPart.Velocity.Z
+	local currentX = character.instance.PrimaryPart.Velocity.X
+	local currentY = character.instance.PrimaryPart.Velocity.Z
 
 	while accumulatedTime >= FRAMERATE do
 		accumulatedTime = accumulatedTime - FRAMERATE
@@ -80,7 +80,7 @@ local function updateCharacter(characterInstance, targetX, targetY, dt)
 	end
 
 	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
-	characterInstance.BottomSphere.Color = bottomColor
+	character.instance.BottomSphere.Color = bottomColor
 
 	if onGround then
 		local up
@@ -90,18 +90,18 @@ local function updateCharacter(characterInstance, targetX, targetY, dt)
 			up = 0
 		end
 
-		characterInstance.PrimaryPart.VectorForce.Force = Vector3.new(
+		character.vectorForce.Force = Vector3.new(
 			currentAccelerationX * characterMass,
 			up,
 			currentAccelerationY * characterMass
 		)
 	else
-		characterInstance.PrimaryPart.VectorForce.Force = Vector3.new(0, 0, 0)
+		character.vectorForce.Force = Vector3.new(0, 0, 0)
 	end
 
 	local velocity = Vector3.new(currentX, 0, currentY)
 
-	character.targetOrientPart.CFrame = CFrame.new(characterInstance.PrimaryPart.Position + velocity / 3)
+	character.targetOrientPart.CFrame = CFrame.new(character.instance.PrimaryPart.Position + velocity / 3)
 end
 
 Workspace.CurrentCamera.CameraSubject = character.instance.PrimaryPart
@@ -136,9 +136,9 @@ RunService.Heartbeat:Connect(function(dt)
 		local absoluteDirection = (CFrame.Angles(0, cameraAngle, 0) * CFrame.new(relativeDirection)).p
 		local movement = absoluteDirection.unit * dt
 
-		updateCharacter(character.instance, movement.X * 2000, movement.Z * 2000, dt)
+		updateCharacter(character, movement.X * 2000, movement.Z * 2000, dt)
 	else
-		updateCharacter(character.instance, 0, 0, dt)
+		updateCharacter(character, 0, 0, dt)
 	end
 end)
 
