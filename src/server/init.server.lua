@@ -1,6 +1,8 @@
 local Workspace = game:GetService("Workspace")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
-local makeCharacter = require(script.makeCharacter)
+local makeCharacter = require(ReplicatedFirst.CharacterControllerCore.makeCharacter)
+
 local Api = require(script.Api)
 
 local ApiImplementation = {}
