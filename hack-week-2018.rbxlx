@@ -9,7 +9,7 @@
 			<double name="DistributedGameTime">0</double>
 			<bool name="ExpSolverEnabled_Replicate">true</bool>
 			<float name="FallenPartsDestroyHeight">-500</float>
-			<bool name="FilteringEnabled">false</bool>
+			<bool name="FilteringEnabled">true</bool>
 			<float name="Gravity">196.199997</float>
 			<CoordinateFrame name="ModelInPrimary">
 				<X>0</X>
@@ -34,26 +34,26 @@
 		<Item class="Camera" referent="RBX3756E04643664949B917E8F0A9963824">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-121.599274</X>
-					<Y>26.8318748</Y>
-					<Z>14.7591896</Z>
-					<R00>0.0489047468</R00>
-					<R01>0.303747773</R01>
-					<R02>-0.951496601</R02>
-					<R10>-0</R10>
-					<R11>0.95263654</R11>
-					<R12>0.30411163</R12>
-					<R20>0.998803496</R20>
-					<R21>-0.0148725025</R21>
-					<R22>0.0465884432</R22>
+					<X>-118.618484</X>
+					<Y>26.191349</Y>
+					<Z>14.7887039</Z>
+					<R00>0.146136612</R00>
+					<R01>0.435294271</R01>
+					<R02>-0.88834846</R02>
+					<R10>3.72529074e-09</R10>
+					<R11>0.897988915</R11>
+					<R12>0.440018117</R12>
+					<R20>0.989264429</R20>
+					<R21>-0.0643027574</R21>
+					<R22>0.131229043</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<CoordinateFrame name="Focus">
-					<X>-119.696281</X>
-					<Y>26.2236519</Y>
-					<Z>14.6660128</Z>
+					<X>-116.841789</X>
+					<Y>25.3113136</Y>
+					<Z>14.5262461</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -1087,8 +1087,12 @@ end
 
 local TARGET_SPEED = 24
 local FRAMERATE = 1 / 240
+
 local STIFFNESS = 170
 local DAMPING = 26
+local AIR_STIFFNESS = 5
+local AIR_DAMPING = 4
+
 local PRECISION = 0.001
 local GROUND_TOLERANCE = 0.15
 
