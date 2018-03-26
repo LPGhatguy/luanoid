@@ -1,12 +1,16 @@
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
-local stepSpring = require(ReplicatedStorage.CharacterControllerCore.stepSpring)
+local stepSpring = require(ReplicatedFirst.CharacterControllerCore.stepSpring)
 
 local Input = require(script.Input)
-local makeCharacter = require(script.makeCharacter)
+local Api = require(script.Api)
+
+while not Players.LocalPlayer do
+	wait()
+end
 
 local FRAMERATE = 1 / 240
 local STIFFNESS = 170
@@ -18,28 +22,7 @@ local accumulatedTime = 0
 local currentAccelerationX = 0
 local currentAccelerationY = 0
 
-local aligner = Instance.new("AlignOrientation")
-aligner.RigidityEnabled = true
-
-local attachment0 = Instance.new("Attachment")
-attachment0.Name = "Align0"
-attachment0.Axis = Vector3.new(0, 1, 0)
-attachment0.SecondaryAxis = Vector3.new(-1, 0, 0)
-
-local attachment1 = Instance.new("Attachment")
-attachment1.Name = "Align1"
-
-aligner.Attachment0 = attachment0
-aligner.Attachment1 = attachment1
-
-local targetOrientPart = Instance.new("Part")
-targetOrientPart.Anchored = true
-targetOrientPart.Size = Vector3.new(1, 1, 1)
-targetOrientPart.Color = Color3.new(1, 1, 0)
-targetOrientPart.CanCollide = false
-targetOrientPart.Transparency = 0.95
-
-attachment1.Parent = targetOrientPart
+local character = Api.requestMakeCharacter()
 
 local function isOnGround(characterInstance)
 	local startPos = characterInstance.PrimaryPart.Position
@@ -118,15 +101,8 @@ local function updateCharacter(characterInstance, targetX, targetY, dt)
 
 	local velocity = Vector3.new(currentX, 0, currentY)
 
-	targetOrientPart.CFrame = CFrame.new(characterInstance.PrimaryPart.Position + velocity / 3)
+	character.targetOrientPart.CFrame = CFrame.new(characterInstance.PrimaryPart.Position + velocity / 3)
 end
-
-local character = makeCharacter(Players.LocalPlayer)
-character.instance.Parent = Workspace
-
-targetOrientPart.Parent = character.instance
-attachment0.Parent = character.instance.PrimaryPart
-aligner.Parent = character.instance.PrimaryPart
 
 Workspace.CurrentCamera.CameraSubject = character.instance.PrimaryPart
 Workspace.CurrentCamera.CameraType = Enum.CameraType.Track

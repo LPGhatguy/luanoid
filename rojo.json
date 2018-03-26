@@ -3,15 +3,15 @@
   "servePort": 8000,
   "partitions": {
     "core": {
-      "path": "core",
-      "target": "ReplicatedStorage.CharacterControllerCore"
+      "path": "src/core",
+      "target": "ReplicatedFirst.CharacterControllerCore"
     },
     "server": {
-      "path": "server",
+      "path": "src/server",
       "target": "ServerScriptService.CharacterControllerServer"
     },
     "client": {
-      "path": "client",
+      "path": "src/client",
       "target": "StarterPlayer.StarterPlayerScripts.CharacterControllerClient"
     }
   }
