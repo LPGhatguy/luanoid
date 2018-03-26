@@ -7,6 +7,7 @@ local function makeCharacter(name)
 	instance.Name = name
 
 	local targetOrientPart = Instance.new("Part")
+	targetOrientPart.Name = "OrientationTarget"
 	targetOrientPart.Anchored = true
 	targetOrientPart.Size = Vector3.new(1, 1, 1)
 	targetOrientPart.Color = Color3.new(1, 1, 0)
