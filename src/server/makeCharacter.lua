@@ -41,10 +41,15 @@ local function makeCharacter(name)
 	vectorForce.Attachment0 = velocity0
 	vectorForce.Parent = instance.PrimaryPart
 
+	local avatarModel = instance:WaitForChild("Avatar")
+	local avatarRoot = avatarModel.PrimaryPart
+
 	return {
 		instance = instance,
 		vectorForce = vectorForce,
 		targetOrientPart = targetOrientPart,
+		avatarModel = avatarModel,
+		avatarRoot = avatarRoot
 	}
 end
 

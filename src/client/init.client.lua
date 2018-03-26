@@ -104,8 +104,15 @@ local function updateCharacter(character, inputX, inputY, dt)
 	end
 
 	local velocity = Vector3.new(currentX, 0, currentY)
+	local speed = velocity.Magnitude
 
 	character.targetOrientPart.CFrame = CFrame.new(character.instance.PrimaryPart.Position + velocity / 3)
+
+	if speed > 0.1 then
+		local velocityRot = CFrame.new(Vector3.new(), velocity)
+		character.avatarRoot.CFrame = velocityRot + character.avatarRoot.Position
+	end
+
 end
 
 Workspace.CurrentCamera.CameraSubject = character.instance.PrimaryPart
