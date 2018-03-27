@@ -2,6 +2,7 @@ local Workspace = game:GetService("Workspace")
 
 local stepSpring = require(script.Parent.stepSpring)
 local getModelMass = require(script.Parent.getModelMass)
+local DebugHandle = require(script.Parent.DebugHandle)
 
 local TARGET_SPEED = 24
 local FRAMERATE = 1 / 240
@@ -22,14 +23,15 @@ end
 
 -- TODO: more appropriate cast distribution algorithm
 -- https://stackoverflow.com/a/28572551/367100
-function radius(k,n,b)
+local function radius(k,n,b)
 	if k > n - b then
 		return 1 -- put on the boundary
 	else
 		return math.sqrt(k - 1/2)/math.sqrt(n - (b + 1)/2) -- apply square root
 	end
 end
-function sunflower(n, alpha) --  example: n=500, alpha=2
+
+local function sunflower(n, alpha) --  example: n=500, alpha=2
 	local b = math.ceil(alpha*math.sqrt(n)) -- number of boundary points
 	local phi = (math.sqrt(5) + 1)/2 -- golden ratio
 	local i = 1
@@ -44,14 +46,10 @@ function sunflower(n, alpha) --  example: n=500, alpha=2
 	end
 end
 
-function createHandles(n)
+local function createHandles(n)
 	local handles = {}
 	for i = 1, n do
-		local adorn = Instance.new("BoxHandleAdornment")
-		adorn.Size = Vector3.new(0.5, 0.5, 0.5)
-		adorn.Adornee = workspace.Terrain
-		adorn.Parent = workspace.Terrain
-		handles[i] = adorn
+		handles[i] = DebugHandle.new()
 	end
 	return handles
 end
@@ -88,8 +86,9 @@ function Simulation:castCylinder(vector)
 	for i, x, z in sunflower(self.castCount, 2) do
 		local p = start.p + Vector3.new(x*radius, 0, z*radius)
 		local ray = Ray.new(p, vector)
-		local part, point, normal = workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
-		adorns[i].CFrame = CFrame.new(point)
+		local part, point, normal = Workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
+
+		adorns[i]:move(point)
 		print(i)
 	end
 end

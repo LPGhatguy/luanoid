@@ -34,18 +34,18 @@
 		<Item class="Camera" referent="RBX3756E04643664949B917E8F0A9963824">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-45.549202</X>
-					<Y>29.6387329</Y>
-					<Z>23.2928753</Z>
-					<R00>-0.228315651</R00>
-					<R01>0.61678642</R01>
-					<R02>-0.753290474</R02>
+					<X>-45.548317</X>
+					<Y>29.5390606</Y>
+					<Z>24.2545872</Z>
+					<R00>0.374640346</R00>
+					<R01>0.541172326</R01>
+					<R02>-0.752846062</R02>
 					<R10>-0</R10>
-					<R11>0.773726881</R11>
-					<R12>0.633519411</R12>
-					<R20>0.973587275</R20>
-					<R21>0.144642398</R21>
-					<R22>-0.176653922</R22>
+					<R11>0.811982572</R11>
+					<R12>0.583681762</R12>
+					<R20>0.927170217</R20>
+					<R21>-0.218670741</R21>
+					<R22>0.304201424</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
@@ -2536,71 +2536,23 @@ gO4=]]></BinaryString>
 			<string name="Name">ReplicatedFirst</string>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Folder" referent="RBXD9E6F44205984D199440F9BE9975D54D">
+		<Item class="Folder" referent="RBXE3D9C138DEA44134840FC0C5235DFDF9">
 			<Properties>
 				<string name="Name">CharacterControllerCore</string>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBXC6CC3305EF394458B97DB6AADC6286D3">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">stepSpring</string>
-					<string name="ScriptGuid">{FAD96BEF-EBE2-454F-9434-38886BFE640D}</string>
-					<ProtectedString name="Source"><![CDATA[--[[
-	Steps forward a spring one step. Handles rounding errors for us.
-
-	This function is similar to React Motion's 'stepper' function:
-	https://github.com/chenglou/react-motion/blob/167c1d19c02c47af64c8c07aeee760d9b3c7559a/src/stepper.js
-
-	It's based off of the simple Damped Harmonic Motion equation:
-
-		x" + cx' + kx = 0
-		x" = -cx' - kx
-
-	We simplify objects to have a mass of 1.
-]]
-
-return function(framerate, position, velocity, destination, stiffness, damping, precision)
-	local displacement = position - destination
-	local springForce = -stiffness * displacement
-	local dampForce = -damping * velocity
-
-	local acceleration = springForce + dampForce
-	local newVelocity = velocity + acceleration * framerate
-	local newPosition = position + velocity * framerate
-
-	-- This allows us to put the simulation to sleep once it reaches its goal.
-	if math.abs(newVelocity) < precision and math.abs(destination - newPosition) < precision then
-		return destination, 0
-	end
-
-	return newPosition, newVelocity
-end]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXDD46CFB35A804F8AA31CF84427911BE7">
+			<Item class="ModuleScript" referent="RBXFE32B88486B445DBA1B0A443DA7BEB87">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">DebugHandle</string>
-					<string name="ScriptGuid">{A7104B16-BBF0-491B-846B-2F5505F6C74D}</string>
+					<string name="ScriptGuid">{8C3167A0-D6D5-4964-AA0B-24B83E56A9B3}</string>
 					<ProtectedString name="Source"><![CDATA[--[[
 	Renders points in the world for debugging things.
 
 	Usually used when dealing with finnicky 3D math.
 ]]
 
-local anchorPoint
-local function init()
-	anchorPoint = Instance.new("Part")
-	anchorPoint.Name = "Graphical Debug Anchor"
-	anchorPoint.Anchored = true
-	anchorPoint.CanCollide = false
-	anchorPoint.Size = Vector3.new(1, 1, 1)
-	anchorPoint.CFrame = CFrame.new(Vector3.new(0, 0, 0))
-	anchorPoint.Transparency = 1
-	anchorPoint.Parent = game.Workspace
-end
+local Terrain = game:GetService("Workspace").Terrain
 
 local DebugHandle = {}
 DebugHandle.__index = DebugHandle
@@ -2608,18 +2560,14 @@ DebugHandle.__index = DebugHandle
 function DebugHandle.new(color)
 	color = color or Color3.new(0, 0, 1)
 
-	if not anchorPoint then
-		init()
-	end
-
 	local instance = Instance.new("SphereHandleAdornment")
 	instance.Color3 = color
 	instance.ZIndex = 1
 	instance.Name = "Debug Handle"
 	instance.AlwaysOnTop = true
-	instance.Radius = 0.3
-	instance.Adornee = anchorPoint
-	instance.Parent = anchorPoint
+	instance.Radius = 0.12
+	instance.Adornee = Terrain
+	instance.Parent = Terrain
 
 	return setmetatable({
 		instance = instance,
@@ -2643,34 +2591,11 @@ return DebugHandle]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX569DB0F8119E477EACDDDE2360E9D1D7">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">ApiSpec</string>
-					<string name="ScriptGuid">{C4F3D9DC-DEF9-400A-99D7-610BFC514921}</string>
-					<ProtectedString name="Source"><![CDATA[--[[
-	Defines the objects that should be created (server) or to wait to exist
-	(client) for facilitating client-server communication.
-
-	The individual client/server code should handle actually interacting with
-	this file, which should just serve as a specification.
-]]
-
-local ApiSpec = {
-	clientMethods = {
-		"requestMakeCharacter",
-	},
-}
-
-return ApiSpec]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXDDD54FD19F8244A2BE0322CF8CC06BD0">
+			<Item class="ModuleScript" referent="RBXB5E7A07CDD744E8285C4422BA15DB4CF">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">makeCharacter</string>
-					<string name="ScriptGuid">{87CF7304-5B24-461D-BF64-0AF143CAA575}</string>
+					<string name="ScriptGuid">{243B8C1F-9BAE-43A9-A551-0EFE311AFA66}</string>
 					<ProtectedString name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
 
 local function makeCharacter(name)
@@ -2731,38 +2656,39 @@ return makeCharacter]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX73A15BDF94074268A052D4BF3577CD66">
+			<Item class="ModuleScript" referent="RBXF79179EE42DF4AC1B49333C9FF692DB5">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">getModelMass</string>
-					<string name="ScriptGuid">{0A720223-C16F-488C-A281-CCD6273992BA}</string>
-					<ProtectedString name="Source"><![CDATA[local function getModelMass(model)
-	local mass = 0
+					<string name="Name">ApiSpec</string>
+					<string name="ScriptGuid">{C7AF68BE-8995-4A41-95CB-158247E08BA7}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+	Defines the objects that should be created (server) or to wait to exist
+	(client) for facilitating client-server communication.
 
-	for _, child in ipairs(model:GetChildren()) do
-		if child:IsA("BasePart") then
-			mass = mass + child:GetMass()
-		else
-			mass = mass + getModelMass(child)
-		end
-	end
+	The individual client/server code should handle actually interacting with
+	this file, which should just serve as a specification.
+]]
 
-	return mass
-end
+local ApiSpec = {
+	clientMethods = {
+		"requestMakeCharacter",
+	},
+}
 
-return getModelMass]]></ProtectedString>
+return ApiSpec]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX39E64DD59FBE439489D2D141B0C5677D">
+			<Item class="ModuleScript" referent="RBXE7E9D896CB5844B4B7CFDBFE22974188">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Simulation</string>
-					<string name="ScriptGuid">{82E3DC83-D169-4984-911B-1D4A7487F6BF}</string>
+					<string name="ScriptGuid">{93779248-7DE7-4B2E-908D-458238DA97B1}</string>
 					<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
 
 local stepSpring = require(script.Parent.stepSpring)
 local getModelMass = require(script.Parent.getModelMass)
+local DebugHandle = require(script.Parent.DebugHandle)
 
 local TARGET_SPEED = 24
 local FRAMERATE = 1 / 240
@@ -2781,20 +2707,76 @@ local function isOnGround(characterInstance)
 	return not not hit
 end
 
+-- TODO: more appropriate cast distribution algorithm
+-- https://stackoverflow.com/a/28572551/367100
+local function radius(k,n,b)
+	if k > n - b then
+		return 1 -- put on the boundary
+	else
+		return math.sqrt(k - 1/2)/math.sqrt(n - (b + 1)/2) -- apply square root
+	end
+end
+
+local function sunflower(n, alpha) --  example: n=500, alpha=2
+	local b = math.ceil(alpha*math.sqrt(n)) -- number of boundary points
+	local phi = (math.sqrt(5) + 1)/2 -- golden ratio
+	local i = 1
+	return function()
+		if i <= n then
+			i = i + 1
+			local r = radius(i, n, b)
+			local theta = 2*math.pi*i/(phi*phi)
+			return i - 1, r*math.cos(theta), r*math.sin(theta)
+		end
+		return
+	end
+end
+
+local function createHandles(n)
+	local handles = {}
+	for i = 1, n do
+		handles[i] = DebugHandle.new()
+	end
+	return handles
+end
+
 local Simulation = {}
 Simulation.__index = Simulation
 
 function Simulation.new(character)
+	local castCount = 32
 	local simulation = {
 		character = character,
 		accumulatedTime = 0,
 		currentAccelerationX = 0,
 		currentAccelerationY = 0,
+		castCount = castCount,
+		adorns = createHandles(castCount),
+		ignoreList = character.instance:GetDescendants(),
 	}
 
 	setmetatable(simulation, Simulation)
 
 	return simulation
+end
+
+-- vector is direction + mag
+function Simulation:castCylinder(vector)
+	-- max len, min length
+	-- update part points and part velocities
+	local radius = 1.5
+	local ignoreList = self.ignoreList
+	local adorns = self.adorns
+	local start = self.character.instance.PrimaryPart.CFrame
+
+	for i, x, z in sunflower(self.castCount, 2) do
+		local p = start.p + Vector3.new(x*radius, 0, z*radius)
+		local ray = Ray.new(p, vector)
+		local part, point, normal = Workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
+
+		adorns[i]:move(point)
+		print(i)
+	end
 end
 
 function Simulation:step(dt, inputX, inputY, inputJump)
@@ -2808,6 +2790,8 @@ function Simulation:step(dt, inputX, inputY, inputJump)
 
 	local currentX = self.character.instance.PrimaryPart.Velocity.X
 	local currentY = self.character.instance.PrimaryPart.Velocity.Z
+
+	self:castCylinder(Vector3.new(0, -5, 0))
 
 	while self.accumulatedTime >= FRAMERATE do
 		self.accumulatedTime = self.accumulatedTime - FRAMERATE
@@ -2865,6 +2849,67 @@ function Simulation:step(dt, inputX, inputY, inputJump)
 end
 
 return Simulation]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX0986C64E4F2A4A08A2F5F5E86AA01CAE">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">stepSpring</string>
+					<string name="ScriptGuid">{3299FB0E-7CFA-4207-8B22-C4337E46D71A}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+	Steps forward a spring one step. Handles rounding errors for us.
+
+	This function is similar to React Motion's 'stepper' function:
+	https://github.com/chenglou/react-motion/blob/167c1d19c02c47af64c8c07aeee760d9b3c7559a/src/stepper.js
+
+	It's based off of the simple Damped Harmonic Motion equation:
+
+		x" + cx' + kx = 0
+		x" = -cx' - kx
+
+	We simplify objects to have a mass of 1.
+]]
+
+return function(framerate, position, velocity, destination, stiffness, damping, precision)
+	local displacement = position - destination
+	local springForce = -stiffness * displacement
+	local dampForce = -damping * velocity
+
+	local acceleration = springForce + dampForce
+	local newVelocity = velocity + acceleration * framerate
+	local newPosition = position + velocity * framerate
+
+	-- This allows us to put the simulation to sleep once it reaches its goal.
+	if math.abs(newVelocity) < precision and math.abs(destination - newPosition) < precision then
+		return destination, 0
+	end
+
+	return newPosition, newVelocity
+end]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX75148ED3AD194420BADD4F7E0800D6C5">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">getModelMass</string>
+					<string name="ScriptGuid">{92C7CDAA-F838-47B1-BDEF-09B7DC94A500}</string>
+					<ProtectedString name="Source"><![CDATA[local function getModelMass(model)
+	local mass = 0
+
+	for _, child in ipairs(model:GetChildren()) do
+		if child:IsA("BasePart") then
+			mass = mass + child:GetMass()
+		else
+			mass = mass + getModelMass(child)
+		end
+	end
+
+	return mass
+end
+
+return getModelMass]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
@@ -3490,7 +3535,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
 						<PhysicalProperties name="CustomPhysicalProperties">
@@ -3617,7 +3662,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -3790,7 +3835,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -3984,7 +4029,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -4262,7 +4307,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -4435,7 +4480,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -4629,7 +4674,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -4802,7 +4847,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -4975,7 +5020,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5148,7 +5193,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5321,7 +5366,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5494,7 +5539,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5667,7 +5712,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5840,7 +5885,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -6013,7 +6058,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -6333,7 +6378,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">true</bool>
+						<bool name="CanCollide">false</bool>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
 						<PhysicalProperties name="CustomPhysicalProperties">
@@ -6976,35 +7021,6 @@ return Api]]></ProtectedString>
 			<string name="Name">ReplicatedStorage</string>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Folder" referent="RBXE287ECF2B919420E9E36636D18ED9544">
-			<Properties>
-				<string name="Name">CharacterControllerCore</string>
-				<BinaryString name="Tags"></BinaryString>
-			</Properties>
-			<Item class="ModuleScript" referent="RBXCDF8DA4EB7744442A9A682D9B96EF01F">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">ApiSpec</string>
-					<string name="ScriptGuid">{C678347B-A5E0-48A7-8F00-A9FEA2B4AB4F}</string>
-					<ProtectedString name="Source"><![CDATA[--[[
-	Defines the objects that should be created (server) or to wait to exist
-	(client) for facilitating client-server communication.
-
-	The individual client/server code should handle actually interacting with
-	this file, which should just serve as a specification.
-]]
-
-local ApiSpec = {
-	clientMethods = {
-		"requestMakeCharacter",
-	},
-}
-
-return ApiSpec]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-		</Item>
 	</Item>
 	<Item class="LuaWebService" referent="RBXC8024DB6CA5440EC8D2B304DCE2BF38C">
 		<Properties>
