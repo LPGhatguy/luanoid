@@ -2137,7 +2137,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -2310,7 +2310,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -2782,7 +2782,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -2955,7 +2955,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -3149,7 +3149,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -3322,7 +3322,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -3495,7 +3495,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -3668,7 +3668,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -3841,7 +3841,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -4014,7 +4014,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -4187,7 +4187,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -4360,7 +4360,7 @@ return Api]]></ProtectedString>
 							<R21>0</R21>
 							<R22>1</R22>
 						</CoordinateFrame>
-						<bool name="CanCollide">false</bool>
+						<bool name="CanCollide">true</bool>
 						<token name="CollisionFidelity">2</token>
 						<int name="CollisionGroupId">0</int>
 						<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
