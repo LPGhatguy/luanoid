@@ -89,7 +89,6 @@ function Simulation:castCylinder(vector)
 		local part, point, normal = Workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
 
 		adorns[i]:move(point)
-		print(i)
 	end
 end
 
