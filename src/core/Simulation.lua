@@ -9,6 +9,50 @@ local FRAMERATE = 1 / 240
 local STIFFNESS = 170
 local DAMPING = 26
 local PRECISION = 0.001
+local PI = math.pi
+local THETA = math.pi * 2
+
+-- (1,0) = 0, (1, -1) = 5.4977871437821...
+local function atan2(x, y)
+	local atan = math.atan(y/x)
+	if x < 0 then
+		if atan > 0 then
+			return atan - PI
+		end
+		return atan + PI
+	end
+	return atan
+end
+
+-- loop between 0 - 2*pi
+local function angleAbs(angle)
+	while angle < 0 do
+		angle = angle + THETA
+	end
+	while angle > THETA do
+		angle = angle - THETA
+	end
+	return angle
+end
+
+local function angleShortest(a0, a1)
+	local d1 = angleAbs(a1 - a0)
+	local d2 = -angleAbs(a0 - a1)
+	return math.abs(d1) > math.abs(d2) and d2 or d1
+end
+
+local function lerpAngle(a0, a1, alpha)
+	return a0 + angleShortest(a0, a1)*alpha
+end
+
+local function makeCFrame(up, look)
+	local upu = up.Unit
+	local looku = (Vector3.new() - look).Unit
+	local rightu = upu:Cross(looku).Unit
+	-- orthonormalize, keeping up vector
+	looku = -upu:Cross(rightu).Unit
+	return CFrame.new(0, 0, 0, rightu.x, upu.x, looku.x, rightu.y, upu.y, looku.y, rightu.z, upu.z, looku.z)
+end
 
 -- TODO: more appropriate cast distribution algorithm
 -- https://stackoverflow.com/a/28572551/367100
@@ -57,7 +101,7 @@ function Simulation.new(character)
 		adorns = createHandles(castCount),
 		maxHorAccel = TARGET_SPEED / 0.25, -- velocity / time to reach it squared
 		maxVerAccel = 50 / 0.1, -- massless max vertical force against gravity
-		hipHeight = 3.5,
+		hipHeight = 2.5,
 		popTime = 0.05, -- target time to reach target height
 	}
 
@@ -177,9 +221,20 @@ function Simulation:step(dt, input)
 	end
 
 	local velocity = Vector3.new(currentX, 0, currentY)
+	local lookVector = self.character.instance.PrimaryPart.CFrame.lookVector
 
-	if velocity.Magnitude > 0.1 then
-		self.character.orientationAttachment.CFrame = CFrame.new(Vector3.new(), velocity)
+	if velocity.Magnitude > 0.1 and lookVector.y < 0.9 then
+		-- Fix "tumbling" where AlignOrientation might pick the "wrong" axis when we cross through 0, lerp angles...
+		local currentAngle = atan2(lookVector.x, lookVector.z)
+		local targetAngle = atan2(currentX, currentY)
+		-- If we crossed through 0 (shortest arc angle is close to pi) then lerp the angle...
+		if math.abs(angleShortest(currentAngle, targetAngle)) > math.pi*0.95 then
+			targetAngle = lerpAngle(currentAngle, targetAngle, 0.95)
+		end
+
+		local up = Vector3.new(0, 1, 0)
+		local look = Vector3.new(math.cos(targetAngle), 0, math.sin(targetAngle))
+		self.character.orientationAttachment.CFrame = makeCFrame(up, look)
 	end
 end
 
