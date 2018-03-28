@@ -34,26 +34,26 @@
 		<Item class="Camera" referent="RBX3756E04643664949B917E8F0A9963824">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-45.548317</X>
-					<Y>29.5390606</Y>
-					<Z>24.2545872</Z>
-					<R00>0.374640346</R00>
-					<R01>0.541172326</R01>
-					<R02>-0.752846062</R02>
+					<X>-60.1767693</X>
+					<Y>8.03574085</Y>
+					<Z>-7.33601713</Z>
+					<R00>-0.979863286</R00>
+					<R01>0.10787265</R01>
+					<R02>-0.168022156</R02>
 					<R10>-0</R10>
-					<R11>0.811982572</R11>
-					<R12>0.583681762</R12>
-					<R20>0.927170217</R20>
-					<R21>-0.218670741</R21>
-					<R22>0.304201424</R22>
+					<R11>0.841500938</R11>
+					<R12>0.540255785</R12>
+					<R20>0.199669585</R20>
+					<R21>0.529376805</R21>
+					<R22>-0.824555874</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<CoordinateFrame name="Focus">
-					<X>-44.0426216</X>
-					<Y>28.3716946</Y>
-					<Z>23.646183</Z>
+					<X>-59.8407249</X>
+					<Y>6.95522928</Y>
+					<Z>-5.68690538</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -2604,6 +2604,7 @@ local function makeCharacter(name)
 	local instance = StarterPlayer.StarterCharacter:Clone()
 	instance.Name = name
 
+	--[[
 	local targetOrientPart = Instance.new("Part")
 	targetOrientPart.Name = "OrientationTarget"
 	targetOrientPart.Anchored = true
@@ -2612,6 +2613,8 @@ local function makeCharacter(name)
 	targetOrientPart.CanCollide = false
 	targetOrientPart.Transparency = 0.95
 	targetOrientPart.Parent = instance
+	]]
+	local targetOrientPart = workspace.Terrain
 
 	local orient0 = Instance.new("Attachment")
 	orient0.Name = "Align0"
@@ -2643,12 +2646,15 @@ local function makeCharacter(name)
 	local avatarModel = instance:WaitForChild("Avatar")
 	local avatarRoot = avatarModel.PrimaryPart
 
+	local castPoint = instance.PrimaryPart:WaitForChild("CastPoint")
+
 	return {
 		instance = instance,
 		vectorForce = vectorForce,
 		targetOrientPart = targetOrientPart,
 		avatarModel = avatarModel,
-		avatarRoot = avatarRoot
+		avatarRoot = avatarRoot,
+		castPoint = castPoint,
 	}
 end
 
@@ -2753,6 +2759,10 @@ function Simulation.new(character)
 		castCount = castCount,
 		adorns = createHandles(castCount),
 		ignoreList = character.instance:GetDescendants(),
+		maxHorAccel = TARGET_SPEED / 0.25, -- velocity / time to reach it squared
+		maxVerAccel = 50 / 0.1, -- massless max vertical force against gravity
+		hipHeight = 2.5,
+		popTime = 0.2, -- target time to reach target height
 	}
 
 	setmetatable(simulation, Simulation)
@@ -2767,31 +2777,53 @@ function Simulation:castCylinder(vector)
 	local radius = 1.5
 	local ignoreList = self.ignoreList
 	local adorns = self.adorns
-	local start = self.character.instance.PrimaryPart.CFrame
+	local start = self.character.castPoint.WorldPosition
+	local legLength = self.hipHeight
 
+	local onGround = false
+	local totalWeight = 0
+	local totalHeight = 0
 	for i, x, z in sunflower(self.castCount, 2) do
-		local p = start.p + Vector3.new(x*radius, 0, z*radius)
+		local p = start + Vector3.new(x*radius, 0, z*radius)
 		local ray = Ray.new(p, vector)
 		local part, point, normal = Workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
+		local hit = not not part
+		local length = (point - p).Magnitude
+		local legHit = length <= legLength*1.25
 
-		adorns[i]:move(point)
-		print(i)
+		-- add to weighted average
+		if hit then
+			local weight = 1
+			totalWeight = totalWeight + weight
+			totalHeight = totalHeight + point.y
+		end
+
+		onGround = onGround or legHit
+
+		local adorn = adorns[i]
+		adorn:move(point)
+		adorn.instance.Color3 = legHit and Color3.new(0, 1, 0) or (part and Color3.new(0, 1, 1) or Color3.new(1, 0, 0))
 	end
+
+	return onGround, totalHeight / totalWeight
 end
 
 function Simulation:step(dt, inputX, inputY, inputJump)
 	local characterMass = getModelMass(self.character.instance)
-	local onGround = isOnGround(self.character.instance)
+	--local onGround = isOnGround(self.character.instance)
 
 	local targetX = TARGET_SPEED * inputX
 	local targetY = TARGET_SPEED * inputY
 
 	self.accumulatedTime = self.accumulatedTime + dt
 
-	local currentX = self.character.instance.PrimaryPart.Velocity.X
-	local currentY = self.character.instance.PrimaryPart.Velocity.Z
+	local currentVelocity = self.character.instance.PrimaryPart.Velocity;
+	local currentX = currentVelocity.X
+	local currentY = currentVelocity.Z
 
-	self:castCylinder(Vector3.new(0, -5, 0))
+	local onGround, groughtHeight = self:castCylinder(Vector3.new(0, -5, 0))
+	local targetHeight = groughtHeight + self.hipHeight
+	local currentHeight = self.character.castPoint.WorldPosition.Y
 
 	while self.accumulatedTime >= FRAMERATE do
 		self.accumulatedTime = self.accumulatedTime - FRAMERATE
@@ -2821,11 +2853,12 @@ function Simulation:step(dt, inputX, inputY, inputJump)
 	self.character.instance.BottomSphere.Color = bottomColor
 
 	if onGround then
-		local up
+		local up = 0
 		if inputJump then
 			up = 5000 * characterMass
 		else
-			up = 0
+			up = characterMass*workspace.gravity
+			up = up + 2*((targetHeight-currentHeight) - currentVelocity.Y*self.popTime)/(self.popTime*self.popTime)*characterMass
 		end
 
 		self.character.vectorForce.Force = Vector3.new(
@@ -2840,9 +2873,9 @@ function Simulation:step(dt, inputX, inputY, inputJump)
 	local velocity = Vector3.new(currentX, 0, currentY)
 	local speed = velocity.Magnitude
 
-	self.character.targetOrientPart.CFrame = CFrame.new(self.character.instance.PrimaryPart.Position + velocity / 3)
+	--self.character.targetOrientPart.CFrame = CFrame.new(self.character.instance.PrimaryPart.Position + velocity / 3)
 
-	if speed > 0.1 then
+	if speed > 0.5 then
 		local velocityRot = CFrame.new(Vector3.new(), velocity)
 		self.character.avatarRoot.CFrame = velocityRot + self.character.avatarRoot.Position
 	end
@@ -3155,8 +3188,8 @@ return Api]]></ProtectedString>
 					<token name="BottomSurfaceInput">0</token>
 					<CoordinateFrame name="CFrame">
 						<X>-57</X>
-						<Y>1.50001097</Y>
-						<Z>-5</Z>
+						<Y>2.50001097</Y>
+						<Z>-2</Z>
 						<R00>0</R00>
 						<R01>0</R01>
 						<R02>1</R02>
@@ -3167,7 +3200,7 @@ return Api]]></ProtectedString>
 						<R21>-1</R21>
 						<R22>0</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4289003520</Color3uint8>
 					<PhysicalProperties name="CustomPhysicalProperties">
@@ -3223,8 +3256,8 @@ return Api]]></ProtectedString>
 				<Item class="WeldConstraint" referent="RBXAD87644568AE4486A2F351F62DAD335D">
 					<Properties>
 						<CoordinateFrame name="CFrame0">
-							<X>1.50001097</X>
-							<Y>-5</Y>
+							<X>2.50001097</X>
+							<Y>-2</Y>
 							<Z>57</Z>
 							<R00>0</R00>
 							<R01>-1</R01>
@@ -3237,8 +3270,8 @@ return Api]]></ProtectedString>
 							<R22>0</R22>
 						</CoordinateFrame>
 						<CoordinateFrame name="CFrame1">
-							<X>2.50001097</X>
-							<Y>-5</Y>
+							<X>3.00001097</X>
+							<Y>-2</Y>
 							<Z>57</Z>
 							<R00>0</R00>
 							<R01>-1</R01>
@@ -3271,8 +3304,8 @@ return Api]]></ProtectedString>
 					<token name="BottomSurfaceInput">0</token>
 					<CoordinateFrame name="CFrame">
 						<X>-57</X>
-						<Y>2.50001097</Y>
-						<Z>-5</Z>
+						<Y>3.00001097</Y>
+						<Z>-2</Z>
 						<R00>0</R00>
 						<R01>0</R01>
 						<R02>1</R02>
@@ -3283,7 +3316,7 @@ return Api]]></ProtectedString>
 						<R21>-1</R21>
 						<R22>0</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4289003520</Color3uint8>
 					<PhysicalProperties name="CustomPhysicalProperties">
@@ -3331,7 +3364,7 @@ return Api]]></ProtectedString>
 					<token name="formFactorRaw">1</token>
 					<token name="shape">2</token>
 					<Vector3 name="size">
-						<X>2</X>
+						<X>1</X>
 						<Y>3</Y>
 						<Z>3</Z>
 					</Vector3>
@@ -3339,8 +3372,8 @@ return Api]]></ProtectedString>
 				<Item class="WeldConstraint" referent="RBXBBFED3E5DD1743519D685D8EA6077EF9">
 					<Properties>
 						<CoordinateFrame name="CFrame0">
-							<X>2.50001097</X>
-							<Y>-5</Y>
+							<X>3.00001097</X>
+							<Y>-2</Y>
 							<Z>57</Z>
 							<R00>0</R00>
 							<R01>-1</R01>
@@ -3355,7 +3388,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame1">
 							<X>57</X>
 							<Y>-2.35237789</Y>
-							<Z>5</Z>
+							<Z>2</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -3373,6 +3406,27 @@ return Api]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
+				<Item class="Attachment" referent="RBX91DBB76D33E345368E617EA34E50F624">
+					<Properties>
+						<CoordinateFrame name="CFrame">
+							<X>0.5</X>
+							<Y>0</Y>
+							<Z>0</Z>
+							<R00>1</R00>
+							<R01>0</R01>
+							<R02>0</R02>
+							<R10>0</R10>
+							<R11>1</R11>
+							<R12>0</R12>
+							<R20>0</R20>
+							<R21>0</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<string name="Name">CastPoint</string>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
 			</Item>
 			<Item class="Part" referent="RBX568DF9DF3EA84231AEB07DC552D743E4">
 				<Properties>
@@ -3388,7 +3442,7 @@ return Api]]></ProtectedString>
 					<CoordinateFrame name="CFrame">
 						<X>-57</X>
 						<Y>3.50001097</Y>
-						<Z>-5</Z>
+						<Z>-2</Z>
 						<R00>0</R00>
 						<R01>0</R01>
 						<R02>1</R02>
@@ -3456,7 +3510,7 @@ return Api]]></ProtectedString>
 					<Properties>
 						<CoordinateFrame name="CFrame0">
 							<X>3.50001097</X>
-							<Y>-5</Y>
+							<Y>-2</Y>
 							<Z>57</Z>
 							<R00>0</R00>
 							<R01>-1</R01>
@@ -3469,8 +3523,8 @@ return Api]]></ProtectedString>
 							<R22>0</R22>
 						</CoordinateFrame>
 						<CoordinateFrame name="CFrame1">
-							<X>2.50001097</X>
-							<Y>-5</Y>
+							<X>3.00001097</X>
+							<Y>-2</Y>
 							<Z>57</Z>
 							<R00>0</R00>
 							<R01>-1</R01>
@@ -3524,7 +3578,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-57</X>
 							<Y>2.35237789</Y>
-							<Z>-5</Z>
+							<Z>-2</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -3651,7 +3705,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-58.1790924</X>
 							<Y>2.75631046</Y>
-							<Z>-4.90299463</Z>
+							<Z>-1.90299451</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -3824,7 +3878,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-58.0733299</X>
 							<Y>3.3268249</Y>
-							<Z>-4.98192739</Z>
+							<Z>-1.98192716</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -4018,7 +4072,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-57</X>
 							<Y>2.31722736</Y>
-							<Z>-5.09498358</Z>
+							<Z>-2.09498334</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -4296,7 +4350,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-55.8209076</X>
 							<Y>2.75631046</Y>
-							<Z>-4.90299416</Z>
+							<Z>-1.90299428</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -4469,7 +4523,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-55.9266701</X>
 							<Y>3.3268249</Y>
-							<Z>-4.98192692</Z>
+							<Z>-1.98192692</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -4663,7 +4717,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-58.2446289</X>
 							<Y>2.06088448</Y>
-							<Z>-4.99812126</Z>
+							<Z>-1.99812138</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -4836,7 +4890,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-56.617981</X>
 							<Y>1.5633291</Y>
-							<Z>-5.05495977</Z>
+							<Z>-2.05495954</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -5009,7 +5063,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-55.7553711</X>
 							<Y>2.06088424</Y>
-							<Z>-4.99812078</Z>
+							<Z>-1.99812114</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -5182,7 +5236,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-57.407299</X>
 							<Y>0.345117569</Y>
-							<Z>-5.13246632</Z>
+							<Z>-2.13246584</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -5355,7 +5409,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-57.401104</X>
 							<Y>0.747419953</Y>
-							<Z>-4.95737123</Z>
+							<Z>-1.957371</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -5528,7 +5582,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-57.382019</X>
 							<Y>1.56332898</Y>
-							<Z>-5.05496025</Z>
+							<Z>-2.05495977</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -5701,7 +5755,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-56.592701</X>
 							<Y>0.345117569</Y>
-							<Z>-5.13246632</Z>
+							<Z>-2.13246584</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -5874,7 +5928,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-56.598896</X>
 							<Y>0.747419953</Y>
-							<Z>-4.95737123</Z>
+							<Z>-1.957371</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -6047,7 +6101,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-57</X>
 							<Y>3.14648914</Y>
-							<Z>-5.04206514</Z>
+							<Z>-2.04206514</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>
@@ -6367,7 +6421,7 @@ return Api]]></ProtectedString>
 						<CoordinateFrame name="CFrame">
 							<X>-57</X>
 							<Y>4.47737789</Y>
-							<Z>-4.99974155</Z>
+							<Z>-1.99974132</Z>
 							<R00>1</R00>
 							<R01>0</R01>
 							<R02>0</R02>

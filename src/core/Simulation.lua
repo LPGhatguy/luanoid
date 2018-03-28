@@ -67,6 +67,10 @@ function Simulation.new(character)
 		castCount = castCount,
 		adorns = createHandles(castCount),
 		ignoreList = character.instance:GetDescendants(),
+		maxHorAccel = TARGET_SPEED / 0.25, -- velocity / time to reach it squared
+		maxVerAccel = 50 / 0.1, -- massless max vertical force against gravity
+		hipHeight = 3.5,
+		popTime = 0.05, -- target time to reach target height
 	}
 
 	setmetatable(simulation, Simulation)
@@ -81,30 +85,53 @@ function Simulation:castCylinder(vector)
 	local radius = 1.5
 	local ignoreList = self.ignoreList
 	local adorns = self.adorns
-	local start = self.character.instance.PrimaryPart.CFrame
+	local start = self.character.castPoint.WorldPosition
+	local legLength = self.hipHeight
 
+	local onGround = false
+	local totalWeight = 0
+	local totalHeight = 0
 	for i, x, z in sunflower(self.castCount, 2) do
-		local p = start.p + Vector3.new(x*radius, 0, z*radius)
+		local p = start + Vector3.new(x*radius, 0, z*radius)
 		local ray = Ray.new(p, vector)
 		local part, point, normal = Workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
+		local hit = not not part
+		local length = (point - p).Magnitude
+		local legHit = length <= legLength + 0.25
 
-		adorns[i]:move(point)
+		-- add to weighted average
+		if hit then
+			local weight = 1
+			totalWeight = totalWeight + weight
+			totalHeight = totalHeight + point.y
+		end
+
+		onGround = onGround or legHit
+
+		local adorn = adorns[i]
+		adorn:move(point)
+		adorn.instance.Color3 = legHit and Color3.new(0, 1, 0) or (part and Color3.new(0, 1, 1) or Color3.new(1, 0, 0))
 	end
+
+	return onGround, totalHeight / totalWeight
 end
 
 function Simulation:step(dt, inputX, inputY, inputJump)
 	local characterMass = getModelMass(self.character.instance)
-	local onGround = isOnGround(self.character.instance)
+	--local onGround = isOnGround(self.character.instance)
 
 	local targetX = TARGET_SPEED * inputX
 	local targetY = TARGET_SPEED * inputY
 
 	self.accumulatedTime = self.accumulatedTime + dt
 
-	local currentX = self.character.instance.PrimaryPart.Velocity.X
-	local currentY = self.character.instance.PrimaryPart.Velocity.Z
+	local currentVelocity = self.character.instance.PrimaryPart.Velocity;
+	local currentX = currentVelocity.X
+	local currentY = currentVelocity.Z
 
-	self:castCylinder(Vector3.new(0, -5, 0))
+	local onGround, groughtHeight = self:castCylinder(Vector3.new(0, -5, 0))
+	local targetHeight = groughtHeight + self.hipHeight
+	local currentHeight = self.character.castPoint.WorldPosition.Y
 
 	while self.accumulatedTime >= FRAMERATE do
 		self.accumulatedTime = self.accumulatedTime - FRAMERATE
@@ -134,11 +161,17 @@ function Simulation:step(dt, inputX, inputY, inputJump)
 	self.character.instance.BottomSphere.Color = bottomColor
 
 	if onGround then
-		local up
+		local up = 0
 		if inputJump then
 			up = 5000 * characterMass
 		else
-			up = 0
+			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
+			up = workspace.gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*self.popTime)/(self.popTime*self.popTime)
+			-- very low downward acceleration cuttoff (limited ability to push yourself down)
+			if up < -1 then
+				up = 0
+			end
+			up = up*characterMass
 		end
 
 		self.character.vectorForce.Force = Vector3.new(
@@ -153,9 +186,9 @@ function Simulation:step(dt, inputX, inputY, inputJump)
 	local velocity = Vector3.new(currentX, 0, currentY)
 	local speed = velocity.Magnitude
 
-	self.character.targetOrientPart.CFrame = CFrame.new(self.character.instance.PrimaryPart.Position + velocity / 3)
+	--self.character.targetOrientPart.CFrame = CFrame.new(self.character.instance.PrimaryPart.Position + velocity / 3)
 
-	if speed > 0.1 then
+	if speed > 0.5 then
 		local velocityRot = CFrame.new(Vector3.new(), velocity)
 		self.character.avatarRoot.CFrame = velocityRot + self.character.avatarRoot.Position
 	end

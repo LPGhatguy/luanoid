@@ -6,6 +6,7 @@ local function makeCharacter(name)
 	local instance = StarterPlayer.StarterCharacter:Clone()
 	instance.Name = name
 
+	--[[
 	local targetOrientPart = Instance.new("Part")
 	targetOrientPart.Name = "OrientationTarget"
 	targetOrientPart.Anchored = true
@@ -14,6 +15,8 @@ local function makeCharacter(name)
 	targetOrientPart.CanCollide = false
 	targetOrientPart.Transparency = 0.95
 	targetOrientPart.Parent = instance
+	]]
+	local targetOrientPart = workspace.Terrain
 
 	local orient0 = Instance.new("Attachment")
 	orient0.Name = "Align0"
@@ -45,12 +48,15 @@ local function makeCharacter(name)
 	local avatarModel = instance:WaitForChild("Avatar")
 	local avatarRoot = avatarModel.PrimaryPart
 
+	local castPoint = instance.PrimaryPart:WaitForChild("CastPoint")
+
 	return {
 		instance = instance,
 		vectorForce = vectorForce,
 		targetOrientPart = targetOrientPart,
 		avatarModel = avatarModel,
-		avatarRoot = avatarRoot
+		avatarRoot = avatarRoot,
+		castPoint = castPoint,
 	}
 end
 
