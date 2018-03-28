@@ -2780,46 +2780,15 @@ function DebugHandle:move(pos)
 	end
 end
 
+function DebugHandle:setColor(color)
+	self.instance.Color3 = color
+end
+
 function DebugHandle:destroy()
 	self.instance:Destroy()
 end
 
 return DebugHandle]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXBF147D2DB15846DEB55E82B1E54E073A">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">CharacterState</string>
-					<string name="ScriptGuid">{9E11CDAC-9938-496C-8176-41C56B6B1B75}</string>
-					<ProtectedString name="Source"><![CDATA[local CharacterState = {}
-CharacterState.__index = CharacterState
-
-CharacterState.Status = {
-	Stable = "Stable",
-}
-
-function CharacterState.new()
-	local state = {
-		input = {
-			movementX = 0,
-			movementY = 0,
-			jump = false,
-		},
-		status = CharacterState.Status.Stable,
-	}
-
-	setmetatable(state, CharacterState)
-
-	return state
-end
-
-function CharacterState:setInput(input)
-	self.input = input
-end
-
-return CharacterState]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
@@ -2900,6 +2869,50 @@ local FRAMERATE = 1 / 240
 local STIFFNESS = 170
 local DAMPING = 26
 local PRECISION = 0.001
+local PI = math.pi
+local THETA = math.pi * 2
+
+-- (1,0) = 0, (1, -1) = 5.4977871437821...
+local function atan2(x, y)
+	local atan = math.atan(y/x)
+	if x < 0 then
+		if atan > 0 then
+			return atan - PI
+		end
+		return atan + PI
+	end
+	return atan
+end
+
+-- loop between 0 - 2*pi
+local function angleAbs(angle)
+	while angle < 0 do
+		angle = angle + THETA
+	end
+	while angle > THETA do
+		angle = angle - THETA
+	end
+	return angle
+end
+
+local function angleShortest(a0, a1)
+	local d1 = angleAbs(a1 - a0)
+	local d2 = -angleAbs(a0 - a1)
+	return math.abs(d1) > math.abs(d2) and d2 or d1
+end
+
+local function lerpAngle(a0, a1, alpha)
+	return a0 + angleShortest(a0, a1)*alpha
+end
+
+local function makeCFrame(up, look)
+	local upu = up.Unit
+	local looku = (Vector3.new() - look).Unit
+	local rightu = upu:Cross(looku).Unit
+	-- orthonormalize, keeping up vector
+	looku = -upu:Cross(rightu).Unit
+	return CFrame.new(0, 0, 0, rightu.x, upu.x, looku.x, rightu.y, upu.y, looku.y, rightu.z, upu.z, looku.z)
+end
 
 -- TODO: more appropriate cast distribution algorithm
 -- https://stackoverflow.com/a/28572551/367100
@@ -2946,10 +2959,9 @@ function Simulation.new(character)
 		currentAccelerationY = 0,
 		castCount = castCount,
 		adorns = createHandles(castCount),
-		ignoreList = character.instance:GetDescendants(),
 		maxHorAccel = TARGET_SPEED / 0.25, -- velocity / time to reach it squared
 		maxVerAccel = 50 / 0.1, -- massless max vertical force against gravity
-		hipHeight = 3.5,
+		hipHeight = 2.5,
 		popTime = 0.05, -- target time to reach target height
 	}
 
@@ -2963,10 +2975,7 @@ function Simulation:castCylinder(vector)
 	-- max len, min length
 	-- update part points and part velocities
 	local radius = 1.5
-	local ignoreList = self.ignoreList
-	local adorns = self.adorns
 	local start = self.character.castPoint.WorldPosition
-	local legLength = self.hipHeight
 
 	local onGround = false
 	local totalWeight = 0
@@ -2974,13 +2983,12 @@ function Simulation:castCylinder(vector)
 	for i, x, z in sunflower(self.castCount, 2) do
 		local p = start + Vector3.new(x*radius, 0, z*radius)
 		local ray = Ray.new(p, vector)
-		local part, point, normal = Workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
-		local hit = not not part
+		local part, point, normal = Workspace:FindPartOnRay(ray, self.character.instance)
 		local length = (point - p).Magnitude
-		local legHit = length <= legLength + 0.25
+		local legHit = length <= self.hipHeight + 0.25
 
 		-- add to weighted average
-		if hit then
+		if part then
 			local weight = 1
 			totalWeight = totalWeight + weight
 			totalHeight = totalHeight + point.y
@@ -2988,9 +2996,16 @@ function Simulation:castCylinder(vector)
 
 		onGround = onGround or legHit
 
-		local adorn = adorns[i]
+		local adorn = self.adorns[i]
 		adorn:move(point)
-		adorn.instance.Color3 = legHit and Color3.new(0, 1, 0) or (part and Color3.new(0, 1, 1) or Color3.new(1, 0, 0))
+
+		if legHit then
+			adorn:setColor(Color3.new(0, 1, 0))
+		elseif part then
+			adorn:setColor(Color3.new(0, 1, 1))
+		else
+			adorn:setColor(Color3.new(1, 0, 0))
+		end
 	end
 
 	return onGround, totalHeight / totalWeight
@@ -3066,9 +3081,20 @@ function Simulation:step(dt, input)
 	end
 
 	local velocity = Vector3.new(currentX, 0, currentY)
+	local lookVector = self.character.instance.PrimaryPart.CFrame.lookVector
 
-	if velocity.Magnitude > 0.1 then
-		self.character.orientationAttachment.CFrame = CFrame.new(Vector3.new(), velocity)
+	if velocity.Magnitude > 0.1 and lookVector.y < 0.9 then
+		-- Fix "tumbling" where AlignOrientation might pick the "wrong" axis when we cross through 0, lerp angles...
+		local currentAngle = atan2(lookVector.x, lookVector.z)
+		local targetAngle = atan2(currentX, currentY)
+		-- If we crossed through 0 (shortest arc angle is close to pi) then lerp the angle...
+		if math.abs(angleShortest(currentAngle, targetAngle)) > math.pi*0.95 then
+			targetAngle = lerpAngle(currentAngle, targetAngle, 0.95)
+		end
+
+		local up = Vector3.new(0, 1, 0)
+		local look = Vector3.new(math.cos(targetAngle), 0, math.sin(targetAngle))
+		self.character.orientationAttachment.CFrame = makeCFrame(up, look)
 	end
 end
 
@@ -3336,7 +3362,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -4578,7 +4604,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -4751,7 +4777,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
 					<PhysicalProperties name="CustomPhysicalProperties">
@@ -5245,7 +5271,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5418,7 +5444,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5785,7 +5811,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5958,7 +5984,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>

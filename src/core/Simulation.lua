@@ -198,8 +198,12 @@ function Simulation:step(dt, input)
 
 	if onGround and not input.ragdoll then
 		local up
-		if input.jump then
-			up = 5000 * characterMass
+		
+		local jumpHeight = 10
+		local jumpInitialVelocity = math.sqrt(workspace.gravity*2*jumpHeight)
+		if input.jump and currentVelocity.Y < jumpInitialVelocitythen
+			up = 0
+			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
 		else
 			local t = self.popTime
 			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
