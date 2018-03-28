@@ -9,17 +9,6 @@ local FRAMERATE = 1 / 240
 local STIFFNESS = 170
 local DAMPING = 26
 local PRECISION = 0.001
-local GROUND_TOLERANCE = 0.15
-
-local function isOnGround(characterInstance)
-	local startPos = characterInstance.PrimaryPart.Position
-	local offset = -Vector3.new(0, (characterInstance.PrimaryPart.Size.X / 2) + 1.5 + GROUND_TOLERANCE, 0)
-
-	local ray = Ray.new(startPos, offset)
-	local hit = Workspace:FindPartOnRayWithIgnoreList(ray, {characterInstance})
-
-	return not not hit
-end
 
 -- TODO: more appropriate cast distribution algorithm
 -- https://stackoverflow.com/a/28572551/367100
@@ -116,7 +105,7 @@ function Simulation:castCylinder(vector)
 	return onGround, totalHeight / totalWeight
 end
 
-function Simulation:step(dt, inputX, inputY, inputJump)
+function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
 	local characterMass = getModelMass(self.character.instance)
 	--local onGround = isOnGround(self.character.instance)
 
@@ -160,7 +149,9 @@ function Simulation:step(dt, inputX, inputY, inputJump)
 	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
 	self.character.instance.PrimaryPart.Color = bottomColor
 
-	if onGround then
+	self.character.orientation.Enabled = not inputRagdoll
+
+	if onGround and not inputRagdoll then
 		local up = 0
 		if inputJump then
 			up = 5000 * characterMass
@@ -185,14 +176,8 @@ function Simulation:step(dt, inputX, inputY, inputJump)
 	end
 
 	local velocity = Vector3.new(currentX, 0, currentY)
-	local speed = velocity.Magnitude
 
-	--self.character.targetOrientPart.CFrame = CFrame.new(self.character.instance.PrimaryPart.Position + velocity / 3)
-
-	if speed > 0.5 then
-		local velocityRot = CFrame.new(Vector3.new(), velocity)
-		self.character.avatarRoot.CFrame = velocityRot + self.character.avatarRoot.Position
-	end
+	self.character.orientationAttachment.Position = self.character.instance.PrimaryPart.Position + velocity
 end
 
 return Simulation

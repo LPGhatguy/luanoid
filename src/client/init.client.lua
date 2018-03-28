@@ -22,7 +22,8 @@ RunService.Heartbeat:Connect(function(dt)
 	local movementX = 0
 	local movementY = 0
 
-	local jump = not not Input.keysDown[Enum.KeyCode.Space]
+	local jump = Input.keysDown[Enum.KeyCode.Space]
+	local ragdoll = Input.keysDown[Enum.KeyCode.F]
 
 	if Input.keysDown[Enum.KeyCode.W] then
 		movementY = movementY + 1
@@ -48,9 +49,9 @@ RunService.Heartbeat:Connect(function(dt)
 
 		local direction = (CFrame.Angles(0, cameraAngle, 0) * CFrame.new(relativeDirection)).p.unit
 
-		simulation:step(dt, direction.X, direction.Z, jump)
+		simulation:step(dt, direction.X, direction.Z, jump, ragdoll)
 	else
-		simulation:step(dt, 0, 0, jump)
+		simulation:step(dt, 0, 0, jump, ragdoll)
 	end
 end)
 
