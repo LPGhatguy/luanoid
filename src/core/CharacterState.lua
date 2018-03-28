@@ -3,6 +3,9 @@ CharacterState.__index = CharacterState
 
 CharacterState.Status = {
 	Stable = "Stable",
+	Climbing = "Climbing",
+	Swimming = "Swimming",
+	Ragdoll = "Ragdoll",
 }
 
 function CharacterState.new()

@@ -35,6 +35,10 @@ function DebugHandle:move(pos)
 	end
 end
 
+function DebugHandle:setColor(color)
+	self.instance.Color3 = color
+end
+
 function DebugHandle:destroy()
 	self.instance:Destroy()
 end

@@ -55,7 +55,6 @@ function Simulation.new(character)
 		currentAccelerationY = 0,
 		castCount = castCount,
 		adorns = createHandles(castCount),
-		ignoreList = character.instance:GetDescendants(),
 		maxHorAccel = TARGET_SPEED / 0.25, -- velocity / time to reach it squared
 		maxVerAccel = 50 / 0.1, -- massless max vertical force against gravity
 		hipHeight = 3.5,
@@ -72,10 +71,7 @@ function Simulation:castCylinder(vector)
 	-- max len, min length
 	-- update part points and part velocities
 	local radius = 1.5
-	local ignoreList = self.ignoreList
-	local adorns = self.adorns
 	local start = self.character.castPoint.WorldPosition
-	local legLength = self.hipHeight
 
 	local onGround = false
 	local totalWeight = 0
@@ -83,13 +79,12 @@ function Simulation:castCylinder(vector)
 	for i, x, z in sunflower(self.castCount, 2) do
 		local p = start + Vector3.new(x*radius, 0, z*radius)
 		local ray = Ray.new(p, vector)
-		local part, point, normal = Workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
-		local hit = not not part
+		local part, point, normal = Workspace:FindPartOnRay(ray, self.character.instance)
 		local length = (point - p).Magnitude
-		local legHit = length <= legLength + 0.25
+		local legHit = length <= self.hipHeight + 0.25
 
 		-- add to weighted average
-		if hit then
+		if part then
 			local weight = 1
 			totalWeight = totalWeight + weight
 			totalHeight = totalHeight + point.y
@@ -97,9 +92,16 @@ function Simulation:castCylinder(vector)
 
 		onGround = onGround or legHit
 
-		local adorn = adorns[i]
+		local adorn = self.adorns[i]
 		adorn:move(point)
-		adorn.instance.Color3 = legHit and Color3.new(0, 1, 0) or (part and Color3.new(0, 1, 1) or Color3.new(1, 0, 0))
+
+		if legHit then
+			adorn:setColor(Color3.new(0, 1, 0))
+		elseif part then
+			adorn:setColor(Color3.new(0, 1, 1))
+		else
+			adorn:setColor(Color3.new(1, 0, 0))
+		end
 	end
 
 	return onGround, totalHeight / totalWeight
