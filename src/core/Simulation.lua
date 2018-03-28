@@ -158,15 +158,16 @@ function Simulation:step(dt, inputX, inputY, inputJump)
 	end
 
 	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
-	self.character.instance.BottomSphere.Color = bottomColor
+	self.character.instance.PrimaryPart.Color = bottomColor
 
 	if onGround then
 		local up = 0
 		if inputJump then
 			up = 5000 * characterMass
 		else
+			local t = self.popTime
 			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
-			up = workspace.gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*self.popTime)/(self.popTime*self.popTime)
+			up = workspace.gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
 			-- very low downward acceleration cuttoff (limited ability to push yourself down)
 			if up < -1 then
 				up = 0
