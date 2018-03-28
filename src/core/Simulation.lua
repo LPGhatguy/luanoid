@@ -107,7 +107,6 @@ end
 
 function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
 	local characterMass = getModelMass(self.character.instance)
-	--local onGround = isOnGround(self.character.instance)
 
 	local targetX = TARGET_SPEED * inputX
 	local targetY = TARGET_SPEED * inputY
@@ -118,8 +117,8 @@ function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
 	local currentX = currentVelocity.X
 	local currentY = currentVelocity.Z
 
-	local onGround, groughtHeight = self:castCylinder(Vector3.new(0, -5, 0))
-	local targetHeight = groughtHeight + self.hipHeight
+	local onGround, groundHeight = self:castCylinder(Vector3.new(0, -5, 0))
+	local targetHeight = groundHeight + self.hipHeight
 	local currentHeight = self.character.castPoint.WorldPosition.Y
 
 	while self.accumulatedTime >= FRAMERATE do
@@ -177,7 +176,9 @@ function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
 
 	local velocity = Vector3.new(currentX, 0, currentY)
 
-	self.character.orientationAttachment.Position = self.character.instance.PrimaryPart.Position + velocity
+	if velocity.Magnitude > 0.1 then
+		self.character.orientationAttachment.CFrame = CFrame.new(Vector3.new(), velocity)
+	end
 end
 
 return Simulation
