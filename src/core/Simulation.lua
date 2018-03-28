@@ -105,11 +105,11 @@ function Simulation:castCylinder(vector)
 	return onGround, totalHeight / totalWeight
 end
 
-function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
+function Simulation:step(dt, input)
 	local characterMass = getModelMass(self.character.instance)
 
-	local targetX = TARGET_SPEED * inputX
-	local targetY = TARGET_SPEED * inputY
+	local targetX = TARGET_SPEED * input.movementX
+	local targetY = TARGET_SPEED * input.movementY
 
 	self.accumulatedTime = self.accumulatedTime + dt
 
@@ -148,11 +148,11 @@ function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
 	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
 	self.character.instance.PrimaryPart.Color = bottomColor
 
-	self.character.orientation.Enabled = not inputRagdoll
+	self.character.orientation.Enabled = not input.ragdoll
 
-	if onGround and not inputRagdoll then
-		local up = 0
-		if inputJump then
+	if onGround and not input.ragdoll then
+		local up
+		if input.jump then
 			up = 5000 * characterMass
 		else
 			local t = self.popTime

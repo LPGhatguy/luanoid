@@ -34,26 +34,26 @@
 		<Item class="Camera" referent="RBX3756E04643664949B917E8F0A9963824">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-29.7193584</X>
-					<Y>30.9288101</Y>
-					<Z>-2.17222857</Z>
-					<R00>-0.941159666</R00>
-					<R01>0.24627921</R01>
-					<R02>-0.231441468</R02>
-					<R10>-0</R10>
-					<R11>0.684814274</R11>
-					<R12>0.728717744</R12>
-					<R20>0.337962419</R20>
-					<R21>0.685839772</R21>
-					<R22>-0.644519508</R22>
+					<X>-47.054451</X>
+					<Y>41.029007</Y>
+					<Z>9.672925</Z>
+					<R00>0.434489876</R00>
+					<R01>0.47033152</R01>
+					<R02>-0.768119037</R02>
+					<R10>-1.4901163e-08</R10>
+					<R11>0.85282445</R11>
+					<R12>0.522197843</R12>
+					<R20>0.900676847</R20>
+					<R21>-0.226889655</R21>
+					<R22>0.37054351</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<CoordinateFrame name="Focus">
-					<X>-29.2564754</X>
-					<Y>29.4713745</Y>
-					<Z>-0.88318944</Z>
+					<X>-45.518219</X>
+					<Y>39.9846153</Y>
+					<Z>8.9318409</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -2652,16 +2652,97 @@ gO4=]]></BinaryString>
 			<string name="Name">ReplicatedFirst</string>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Folder" referent="RBXA97E132797B94D7683BA5B509FB0669B">
+		<Item class="Folder" referent="RBX0649738D41E94DA49A3F365E6C20FF1D">
 			<Properties>
 				<string name="Name">CharacterControllerCore</string>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBX87C1ACE74C414B9FBF0482F9BB70983B">
+			<Item class="ModuleScript" referent="RBXCDCD41E1FB1F4AA5A5E07251402EFF7E">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">makeCharacter</string>
+					<string name="ScriptGuid">{CD294271-3EA5-4C1E-B928-5352262C06D8}</string>
+					<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+local StarterPlayer = game:GetService("StarterPlayer")
+
+local function makeCharacter(name)
+	name = name or "Unnamed Character"
+
+	local instance = StarterPlayer.StarterCharacter:Clone()
+	instance.Name = name
+
+	local orient0 = Instance.new("Attachment")
+	orient0.Name = "Align0"
+	-- orient0.Axis = Vector3.new(0, 1, 0)
+	-- orient0.SecondaryAxis = Vector3.new(-1, 0, 0)
+	orient0.Parent = instance.PrimaryPart
+
+	-- TODO: Track attachments in Terrain for cleanup
+
+	local orient1 = Instance.new("Attachment")
+	orient1.Name = "Align1"
+	orient1.Parent = Workspace.Terrain
+
+	local orientation = Instance.new("AlignOrientation")
+	orientation.RigidityEnabled = true
+	orientation.Attachment0 = orient0
+	orientation.Attachment1 = orient1
+	orientation.Parent = instance.PrimaryPart
+
+	local velocity0 = Instance.new("Attachment")
+	velocity0.Name = "Velocity0"
+	velocity0.Parent = instance.PrimaryPart
+
+	local vectorForce = Instance.new("VectorForce")
+	vectorForce.ApplyAtCenterOfMass = true
+	vectorForce.Force = Vector3.new(0, 0, 0)
+	vectorForce.RelativeTo = Enum.ActuatorRelativeTo.World
+	vectorForce.Attachment0 = velocity0
+	vectorForce.Parent = instance.PrimaryPart
+
+	local castPoint = instance.PrimaryPart:WaitForChild("CastPoint")
+
+	return {
+		instance = instance,
+		vectorForce = vectorForce,
+		orientationAttachment = orient1,
+		orientation = orientation,
+		castPoint = castPoint,
+	}
+end
+
+return makeCharacter]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX7F0B4801B64B4B94AB7955D0E208C3E7">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">getModelMass</string>
+					<string name="ScriptGuid">{8E7D0618-D922-4A52-8560-35156BA5ADF8}</string>
+					<ProtectedString name="Source"><![CDATA[local function getModelMass(model)
+	local mass = 0
+
+	for _, child in ipairs(model:GetChildren()) do
+		if child:IsA("BasePart") then
+			mass = mass + child:GetMass()
+		else
+			mass = mass + getModelMass(child)
+		end
+	end
+
+	return mass
+end
+
+return getModelMass]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXBC55A27E0EA0468EBFB78D8131A5B880">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">DebugHandle</string>
-					<string name="ScriptGuid">{3B035704-6988-4F0C-BA3B-B86939B5078E}</string>
+					<string name="ScriptGuid">{BE11D846-76E1-4AF9-AB43-85214538C27B}</string>
 					<ProtectedString name="Source"><![CDATA[--[[
 	Renders points in the world for debugging things.
 
@@ -2707,11 +2788,107 @@ return DebugHandle]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX109764D57756449BA241B07E2C8A5EDA">
+			<Item class="ModuleScript" referent="RBXBF147D2DB15846DEB55E82B1E54E073A">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">CharacterState</string>
+					<string name="ScriptGuid">{9E11CDAC-9938-496C-8176-41C56B6B1B75}</string>
+					<ProtectedString name="Source"><![CDATA[local CharacterState = {}
+CharacterState.__index = CharacterState
+
+CharacterState.Status = {
+	Stable = "Stable",
+}
+
+function CharacterState.new()
+	local state = {
+		input = {
+			movementX = 0,
+			movementY = 0,
+			jump = false,
+		},
+		status = CharacterState.Status.Stable,
+	}
+
+	setmetatable(state, CharacterState)
+
+	return state
+end
+
+function CharacterState:setInput(input)
+	self.input = input
+end
+
+return CharacterState]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX11A1A95F6BC84571A5D31350027E115A">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">ApiSpec</string>
+					<string name="ScriptGuid">{76903C47-CCA5-4069-947E-06ED99CE82D0}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+	Defines the objects that should be created (server) or to wait to exist
+	(client) for facilitating client-server communication.
+
+	The individual client/server code should handle actually interacting with
+	this file, which should just serve as a specification.
+]]
+
+local ApiSpec = {
+	clientMethods = {
+		"requestMakeCharacter",
+	},
+}
+
+return ApiSpec]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX07EF30DC8FE54ED7A065717011798A07">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">stepSpring</string>
+					<string name="ScriptGuid">{2F79E70F-A92F-4341-90FA-6CE40C834E3F}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+	Steps forward a spring one step. Handles rounding errors for us.
+
+	This function is similar to React Motion's 'stepper' function:
+	https://github.com/chenglou/react-motion/blob/167c1d19c02c47af64c8c07aeee760d9b3c7559a/src/stepper.js
+
+	It's based off of the simple Damped Harmonic Motion equation:
+
+		x" + cx' + kx = 0
+		x" = -cx' - kx
+
+	We simplify objects to have a mass of 1.
+]]
+
+return function(framerate, position, velocity, destination, stiffness, damping, precision)
+	local displacement = position - destination
+	local springForce = -stiffness * displacement
+	local dampForce = -damping * velocity
+
+	local acceleration = springForce + dampForce
+	local newVelocity = velocity + acceleration * framerate
+	local newPosition = position + velocity * framerate
+
+	-- This allows us to put the simulation to sleep once it reaches its goal.
+	if math.abs(newVelocity) < precision and math.abs(destination - newPosition) < precision then
+		return destination, 0
+	end
+
+	return newPosition, newVelocity
+end]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX6F6E93F60ED24747B53846957A9662E6">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Simulation</string>
-					<string name="ScriptGuid">{48746C8A-3921-4810-9D21-51512CB2C668}</string>
+					<string name="ScriptGuid">{DC65F292-EE69-43BE-90FD-13E0F9656039}</string>
 					<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
 
 local stepSpring = require(script.Parent.stepSpring)
@@ -2819,12 +2996,11 @@ function Simulation:castCylinder(vector)
 	return onGround, totalHeight / totalWeight
 end
 
-function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
+function Simulation:step(dt, input)
 	local characterMass = getModelMass(self.character.instance)
-	--local onGround = isOnGround(self.character.instance)
 
-	local targetX = TARGET_SPEED * inputX
-	local targetY = TARGET_SPEED * inputY
+	local targetX = TARGET_SPEED * input.movementX
+	local targetY = TARGET_SPEED * input.movementY
 
 	self.accumulatedTime = self.accumulatedTime + dt
 
@@ -2832,7 +3008,7 @@ function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
 	local currentX = currentVelocity.X
 	local currentY = currentVelocity.Z
 
-	local onGround, groundHeight = self:castCylinder(Vector3.new(0, -(self.hipHeight + 2), 0))
+	local onGround, groundHeight = self:castCylinder(Vector3.new(0, -5, 0))
 	local targetHeight = groundHeight + self.hipHeight
 	local currentHeight = self.character.castPoint.WorldPosition.Y
 
@@ -2863,11 +3039,11 @@ function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
 	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
 	self.character.instance.PrimaryPart.Color = bottomColor
 
-	self.character.orientation.Enabled = not inputRagdoll
+	self.character.orientation.Enabled = not input.ragdoll
 
-	if onGround and not inputRagdoll then
-		local up = 0
-		if inputJump then
+	if onGround and not input.ragdoll then
+		local up
+		if input.jump then
 			up = 5000 * characterMass
 		else
 			local t = self.popTime
@@ -2891,153 +3067,12 @@ function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
 
 	local velocity = Vector3.new(currentX, 0, currentY)
 
-	--self.character.orientationAttachment.Position = self.character.instance.PrimaryPart.Position + velocity
-	self.character.orientationAttachment.CFrame = CFrame.new(Vector3.new(), velocity)
+	if velocity.Magnitude > 0.1 then
+		self.character.orientationAttachment.CFrame = CFrame.new(Vector3.new(), velocity)
+	end
 end
 
 return Simulation]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBX73ED0B472BF04CB3A6CC630FED273037">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">stepSpring</string>
-					<string name="ScriptGuid">{2A18EB69-49A7-487B-98B3-027396176B43}</string>
-					<ProtectedString name="Source"><![CDATA[--[[
-	Steps forward a spring one step. Handles rounding errors for us.
-
-	This function is similar to React Motion's 'stepper' function:
-	https://github.com/chenglou/react-motion/blob/167c1d19c02c47af64c8c07aeee760d9b3c7559a/src/stepper.js
-
-	It's based off of the simple Damped Harmonic Motion equation:
-
-		x" + cx' + kx = 0
-		x" = -cx' - kx
-
-	We simplify objects to have a mass of 1.
-]]
-
-return function(framerate, position, velocity, destination, stiffness, damping, precision)
-	local displacement = position - destination
-	local springForce = -stiffness * displacement
-	local dampForce = -damping * velocity
-
-	local acceleration = springForce + dampForce
-	local newVelocity = velocity + acceleration * framerate
-	local newPosition = position + velocity * framerate
-
-	-- This allows us to put the simulation to sleep once it reaches its goal.
-	if math.abs(newVelocity) < precision and math.abs(destination - newPosition) < precision then
-		return destination, 0
-	end
-
-	return newPosition, newVelocity
-end]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBX2EC1E6247B2A46A2B67126B9B3E9DA38">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">getModelMass</string>
-					<string name="ScriptGuid">{5FA2BA19-B291-448D-B137-A0C3169AED4A}</string>
-					<ProtectedString name="Source"><![CDATA[local function getModelMass(model)
-	local mass = 0
-
-	for _, child in ipairs(model:GetChildren()) do
-		if child:IsA("BasePart") then
-			mass = mass + child:GetMass()
-		else
-			mass = mass + getModelMass(child)
-		end
-	end
-
-	return mass
-end
-
-return getModelMass]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXE3CA9E6CB3D748F08BF4E16F9A318C44">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">ApiSpec</string>
-					<string name="ScriptGuid">{28C41DC3-F479-4ED3-AF04-DE130FBF4CB1}</string>
-					<ProtectedString name="Source"><![CDATA[--[[
-	Defines the objects that should be created (server) or to wait to exist
-	(client) for facilitating client-server communication.
-
-	The individual client/server code should handle actually interacting with
-	this file, which should just serve as a specification.
-]]
-
-local ApiSpec = {
-	clientMethods = {
-		"requestMakeCharacter",
-	},
-}
-
-return ApiSpec]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBX1D21001149984BAA8B6D301BDC8DD220">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">makeCharacter</string>
-					<string name="ScriptGuid">{CA27AB8F-CB3F-4D25-803D-52C660849B79}</string>
-					<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
-local StarterPlayer = game:GetService("StarterPlayer")
-
-local function makeCharacter(name)
-	name = name or "Unnamed Character"
-
-	local instance = StarterPlayer.StarterCharacter:Clone()
-	instance.Name = name
-
-	local orient0 = Instance.new("Attachment")
-	orient0.Name = "Align0"
-	-- orient0.Axis = Vector3.new(0, 1, 0)
-	-- orient0.SecondaryAxis = Vector3.new(-1, 0, 0)
-	orient0.Parent = instance.PrimaryPart
-
-	-- TODO: Track attachments in Terrain for cleanup
-
-	local orient1 = Instance.new("Attachment")
-	orient1.Name = "Align1"
-	orient1.Parent = Workspace.Terrain
-
-	local orientation = Instance.new("AlignOrientation")
-	orientation.RigidityEnabled = true
-	orientation.Attachment0 = orient0
-	orientation.Attachment1 = orient1
-	orientation.Parent = instance.PrimaryPart
-
-	local velocity0 = Instance.new("Attachment")
-	velocity0.Name = "Velocity0"
-	velocity0.Parent = instance.PrimaryPart
-
-	local vectorForce = Instance.new("VectorForce")
-	vectorForce.ApplyAtCenterOfMass = true
-	vectorForce.Force = Vector3.new(0, 0, 0)
-	vectorForce.RelativeTo = Enum.ActuatorRelativeTo.World
-	vectorForce.Attachment0 = velocity0
-	vectorForce.Parent = instance.PrimaryPart
-
-	local castPoint = instance.PrimaryPart:WaitForChild("CastPoint")
-
-	return {
-		instance = instance,
-		vectorForce = vectorForce,
-		orientationAttachment = orient1,
-		orientation = orientation,
-		castPoint = castPoint,
-	}
-end
-
-return makeCharacter]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
@@ -3145,40 +3180,45 @@ Workspace.CurrentCamera.CameraSubject = character.instance.PrimaryPart
 Workspace.CurrentCamera.CameraType = Enum.CameraType.Track
 
 RunService.Heartbeat:Connect(function(dt)
-	local movementX = 0
-	local movementY = 0
+	local input = {
+		movementX = 0,
+		movementY = 0,
+		jump = Input.keysDown[Enum.KeyCode.Space],
+		ragdoll = Input.keysDown[Enum.KeyCode.F],
+	}
 
-	local jump = Input.keysDown[Enum.KeyCode.Space]
-	local ragdoll = Input.keysDown[Enum.KeyCode.F]
+	local inputX = 0
+	local inputY = 0
 
 	if Input.keysDown[Enum.KeyCode.W] then
-		movementY = movementY + 1
+		inputY = inputY + 1
 	end
 
 	if Input.keysDown[Enum.KeyCode.S] then
-		movementY = movementY - 1
+		inputY = inputY - 1
 	end
 
 	if Input.keysDown[Enum.KeyCode.D] then
-		movementX = movementX - 1
+		inputX = inputX - 1
 	end
 
 	if Input.keysDown[Enum.KeyCode.A] then
-		movementX = movementX + 1
+		inputX = inputX + 1
 	end
 
-	if movementX ~= 0 or movementY ~= 0 then
-		local relativeDirection = Vector3.new(movementX, 0, movementY)
-
+	if inputX ~= 0 or inputY ~= 0 then
 		local cameraLook = Workspace.CurrentCamera.CFrame.lookVector
 		local cameraAngle = math.atan2(cameraLook.x, cameraLook.z)
 
-		local direction = (CFrame.Angles(0, cameraAngle, 0) * CFrame.new(relativeDirection)).p.unit
+		local magnitude = math.sqrt(inputX^2 + inputY^2)
+		local relativeX = inputX / magnitude
+		local relativeY = inputY / magnitude
 
-		simulation:step(dt, direction.X, direction.Z, jump, ragdoll)
-	else
-		simulation:step(dt, 0, 0, jump, ragdoll)
+		input.movementX = relativeX * math.cos(cameraAngle) + relativeY * math.sin(cameraAngle)
+		input.movementY = -relativeX * math.sin(cameraAngle) + relativeY * math.cos(cameraAngle)
 	end
+
+	simulation:step(dt, input)
 end)
 
 Input.start()]]></ProtectedString>
@@ -6722,12 +6762,12 @@ return Api]]></ProtectedString>
 			<string name="Name">ServerScriptService</string>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Script" referent="RBX6D3C19D364554034A7BC2142480C3A36">
+		<Item class="Script" referent="RBX6437A41015BA49A78593994783951994">
 			<Properties>
 				<bool name="Disabled">false</bool>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">CharacterControllerServer</string>
-				<string name="ScriptGuid">{5D6870FA-A37B-4F3C-8AD4-D533843B5E28}</string>
+				<string name="ScriptGuid">{85B6DBAF-D04A-436B-A2BA-51D2548FA085}</string>
 				<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
@@ -6750,11 +6790,11 @@ end
 Api.implement(ApiImplementation)]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBXB490C137A8A04DD0ADE280C859E15E18">
+			<Item class="ModuleScript" referent="RBXF1E3AEC5DFE3468197906F9FF51BD4FC">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Api</string>
-					<string name="ScriptGuid">{5A186333-E0C6-48B0-809B-42CEF320453F}</string>
+					<string name="ScriptGuid">{BBDE6F89-584B-43A5-81A2-2D95F0F95D07}</string>
 					<ProtectedString name="Source"><![CDATA[local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
