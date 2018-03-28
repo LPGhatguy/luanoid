@@ -34,26 +34,26 @@
 		<Item class="Camera" referent="RBX3756E04643664949B917E8F0A9963824">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-83.3482208</X>
-					<Y>15.60748</Y>
-					<Z>-26.2710896</Z>
-					<R00>-0.14726986</R00>
-					<R01>0.317078233</R01>
-					<R02>-0.93689537</R02>
-					<R10>3.72529074e-09</R10>
-					<R11>0.947223604</R11>
-					<R12>0.320573628</R12>
-					<R20>0.989096403</R20>
-					<R21>0.0472108312</R21>
-					<R22>-0.139497474</R22>
+					<X>-29.7193584</X>
+					<Y>30.9288101</Y>
+					<Z>-2.17222857</Z>
+					<R00>-0.941159666</R00>
+					<R01>0.24627921</R01>
+					<R02>-0.231441468</R02>
+					<R10>-0</R10>
+					<R11>0.684814274</R11>
+					<R12>0.728717744</R12>
+					<R20>0.337962419</R20>
+					<R21>0.685839772</R21>
+					<R22>-0.644519508</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<CoordinateFrame name="Focus">
-					<X>-81.4744263</X>
-					<Y>14.9663315</Y>
-					<Z>-25.992094</Z>
+					<X>-29.2564754</X>
+					<Y>29.4713745</Y>
+					<Z>-0.88318944</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -486,228 +486,6 @@ gO4=]]></BinaryString>
 				</Vector3>
 			</Properties>
 		</Item>
-		<Item class="Part" referent="RBX01DC1F43CF4A43FDB3BA679CAD50C010">
-			<Properties>
-				<bool name="Anchored">true</bool>
-				<float name="BackParamA">-0.5</float>
-				<float name="BackParamB">0.5</float>
-				<token name="BackSurface">0</token>
-				<token name="BackSurfaceInput">0</token>
-				<float name="BottomParamA">-0.5</float>
-				<float name="BottomParamB">0.5</float>
-				<token name="BottomSurface">0</token>
-				<token name="BottomSurfaceInput">0</token>
-				<CoordinateFrame name="CFrame">
-					<X>-36.239994</X>
-					<Y>3.77999997</Y>
-					<Z>-1.73000014</Z>
-					<R00>0.820090592</R00>
-					<R01>0.572233677</R01>
-					<R02>0</R02>
-					<R10>-0.572233677</R10>
-					<R11>0.820090592</R11>
-					<R12>0</R12>
-					<R20>0</R20>
-					<R21>0</R21>
-					<R22>1</R22>
-				</CoordinateFrame>
-				<bool name="CanCollide">true</bool>
-				<int name="CollisionGroupId">0</int>
-				<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
-				<PhysicalProperties name="CustomPhysicalProperties">
-					<CustomPhysics>false</CustomPhysics>
-				</PhysicalProperties>
-				<float name="Elasticity">0.5</float>
-				<float name="Friction">0.300000012</float>
-				<float name="FrontParamA">-0.5</float>
-				<float name="FrontParamB">0.5</float>
-				<token name="FrontSurface">0</token>
-				<token name="FrontSurfaceInput">0</token>
-				<float name="LeftParamA">-0.5</float>
-				<float name="LeftParamB">0.5</float>
-				<token name="LeftSurface">0</token>
-				<token name="LeftSurfaceInput">0</token>
-				<bool name="Locked">false</bool>
-				<token name="Material">256</token>
-				<string name="Name">Ramp1</string>
-				<float name="Reflectance">0</float>
-				<float name="RightParamA">-0.5</float>
-				<float name="RightParamB">0.5</float>
-				<token name="RightSurface">0</token>
-				<token name="RightSurfaceInput">0</token>
-				<Vector3 name="RotVelocity">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Vector3>
-				<BinaryString name="Tags"></BinaryString>
-				<float name="TopParamA">-0.5</float>
-				<float name="TopParamB">0.5</float>
-				<token name="TopSurface">0</token>
-				<token name="TopSurfaceInput">0</token>
-				<float name="Transparency">0</float>
-				<Vector3 name="Velocity">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Vector3>
-				<token name="formFactorRaw">1</token>
-				<token name="shape">1</token>
-				<Vector3 name="size">
-					<X>25</X>
-					<Y>8</Y>
-					<Z>5</Z>
-				</Vector3>
-			</Properties>
-		</Item>
-		<Item class="Part" referent="RBX9A422793A45B4AB7B880C24934819602">
-			<Properties>
-				<bool name="Anchored">true</bool>
-				<float name="BackParamA">-0.5</float>
-				<float name="BackParamB">0.5</float>
-				<token name="BackSurface">0</token>
-				<token name="BackSurfaceInput">0</token>
-				<float name="BottomParamA">-0.5</float>
-				<float name="BottomParamB">0.5</float>
-				<token name="BottomSurface">0</token>
-				<token name="BottomSurfaceInput">0</token>
-				<CoordinateFrame name="CFrame">
-					<X>-36.4089432</X>
-					<Y>-0.416780859</Y>
-					<Z>8.21999931</Z>
-					<R00>0.960699379</R00>
-					<R01>0.277591079</R01>
-					<R02>0</R02>
-					<R10>-0.277591079</R10>
-					<R11>0.960699379</R11>
-					<R12>0</R12>
-					<R20>0</R20>
-					<R21>0</R21>
-					<R22>1</R22>
-				</CoordinateFrame>
-				<bool name="CanCollide">true</bool>
-				<int name="CollisionGroupId">0</int>
-				<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
-				<PhysicalProperties name="CustomPhysicalProperties">
-					<CustomPhysics>false</CustomPhysics>
-				</PhysicalProperties>
-				<float name="Elasticity">0.5</float>
-				<float name="Friction">0.300000012</float>
-				<float name="FrontParamA">-0.5</float>
-				<float name="FrontParamB">0.5</float>
-				<token name="FrontSurface">0</token>
-				<token name="FrontSurfaceInput">0</token>
-				<float name="LeftParamA">-0.5</float>
-				<float name="LeftParamB">0.5</float>
-				<token name="LeftSurface">0</token>
-				<token name="LeftSurfaceInput">0</token>
-				<bool name="Locked">false</bool>
-				<token name="Material">256</token>
-				<string name="Name">Ramp3</string>
-				<float name="Reflectance">0</float>
-				<float name="RightParamA">-0.5</float>
-				<float name="RightParamB">0.5</float>
-				<token name="RightSurface">0</token>
-				<token name="RightSurfaceInput">0</token>
-				<Vector3 name="RotVelocity">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Vector3>
-				<BinaryString name="Tags"></BinaryString>
-				<float name="TopParamA">-0.5</float>
-				<float name="TopParamB">0.5</float>
-				<token name="TopSurface">0</token>
-				<token name="TopSurfaceInput">0</token>
-				<float name="Transparency">0</float>
-				<Vector3 name="Velocity">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Vector3>
-				<token name="formFactorRaw">1</token>
-				<token name="shape">1</token>
-				<Vector3 name="size">
-					<X>25</X>
-					<Y>8</Y>
-					<Z>5</Z>
-				</Vector3>
-			</Properties>
-		</Item>
-		<Item class="Part" referent="RBXA12B376B166E4001B8EAFAEBCC78FAD7">
-			<Properties>
-				<bool name="Anchored">true</bool>
-				<float name="BackParamA">-0.5</float>
-				<float name="BackParamB">0.5</float>
-				<token name="BackSurface">0</token>
-				<token name="BackSurfaceInput">0</token>
-				<float name="BottomParamA">-0.5</float>
-				<float name="BottomParamB">0.5</float>
-				<token name="BottomSurface">0</token>
-				<token name="BottomSurfaceInput">0</token>
-				<CoordinateFrame name="CFrame">
-					<X>-36.4076843</X>
-					<Y>1.92013907</Y>
-					<Z>3.2699995</Z>
-					<R00>0.895269692</R00>
-					<R01>0.445524842</R01>
-					<R02>0</R02>
-					<R10>-0.445524842</R10>
-					<R11>0.895269692</R11>
-					<R12>0</R12>
-					<R20>0</R20>
-					<R21>0</R21>
-					<R22>1</R22>
-				</CoordinateFrame>
-				<bool name="CanCollide">true</bool>
-				<int name="CollisionGroupId">0</int>
-				<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
-				<PhysicalProperties name="CustomPhysicalProperties">
-					<CustomPhysics>false</CustomPhysics>
-				</PhysicalProperties>
-				<float name="Elasticity">0.5</float>
-				<float name="Friction">0.300000012</float>
-				<float name="FrontParamA">-0.5</float>
-				<float name="FrontParamB">0.5</float>
-				<token name="FrontSurface">0</token>
-				<token name="FrontSurfaceInput">0</token>
-				<float name="LeftParamA">-0.5</float>
-				<float name="LeftParamB">0.5</float>
-				<token name="LeftSurface">0</token>
-				<token name="LeftSurfaceInput">0</token>
-				<bool name="Locked">false</bool>
-				<token name="Material">256</token>
-				<string name="Name">Ramp2</string>
-				<float name="Reflectance">0</float>
-				<float name="RightParamA">-0.5</float>
-				<float name="RightParamB">0.5</float>
-				<token name="RightSurface">0</token>
-				<token name="RightSurfaceInput">0</token>
-				<Vector3 name="RotVelocity">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Vector3>
-				<BinaryString name="Tags"></BinaryString>
-				<float name="TopParamA">-0.5</float>
-				<float name="TopParamB">0.5</float>
-				<token name="TopSurface">0</token>
-				<token name="TopSurfaceInput">0</token>
-				<float name="Transparency">0</float>
-				<Vector3 name="Velocity">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Vector3>
-				<token name="formFactorRaw">1</token>
-				<token name="shape">1</token>
-				<Vector3 name="size">
-					<X>25</X>
-					<Y>8</Y>
-					<Z>5</Z>
-				</Vector3>
-			</Properties>
-		</Item>
 		<Item class="Part" referent="RBX4C9A96AC12EC4F8B8E6A96B7DE730E2E">
 			<Properties>
 				<bool name="Anchored">true</bool>
@@ -1097,80 +875,6 @@ gO4=]]></BinaryString>
 					<bool name="Visible">false</bool>
 				</Properties>
 			</Item>
-		</Item>
-		<Item class="Part" referent="RBX1DA3701154DB431D8C6FB6FCBE292CE2">
-			<Properties>
-				<bool name="Anchored">true</bool>
-				<float name="BackParamA">-0.5</float>
-				<float name="BackParamB">0.5</float>
-				<token name="BackSurface">0</token>
-				<token name="BackSurfaceInput">0</token>
-				<float name="BottomParamA">-0.5</float>
-				<float name="BottomParamB">0.5</float>
-				<token name="BottomSurface">0</token>
-				<token name="BottomSurfaceInput">0</token>
-				<CoordinateFrame name="CFrame">
-					<X>-35.7900009</X>
-					<Y>5.77000189</Y>
-					<Z>-6.6699996</Z>
-					<R00>0.707106769</R00>
-					<R01>0.707106769</R01>
-					<R02>0</R02>
-					<R10>-0.707106769</R10>
-					<R11>0.707106769</R11>
-					<R12>0</R12>
-					<R20>0</R20>
-					<R21>0</R21>
-					<R22>1</R22>
-				</CoordinateFrame>
-				<bool name="CanCollide">true</bool>
-				<int name="CollisionGroupId">0</int>
-				<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
-				<PhysicalProperties name="CustomPhysicalProperties">
-					<CustomPhysics>false</CustomPhysics>
-				</PhysicalProperties>
-				<float name="Elasticity">0.5</float>
-				<float name="Friction">0.300000012</float>
-				<float name="FrontParamA">-0.5</float>
-				<float name="FrontParamB">0.5</float>
-				<token name="FrontSurface">0</token>
-				<token name="FrontSurfaceInput">0</token>
-				<float name="LeftParamA">-0.5</float>
-				<float name="LeftParamB">0.5</float>
-				<token name="LeftSurface">0</token>
-				<token name="LeftSurfaceInput">0</token>
-				<bool name="Locked">false</bool>
-				<token name="Material">256</token>
-				<string name="Name">Ramp1</string>
-				<float name="Reflectance">0</float>
-				<float name="RightParamA">-0.5</float>
-				<float name="RightParamB">0.5</float>
-				<token name="RightSurface">0</token>
-				<token name="RightSurfaceInput">0</token>
-				<Vector3 name="RotVelocity">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Vector3>
-				<BinaryString name="Tags"></BinaryString>
-				<float name="TopParamA">-0.5</float>
-				<float name="TopParamB">0.5</float>
-				<token name="TopSurface">0</token>
-				<token name="TopSurfaceInput">0</token>
-				<float name="Transparency">0</float>
-				<Vector3 name="Velocity">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Vector3>
-				<token name="formFactorRaw">1</token>
-				<token name="shape">1</token>
-				<Vector3 name="size">
-					<X>25</X>
-					<Y>8</Y>
-					<Z>5</Z>
-				</Vector3>
-			</Properties>
 		</Item>
 		<Item class="Model" referent="RBXD9356FE992B94E108454E59C0FE80AE9">
 			<Properties>
@@ -2249,9 +1953,9 @@ gO4=]]></BinaryString>
 				<token name="style">0</token>
 			</Properties>
 		</Item>
-		<Item class="Part" referent="RBXB43C211E30C8468B93779FA3355B3988">
+		<Item class="Part" referent="RBX6CA101254AC24C139CA380EAD96FBD16">
 			<Properties>
-				<bool name="Anchored">false</bool>
+				<bool name="Anchored">true</bool>
 				<float name="BackParamA">-0.5</float>
 				<float name="BackParamB">0.5</float>
 				<token name="BackSurface">0</token>
@@ -2261,18 +1965,18 @@ gO4=]]></BinaryString>
 				<token name="BottomSurface">0</token>
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
-					<X>-5</X>
-					<Y>-1</Y>
-					<Z>33</Z>
-					<R00>1</R00>
-					<R01>0</R01>
-					<R02>0</R02>
-					<R10>0</R10>
+					<X>2.92566252</X>
+					<Y>7.26000214</Y>
+					<Z>-18.2354069</Z>
+					<R00>0.706953466</R00>
+					<R01>-1.08660814e-07</R01>
+					<R02>-0.707260072</R02>
+					<R10>1.20253105e-07</R10>
 					<R11>1</R11>
-					<R12>0</R12>
-					<R20>0</R20>
-					<R21>0</R21>
-					<R22>1</R22>
+					<R12>-3.34353238e-08</R12>
+					<R20>0.707260072</R20>
+					<R21>-6.14129974e-08</R21>
+					<R22>0.706953466</R22>
 				</CoordinateFrame>
 				<bool name="CanCollide">true</bool>
 				<int name="CollisionGroupId">0</int>
@@ -2292,7 +1996,7 @@ gO4=]]></BinaryString>
 				<token name="LeftSurfaceInput">0</token>
 				<bool name="Locked">false</bool>
 				<token name="Material">256</token>
-				<string name="Name">Part</string>
+				<string name="Name">Crossbeam</string>
 				<float name="Reflectance">0</float>
 				<float name="RightParamA">-0.5</float>
 				<float name="RightParamB">0.5</float>
@@ -2317,71 +2021,335 @@ gO4=]]></BinaryString>
 				<token name="formFactorRaw">1</token>
 				<token name="shape">1</token>
 				<Vector3 name="size">
-					<X>4</X>
-					<Y>4</Y>
-					<Z>20</Z>
+					<X>29</X>
+					<Y>1</Y>
+					<Z>1</Z>
 				</Vector3>
 			</Properties>
-			<Item class="Attachment" referent="RBX7B89AA9B4EB04677BA17370DEF997891">
+		</Item>
+		<Item class="Model" referent="RBX5C526DDCA2B4407883F250926951A73F">
+			<Properties>
+				<CoordinateFrame name="ModelInPrimary">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<string name="Name">Ramps</string>
+				<Ref name="PrimaryPart">null</Ref>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+			<Item class="Part" referent="RBX01DC1F43CF4A43FDB3BA679CAD50C010">
 				<Properties>
+					<bool name="Anchored">true</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
 					<CoordinateFrame name="CFrame">
+						<X>-36.239994</X>
+						<Y>3.77999997</Y>
+						<Z>-1.73000014</Z>
+						<R00>0.820090592</R00>
+						<R01>0.572233677</R01>
+						<R02>0</R02>
+						<R10>-0.572233677</R10>
+						<R11>0.820090592</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<float name="Elasticity">0.5</float>
+					<float name="Friction">0.300000012</float>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<token name="Material">256</token>
+					<string name="Name">Ramp1</string>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<Vector3 name="RotVelocity">
 						<X>0</X>
 						<Y>0</Y>
-						<Z>10</Z>
-						<R00>0</R00>
-						<R01>0</R01>
-						<R02>-1</R02>
-						<R10>0</R10>
-						<R11>1</R11>
-						<R12>0</R12>
-						<R20>1</R20>
-						<R21>0</R21>
-						<R22>0</R22>
-					</CoordinateFrame>
-					<string name="Name">Attachment0</string>
+						<Z>0</Z>
+					</Vector3>
 					<BinaryString name="Tags"></BinaryString>
-					<bool name="Visible">false</bool>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<token name="formFactorRaw">1</token>
+					<token name="shape">1</token>
+					<Vector3 name="size">
+						<X>25</X>
+						<Y>8</Y>
+						<Z>5</Z>
+					</Vector3>
 				</Properties>
 			</Item>
-			<Item class="HingeConstraint" referent="RBX768D759725FE44308377086284F55CCB">
+			<Item class="Part" referent="RBX1DA3701154DB431D8C6FB6FCBE292CE2">
 				<Properties>
-					<token name="ActuatorType">1</token>
-					<float name="AngularSpeed">0</float>
-					<float name="AngularVelocity">1</float>
-					<Ref name="Attachment0">RBX7B89AA9B4EB04677BA17370DEF997891</Ref>
-					<Ref name="Attachment1">RBX5261EE4C55524B5E92F0D353E47F1605</Ref>
-					<int name="Color">1009</int>
-					<bool name="Enabled">true</bool>
-					<bool name="LimitsEnabled">false</bool>
-					<float name="LowerAngle">-45</float>
-					<float name="MotorMaxAcceleration">INF</float>
-					<float name="MotorMaxTorque">10000000</float>
-					<string name="Name">HingeConstraint</string>
-					<float name="Radius">0.150000006</float>
-					<float name="Restitution">0</float>
-					<float name="ServoMaxTorque">0</float>
+					<bool name="Anchored">true</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>-35.7900009</X>
+						<Y>5.77000189</Y>
+						<Z>-6.6699996</Z>
+						<R00>0.707106769</R00>
+						<R01>0.707106769</R01>
+						<R02>0</R02>
+						<R10>-0.707106769</R10>
+						<R11>0.707106769</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<float name="Elasticity">0.5</float>
+					<float name="Friction">0.300000012</float>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<token name="Material">256</token>
+					<string name="Name">Ramp1</string>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
 					<BinaryString name="Tags"></BinaryString>
-					<float name="TargetAngle">0</float>
-					<float name="UpperAngle">45</float>
-					<bool name="Visible">false</bool>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<token name="formFactorRaw">1</token>
+					<token name="shape">1</token>
+					<Vector3 name="size">
+						<X>25</X>
+						<Y>8</Y>
+						<Z>5</Z>
+					</Vector3>
+				</Properties>
+			</Item>
+			<Item class="Part" referent="RBXA12B376B166E4001B8EAFAEBCC78FAD7">
+				<Properties>
+					<bool name="Anchored">true</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>-36.4076843</X>
+						<Y>1.92013907</Y>
+						<Z>3.2699995</Z>
+						<R00>0.895269692</R00>
+						<R01>0.445524842</R01>
+						<R02>0</R02>
+						<R10>-0.445524842</R10>
+						<R11>0.895269692</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<float name="Elasticity">0.5</float>
+					<float name="Friction">0.300000012</float>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<token name="Material">256</token>
+					<string name="Name">Ramp2</string>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<BinaryString name="Tags"></BinaryString>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<token name="formFactorRaw">1</token>
+					<token name="shape">1</token>
+					<Vector3 name="size">
+						<X>25</X>
+						<Y>8</Y>
+						<Z>5</Z>
+					</Vector3>
+				</Properties>
+			</Item>
+			<Item class="Part" referent="RBX9A422793A45B4AB7B880C24934819602">
+				<Properties>
+					<bool name="Anchored">true</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>-36.4089432</X>
+						<Y>-0.416780859</Y>
+						<Z>8.21999931</Z>
+						<R00>0.960699379</R00>
+						<R01>0.277591079</R01>
+						<R02>0</R02>
+						<R10>-0.277591079</R10>
+						<R11>0.960699379</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<float name="Elasticity">0.5</float>
+					<float name="Friction">0.300000012</float>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<token name="Material">256</token>
+					<string name="Name">Ramp3</string>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<BinaryString name="Tags"></BinaryString>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<token name="formFactorRaw">1</token>
+					<token name="shape">1</token>
+					<Vector3 name="size">
+						<X>25</X>
+						<Y>8</Y>
+						<Z>5</Z>
+					</Vector3>
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Part" referent="RBX7959C0F8DED14497AF970E800154A12D">
+		<Item class="Model" referent="RBX32D31C8006A940449D00ACAEB44FDF3C">
 			<Properties>
-				<bool name="Anchored">false</bool>
-				<float name="BackParamA">-0.5</float>
-				<float name="BackParamB">0.5</float>
-				<token name="BackSurface">0</token>
-				<token name="BackSurfaceInput">0</token>
-				<float name="BottomParamA">-0.5</float>
-				<float name="BottomParamB">0.5</float>
-				<token name="BottomSurface">0</token>
-				<token name="BottomSurfaceInput">0</token>
-				<CoordinateFrame name="CFrame">
-					<X>1</X>
-					<Y>-1</Y>
-					<Z>33</Z>
+				<CoordinateFrame name="ModelInPrimary">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -2392,97 +2360,245 @@ gO4=]]></BinaryString>
 					<R21>0</R21>
 					<R22>1</R22>
 				</CoordinateFrame>
-				<bool name="CanCollide">true</bool>
-				<int name="CollisionGroupId">0</int>
-				<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
-				<PhysicalProperties name="CustomPhysicalProperties">
-					<CustomPhysics>false</CustomPhysics>
-				</PhysicalProperties>
-				<float name="Elasticity">0.5</float>
-				<float name="Friction">0.300000012</float>
-				<float name="FrontParamA">-0.5</float>
-				<float name="FrontParamB">0.5</float>
-				<token name="FrontSurface">0</token>
-				<token name="FrontSurfaceInput">0</token>
-				<float name="LeftParamA">-0.5</float>
-				<float name="LeftParamB">0.5</float>
-				<token name="LeftSurface">0</token>
-				<token name="LeftSurfaceInput">0</token>
-				<bool name="Locked">false</bool>
-				<token name="Material">256</token>
-				<string name="Name">Part</string>
-				<float name="Reflectance">0</float>
-				<float name="RightParamA">-0.5</float>
-				<float name="RightParamB">0.5</float>
-				<token name="RightSurface">0</token>
-				<token name="RightSurfaceInput">0</token>
-				<Vector3 name="RotVelocity">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Vector3>
+				<string name="Name">Rollers</string>
+				<Ref name="PrimaryPart">null</Ref>
 				<BinaryString name="Tags"></BinaryString>
-				<float name="TopParamA">-0.5</float>
-				<float name="TopParamB">0.5</float>
-				<token name="TopSurface">0</token>
-				<token name="TopSurfaceInput">0</token>
-				<float name="Transparency">0</float>
-				<Vector3 name="Velocity">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Vector3>
-				<token name="formFactorRaw">1</token>
-				<token name="shape">1</token>
-				<Vector3 name="size">
-					<X>4</X>
-					<Y>4</Y>
-					<Z>20</Z>
-				</Vector3>
 			</Properties>
-			<Item class="Attachment" referent="RBX0775E5BA66BA41A9848A245D2701C7C7">
+			<Item class="Part" referent="RBXB43C211E30C8468B93779FA3355B3988">
 				<Properties>
+					<bool name="Anchored">false</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
 					<CoordinateFrame name="CFrame">
-						<X>0</X>
-						<Y>0</Y>
-						<Z>10</Z>
-						<R00>0</R00>
+						<X>-5</X>
+						<Y>-1</Y>
+						<Z>33</Z>
+						<R00>1</R00>
 						<R01>0</R01>
-						<R02>-1</R02>
+						<R02>0</R02>
 						<R10>0</R10>
 						<R11>1</R11>
 						<R12>0</R12>
-						<R20>1</R20>
+						<R20>0</R20>
 						<R21>0</R21>
-						<R22>0</R22>
+						<R22>1</R22>
 					</CoordinateFrame>
-					<string name="Name">Attachment0</string>
+					<bool name="CanCollide">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<float name="Elasticity">0.5</float>
+					<float name="Friction">0.300000012</float>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<token name="Material">256</token>
+					<string name="Name">Part</string>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
 					<BinaryString name="Tags"></BinaryString>
-					<bool name="Visible">false</bool>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<token name="formFactorRaw">1</token>
+					<token name="shape">1</token>
+					<Vector3 name="size">
+						<X>4</X>
+						<Y>4</Y>
+						<Z>20</Z>
+					</Vector3>
 				</Properties>
+				<Item class="Attachment" referent="RBX7B89AA9B4EB04677BA17370DEF997891">
+					<Properties>
+						<CoordinateFrame name="CFrame">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>10</Z>
+							<R00>0</R00>
+							<R01>0</R01>
+							<R02>-1</R02>
+							<R10>0</R10>
+							<R11>1</R11>
+							<R12>0</R12>
+							<R20>1</R20>
+							<R21>0</R21>
+							<R22>0</R22>
+						</CoordinateFrame>
+						<string name="Name">Attachment0</string>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
+				<Item class="HingeConstraint" referent="RBX768D759725FE44308377086284F55CCB">
+					<Properties>
+						<token name="ActuatorType">1</token>
+						<float name="AngularSpeed">0</float>
+						<float name="AngularVelocity">1</float>
+						<Ref name="Attachment0">RBX7B89AA9B4EB04677BA17370DEF997891</Ref>
+						<Ref name="Attachment1">RBX5261EE4C55524B5E92F0D353E47F1605</Ref>
+						<int name="Color">1009</int>
+						<bool name="Enabled">true</bool>
+						<bool name="LimitsEnabled">false</bool>
+						<float name="LowerAngle">-45</float>
+						<float name="MotorMaxAcceleration">INF</float>
+						<float name="MotorMaxTorque">10000000</float>
+						<string name="Name">HingeConstraint</string>
+						<float name="Radius">0.150000006</float>
+						<float name="Restitution">0</float>
+						<float name="ServoMaxTorque">0</float>
+						<BinaryString name="Tags"></BinaryString>
+						<float name="TargetAngle">0</float>
+						<float name="UpperAngle">45</float>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
 			</Item>
-			<Item class="HingeConstraint" referent="RBXC812EA2649AA4530B730E843AE72916F">
+			<Item class="Part" referent="RBX7959C0F8DED14497AF970E800154A12D">
 				<Properties>
-					<token name="ActuatorType">1</token>
-					<float name="AngularSpeed">0</float>
-					<float name="AngularVelocity">1</float>
-					<Ref name="Attachment0">RBX0775E5BA66BA41A9848A245D2701C7C7</Ref>
-					<Ref name="Attachment1">RBX44CAAE1D03FB4D20863D3ED685A12629</Ref>
-					<int name="Color">1009</int>
-					<bool name="Enabled">true</bool>
-					<bool name="LimitsEnabled">false</bool>
-					<float name="LowerAngle">-45</float>
-					<float name="MotorMaxAcceleration">INF</float>
-					<float name="MotorMaxTorque">10000000</float>
-					<string name="Name">HingeConstraint</string>
-					<float name="Radius">0.150000006</float>
-					<float name="Restitution">0</float>
-					<float name="ServoMaxTorque">0</float>
+					<bool name="Anchored">false</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>1</X>
+						<Y>-1</Y>
+						<Z>33</Z>
+						<R00>1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<float name="Elasticity">0.5</float>
+					<float name="Friction">0.300000012</float>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<token name="Material">256</token>
+					<string name="Name">Part</string>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
 					<BinaryString name="Tags"></BinaryString>
-					<float name="TargetAngle">0</float>
-					<float name="UpperAngle">45</float>
-					<bool name="Visible">false</bool>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<token name="formFactorRaw">1</token>
+					<token name="shape">1</token>
+					<Vector3 name="size">
+						<X>4</X>
+						<Y>4</Y>
+						<Z>20</Z>
+					</Vector3>
 				</Properties>
+				<Item class="Attachment" referent="RBX0775E5BA66BA41A9848A245D2701C7C7">
+					<Properties>
+						<CoordinateFrame name="CFrame">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>10</Z>
+							<R00>0</R00>
+							<R01>0</R01>
+							<R02>-1</R02>
+							<R10>0</R10>
+							<R11>1</R11>
+							<R12>0</R12>
+							<R20>1</R20>
+							<R21>0</R21>
+							<R22>0</R22>
+						</CoordinateFrame>
+						<string name="Name">Attachment0</string>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
+				<Item class="HingeConstraint" referent="RBXC812EA2649AA4530B730E843AE72916F">
+					<Properties>
+						<token name="ActuatorType">1</token>
+						<float name="AngularSpeed">0</float>
+						<float name="AngularVelocity">1</float>
+						<Ref name="Attachment0">RBX0775E5BA66BA41A9848A245D2701C7C7</Ref>
+						<Ref name="Attachment1">RBX44CAAE1D03FB4D20863D3ED685A12629</Ref>
+						<int name="Color">1009</int>
+						<bool name="Enabled">true</bool>
+						<bool name="LimitsEnabled">false</bool>
+						<float name="LowerAngle">-45</float>
+						<float name="MotorMaxAcceleration">INF</float>
+						<float name="MotorMaxTorque">10000000</float>
+						<string name="Name">HingeConstraint</string>
+						<float name="Radius">0.150000006</float>
+						<float name="Restitution">0</float>
+						<float name="ServoMaxTorque">0</float>
+						<BinaryString name="Tags"></BinaryString>
+						<float name="TargetAngle">0</float>
+						<float name="UpperAngle">45</float>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
 			</Item>
 		</Item>
 	</Item>
@@ -2716,8 +2832,8 @@ function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
 	local currentX = currentVelocity.X
 	local currentY = currentVelocity.Z
 
-	local onGround, groughtHeight = self:castCylinder(Vector3.new(0, -5, 0))
-	local targetHeight = groughtHeight + self.hipHeight
+	local onGround, groundHeight = self:castCylinder(Vector3.new(0, -(self.hipHeight + 2), 0))
+	local targetHeight = groundHeight + self.hipHeight
 	local currentHeight = self.character.castPoint.WorldPosition.Y
 
 	while self.accumulatedTime >= FRAMERATE do
@@ -2775,7 +2891,8 @@ function Simulation:step(dt, inputX, inputY, inputJump, inputRagdoll)
 
 	local velocity = Vector3.new(currentX, 0, currentY)
 
-	self.character.orientationAttachment.Position = self.character.instance.PrimaryPart.Position + velocity
+	--self.character.orientationAttachment.Position = self.character.instance.PrimaryPart.Position + velocity
+	self.character.orientationAttachment.CFrame = CFrame.new(Vector3.new(), velocity)
 end
 
 return Simulation]]></ProtectedString>
