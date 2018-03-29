@@ -9,7 +9,7 @@ function Climbing.new(simulation)
 	return state
 end
 
-function Climbing:enterState()
+function Climbing:enterState(oldState, options)
 	-- TODO
 end
 

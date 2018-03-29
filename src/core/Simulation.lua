@@ -24,7 +24,7 @@ function Simulation.new(character)
 	return simulation
 end
 
-function Simulation:setState(newState)
+function Simulation:setState(newState, options)
 	assert(newState, "setState requires a state parameter!")
 
 	if newState == self.currentState then
@@ -34,13 +34,13 @@ function Simulation:setState(newState)
 	local oldState = self.currentState
 
 	if oldState.leaveState then
-		oldState:leaveState()
+		oldState:leaveState(newState)
 	end
 
 	self.currentState = newState
 
 	if newState.enterState then
-		newState:enterState()
+		newState:enterState(oldState, options)
 	end
 end
 
