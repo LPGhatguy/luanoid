@@ -101,7 +101,7 @@ function Simulation.new(character)
 		adorns = createHandles(castCount),
 		maxHorAccel = TARGET_SPEED / 0.25, -- velocity / time to reach it squared
 		maxVerAccel = 50 / 0.1, -- massless max vertical force against gravity
-		hipHeight = 2.5,
+		hipHeight = 2.352,
 		popTime = 0.05, -- target time to reach target height
 	}
 
@@ -111,38 +111,46 @@ function Simulation.new(character)
 end
 
 -- vector is direction + mag
-function Simulation:castCylinder(vector)
+function Simulation:castCylinder(vector, bias)
 	-- max len, min length
 	-- update part points and part velocities
-	local radius = 1.5
-	local start = self.character.castPoint.WorldPosition
+	local radius = 2
+	local center = self.character.castPoint.WorldPosition
+
+	if bias.Magnitude > radius then
+		bias = bias.Unit * radius
+	end
 
 	local onGround = false
 	local totalWeight = 0
 	local totalHeight = 0
 	for i, x, z in sunflower(self.castCount, 2) do
-		local p = start + Vector3.new(x*radius, 0, z*radius)
-		local ray = Ray.new(p, vector)
+		local offset = Vector3.new(x*radius, 0, z*radius)
+		local start = center + offset
+		local ray = Ray.new(start, vector)
+
 		local part, point, normal = Workspace:FindPartOnRay(ray, self.character.instance)
-		local length = (point - p).Magnitude
+		local length = (point - start).Magnitude
 		local legHit = length <= self.hipHeight + 0.25
+		onGround = onGround or legHit
 
 		-- add to weighted average
+		local weight = 1
 		if part then
-			local weight = 1
+			local biasDist = (offset - bias).Magnitude / radius
+			weight = 1 - biasDist*biasDist
+			-- can't let total be 0 if onGround
+			weight = math.max(weight, 0.1)
 			totalWeight = totalWeight + weight
-			totalHeight = totalHeight + point.y
+			totalHeight = totalHeight + point.y*weight
 		end
-
-		onGround = onGround or legHit
 
 		local adorn = self.adorns[i]
 		adorn:move(point)
-
 		if legHit then
-			adorn:setColor(Color3.new(0, 1, 0))
+			adorn:setColor(Color3.new(0, weight, 0))
 		elseif part then
-			adorn:setColor(Color3.new(0, 1, 1))
+			adorn:setColor(Color3.new(0, weight, weight))
 		else
 			adorn:setColor(Color3.new(1, 0, 0))
 		end
@@ -162,14 +170,10 @@ function Simulation:step(dt, input)
 	local currentVelocity = self.character.instance.PrimaryPart.Velocity;
 	local currentX = currentVelocity.X
 	local currentY = currentVelocity.Z
-
-	local onGround, groundHeight = self:castCylinder(Vector3.new(0, -5, 0))
-	local targetHeight = groundHeight + self.hipHeight
-	local currentHeight = self.character.castPoint.WorldPosition.Y
-
+	
 	while self.accumulatedTime >= FRAMERATE do
 		self.accumulatedTime = self.accumulatedTime - FRAMERATE
-
+		
 		currentX, self.currentAccelerationX = stepSpring(
 			FRAMERATE,
 			currentX,
@@ -179,7 +183,7 @@ function Simulation:step(dt, input)
 			DAMPING,
 			PRECISION
 		)
-
+		
 		currentY, self.currentAccelerationY = stepSpring(
 			FRAMERATE,
 			currentY,
@@ -190,6 +194,13 @@ function Simulation:step(dt, input)
 			PRECISION
 		)
 	end
+
+	local vFactor = 0.075 -- fudge constant
+	local bias = Vector3.new(currentX*vFactor, 0, currentY*vFactor)
+
+	local onGround, groundHeight = self:castCylinder(Vector3.new(0, -5, 0), bias)
+	local targetHeight = groundHeight + self.hipHeight
+	local currentHeight = self.character.castPoint.WorldPosition.Y
 
 	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
 	self.character.instance.PrimaryPart.Color = bottomColor

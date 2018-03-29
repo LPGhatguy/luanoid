@@ -2853,11 +2853,11 @@ end]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX6F6E93F60ED24747B53846957A9662E6">
+			<Item class="ModuleScript" referent="RBX8BD37E06DDEA4802824ED042F206444C">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Simulation</string>
-					<string name="ScriptGuid">{DC65F292-EE69-43BE-90FD-13E0F9656039}</string>
+					<string name="ScriptGuid">{0B4DCAB7-21F1-4714-9FBC-A23B528CF32C}</string>
 					<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
 
 local stepSpring = require(script.Parent.stepSpring)
@@ -2971,38 +2971,46 @@ function Simulation.new(character)
 end
 
 -- vector is direction + mag
-function Simulation:castCylinder(vector)
+function Simulation:castCylinder(vector, bias)
 	-- max len, min length
 	-- update part points and part velocities
-	local radius = 1.5
-	local start = self.character.castPoint.WorldPosition
+	local radius = 2
+	local center = self.character.castPoint.WorldPosition
+
+	if bias.Magnitude > radius then
+		bias = bias.Unit * radius
+	end
 
 	local onGround = false
 	local totalWeight = 0
 	local totalHeight = 0
 	for i, x, z in sunflower(self.castCount, 2) do
-		local p = start + Vector3.new(x*radius, 0, z*radius)
-		local ray = Ray.new(p, vector)
+		local offset = Vector3.new(x*radius, 0, z*radius)
+		local start = center + offset
+		local ray = Ray.new(start, vector)
+
 		local part, point, normal = Workspace:FindPartOnRay(ray, self.character.instance)
-		local length = (point - p).Magnitude
+		local length = (point - start).Magnitude
 		local legHit = length <= self.hipHeight + 0.25
+		onGround = onGround or legHit
 
 		-- add to weighted average
+		local weight = 1
 		if part then
-			local weight = 1
+			local biasDist = (offset - bias).Magnitude / radius
+			weight = 1 - biasDist*biasDist
+			-- can't let total be 0 if onGround
+			weight = math.max(weight, 0.1)
 			totalWeight = totalWeight + weight
-			totalHeight = totalHeight + point.y
+			totalHeight = totalHeight + point.y*weight
 		end
-
-		onGround = onGround or legHit
 
 		local adorn = self.adorns[i]
 		adorn:move(point)
-
 		if legHit then
-			adorn:setColor(Color3.new(0, 1, 0))
+			adorn:setColor(Color3.new(0, weight, 0))
 		elseif part then
-			adorn:setColor(Color3.new(0, 1, 1))
+			adorn:setColor(Color3.new(0, weight, weight))
 		else
 			adorn:setColor(Color3.new(1, 0, 0))
 		end
@@ -3022,14 +3030,10 @@ function Simulation:step(dt, input)
 	local currentVelocity = self.character.instance.PrimaryPart.Velocity;
 	local currentX = currentVelocity.X
 	local currentY = currentVelocity.Z
-
-	local onGround, groundHeight = self:castCylinder(Vector3.new(0, -5, 0))
-	local targetHeight = groundHeight + self.hipHeight
-	local currentHeight = self.character.castPoint.WorldPosition.Y
-
+	
 	while self.accumulatedTime >= FRAMERATE do
 		self.accumulatedTime = self.accumulatedTime - FRAMERATE
-
+		
 		currentX, self.currentAccelerationX = stepSpring(
 			FRAMERATE,
 			currentX,
@@ -3039,7 +3043,7 @@ function Simulation:step(dt, input)
 			DAMPING,
 			PRECISION
 		)
-
+		
 		currentY, self.currentAccelerationY = stepSpring(
 			FRAMERATE,
 			currentY,
@@ -3051,6 +3055,13 @@ function Simulation:step(dt, input)
 		)
 	end
 
+	local vFactor = 0.075 -- fudge constant
+	local bias = Vector3.new(currentX*vFactor, 0, currentY*vFactor)
+
+	local onGround, groundHeight = self:castCylinder(Vector3.new(0, -5, 0), bias)
+	local targetHeight = groundHeight + self.hipHeight
+	local currentHeight = self.character.castPoint.WorldPosition.Y
+
 	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
 	self.character.instance.PrimaryPart.Color = bottomColor
 
@@ -3058,8 +3069,12 @@ function Simulation:step(dt, input)
 
 	if onGround and not input.ragdoll then
 		local up
-		if input.jump then
-			up = 5000 * characterMass
+		
+		local jumpHeight = 10
+		local jumpInitialVelocity = math.sqrt(workspace.gravity*2*jumpHeight)
+		if input.jump and currentVelocity.Y < jumpInitialVelocity then
+			up = 0
+			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
 		else
 			local t = self.popTime
 			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
@@ -4925,7 +4940,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5098,7 +5113,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5617,7 +5632,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -6157,7 +6172,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -6330,7 +6345,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -6503,7 +6518,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">true</bool>
+					<bool name="CanCollide">false</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
