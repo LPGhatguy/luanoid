@@ -2,6 +2,7 @@ local UserInputService = game:GetService("UserInputService")
 
 local Input = {
 	keysDown = {},
+	previousKeysDown = {},
 }
 
 function Input.start()
@@ -20,6 +21,17 @@ function Input.start()
 
 		Input.keysDown[inputObject.KeyCode] = nil
 	end)
+end
+
+function Input.step()
+	local newKeysDown = {}
+
+	for key, value in pairs(Input.keysDown) do
+		newKeysDown[key] = value
+	end
+
+	Input.previousKeysDown = Input.keysDown
+	Input.keysDown = newKeysDown
 end
 
 return Input

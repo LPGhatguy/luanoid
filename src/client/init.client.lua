@@ -22,7 +22,7 @@ RunService.Heartbeat:Connect(function(dt)
 	local input = {
 		movementX = 0,
 		movementY = 0,
-		jump = Input.keysDown[Enum.KeyCode.Space],
+		jump = Input.keysDown[Enum.KeyCode.Space] and not Input.previousKeysDown[Enum.KeyCode.Space],
 		ragdoll = Input.keysDown[Enum.KeyCode.F],
 	}
 
@@ -43,6 +43,7 @@ RunService.Heartbeat:Connect(function(dt)
 	end
 
 	simulation:step(dt, input)
+	Input.step()
 end)
 
 Input.start()
