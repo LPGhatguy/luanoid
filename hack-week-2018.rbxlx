@@ -34,26 +34,26 @@
 		<Item class="Camera" referent="RBX3756E04643664949B917E8F0A9963824">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-47.054451</X>
-					<Y>41.029007</Y>
-					<Z>9.672925</Z>
-					<R00>0.434489876</R00>
-					<R01>0.47033152</R01>
-					<R02>-0.768119037</R02>
-					<R10>-1.4901163e-08</R10>
-					<R11>0.85282445</R11>
-					<R12>0.522197843</R12>
-					<R20>0.900676847</R20>
-					<R21>-0.226889655</R21>
-					<R22>0.37054351</R22>
+					<X>23.8558502</X>
+					<Y>30.0075512</Y>
+					<Z>-32.1297722</Z>
+					<R00>0.602455437</R00>
+					<R01>-0.530749142</R01>
+					<R02>0.596114874</R02>
+					<R10>-0</R10>
+					<R11>0.746868372</R11>
+					<R12>0.664972067</R12>
+					<R20>-0.798152566</R20>
+					<R21>-0.40061605</R21>
+					<R22>0.449954838</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<CoordinateFrame name="Focus">
-					<X>-45.518219</X>
-					<Y>39.9846153</Y>
-					<Z>8.9318409</Z>
+					<X>22.66362</X>
+					<Y>28.6776066</Y>
+					<Z>-33.0296822</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -1952,6 +1952,13 @@ gO4=]]></BinaryString>
 				</Vector3>
 				<token name="style">0</token>
 			</Properties>
+			<Item class="StringValue" referent="RBX5D1CBA1FE2774C82BC38079B48A7D05A">
+				<Properties>
+					<string name="Name">Climbable</string>
+					<BinaryString name="Tags"></BinaryString>
+					<string name="Value"></string>
+				</Properties>
+			</Item>
 		</Item>
 		<Item class="Part" referent="RBX6CA101254AC24C139CA380EAD96FBD16">
 			<Properties>
@@ -2652,16 +2659,512 @@ gO4=]]></BinaryString>
 			<string name="Name">ReplicatedFirst</string>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Folder" referent="RBX0649738D41E94DA49A3F365E6C20FF1D">
+		<Item class="Folder" referent="RBX7297C837C0A0441F9AA1A9C3783472DC">
 			<Properties>
 				<string name="Name">CharacterControllerCore</string>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBXCDCD41E1FB1F4AA5A5E07251402EFF7E">
+			<Item class="ModuleScript" referent="RBXB4BEC038CCE141F68E9A6CD5226DE327">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Simulation</string>
+					<string name="ScriptGuid">{4A920C18-3F9C-4518-908B-47583248F955}</string>
+					<ProtectedString name="Source"><![CDATA[local CharacterState = require(script.Parent.CharacterState)
+
+local Simulation = {}
+Simulation.__index = Simulation
+
+function Simulation.new(character)
+	local simulation = {
+		character = character,
+	}
+
+	simulation.states = {
+		Walking = CharacterState.Walking.new(simulation),
+		Ragdoll = CharacterState.Ragdoll.new(simulation),
+	}
+
+	simulation.state = "Walking"
+
+	simulation.states[simulation.state]:enterState()
+
+	setmetatable(simulation, Simulation)
+
+	return simulation
+end
+
+function Simulation:setState(stateName)
+	if stateName == self.state then
+		return
+	end
+
+	if not self.states[stateName] then
+		error("Invalid state name " .. stateName, 2)
+	end
+
+	self.states[self.state]:leaveState()
+	self.state = stateName
+	self.states[self.state]:enterState()
+end
+
+function Simulation:step(dt, input)
+	self.states[self.state]:step(dt, input)
+end
+
+return Simulation]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXA45C94410F2049628AF23232CF2575C0">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">castCylinder</string>
+					<string name="ScriptGuid">{9CC75CB3-8D1B-45F2-9A56-5EC09C401EC5}</string>
+					<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+
+local DebugHandle = require(script.Parent.DebugHandle)
+
+local CAST_COUNT = 32
+
+-- TODO: more appropriate cast distribution algorithm
+-- https://stackoverflow.com/a/28572551/367100
+local function radius(k,n,b)
+	if k > n - b then
+		return 1 -- put on the boundary
+	else
+		return math.sqrt(k - 1/2)/math.sqrt(n - (b + 1)/2) -- apply square root
+	end
+end
+
+local function sunflower(n, alpha) --  example: n=500, alpha=2
+	local b = math.ceil(alpha*math.sqrt(n)) -- number of boundary points
+	local phi = (math.sqrt(5) + 1)/2 -- golden ratio
+	local i = 1
+	return function()
+		if i <= n then
+			i = i + 1
+			local r = radius(i, n, b)
+			local theta = 2*math.pi*i/(phi*phi)
+			return i - 1, r*math.cos(theta), r*math.sin(theta)
+		end
+		return
+	end
+end
+
+-- direction is direction + mag
+local function castCylinder(options)
+	local origin = assert(options.origin)
+	local direction = assert(options.direction)
+	local bias = assert(options.bias)
+	local hipHeight = assert(options.hipHeight)
+	local adorns = options.adorns
+	local ignoreInstance = options.ignoreInstance
+
+	-- max len, min length
+	-- update part points and part velocities
+	local radius = 1.5
+
+	if bias.Magnitude > radius then
+		bias = bias.Unit * radius
+	end
+
+	local onGround = false
+	local totalWeight = 0
+	local totalHeight = 0
+
+	for index, x, z in sunflower(CAST_COUNT, 2) do
+		local offset = Vector3.new(x*radius, 0, z*radius)
+		local start = origin + offset
+		local ray = Ray.new(start, direction)
+
+		local part, point = Workspace:FindPartOnRay(ray, ignoreInstance)
+		local length = (point - start).Magnitude
+		local legHit = length <= hipHeight + 0.25
+		onGround = onGround or legHit
+
+		-- add to weighted average
+		local weight = 1
+		if part then
+			local biasDist = (offset - bias).Magnitude / radius
+			weight = 1 - biasDist*biasDist
+			-- can't let total be 0 if onGround
+			weight = math.max(weight, 0.1)
+			totalWeight = totalWeight + weight
+			totalHeight = totalHeight + point.y*weight
+		end
+
+		if adorns then
+			local adorn = adorns[index]
+
+			if not adorn then
+				adorn = DebugHandle.new()
+				adorns[index] = adorn
+			end
+
+			adorn:move(point)
+
+			if legHit then
+				adorn:setColor(Color3.new(0, weight, 0))
+			elseif part then
+				adorn:setColor(Color3.new(0, weight, weight))
+			else
+				adorn:setColor(Color3.new(1, 0, 0))
+			end
+		end
+	end
+
+	return onGround, totalHeight / totalWeight
+end
+
+return castCylinder]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX0DFDEFDD83594DC3BDA886993E7B9231">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">getModelMass</string>
+					<string name="ScriptGuid">{0252EE2D-9907-4831-9256-3FB33F00CF1F}</string>
+					<ProtectedString name="Source"><![CDATA[local function getModelMass(model)
+	local mass = 0
+
+	for _, child in ipairs(model:GetChildren()) do
+		if child:IsA("BasePart") then
+			mass = mass + child:GetMass()
+		else
+			mass = mass + getModelMass(child)
+		end
+	end
+
+	return mass
+end
+
+return getModelMass]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXDEFD9AA1A5B6461AAC50FA8ED2800E4D">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">CharacterState</string>
+					<string name="ScriptGuid">{28D7FBA1-FD62-4140-B08A-AE93C9C179A7}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+	Bundle up each CharacterState and expose it through one object
+]]
+
+local result = {}
+
+for _, instance in pairs(script:GetChildren()) do
+	result[instance.Name] = require(instance)
+end
+
+return result]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="ModuleScript" referent="RBXA25A4CEE1BE74B89A0FB19B7F3261D1A">
+					<Properties>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Walking</string>
+						<string name="ScriptGuid">{1188AA7F-B311-467E-9B16-1BF8C283E204}</string>
+						<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+
+local getModelMass = require(script.Parent.Parent.getModelMass)
+local stepSpring = require(script.Parent.Parent.stepSpring)
+local castCylinder = require(script.Parent.Parent.castCylinder)
+
+local FRAMERATE = 1 / 240
+local STIFFNESS = 170
+local DAMPING = 26
+local PRECISION = 0.001
+local TARGET_SPEED = 24
+local HIP_HEIGHT = 2.352
+local MAX_HOR_ACCEL = TARGET_SPEED / 0.25 -- velocity / time to reach it squared
+local MAX_VER_ACCELT = 50 / 0.1 -- massless max vertical force against gravity
+local POP_TIME = 0.05 -- target time to reach target height
+
+local THETA = math.pi * 2
+
+-- loop between 0 - 2*pi
+local function angleAbs(angle)
+	while angle < 0 do
+		angle = angle + THETA
+	end
+	while angle > THETA do
+		angle = angle - THETA
+	end
+	return angle
+end
+
+local function angleShortest(a0, a1)
+	local d1 = angleAbs(a1 - a0)
+	local d2 = -angleAbs(a0 - a1)
+	return math.abs(d1) > math.abs(d2) and d2 or d1
+end
+
+local function lerpAngle(a0, a1, alpha)
+	return a0 + angleShortest(a0, a1)*alpha
+end
+
+local function makeCFrame(up, look)
+	local upu = up.Unit
+	local looku = (Vector3.new() - look).Unit
+	local rightu = upu:Cross(looku).Unit
+	-- orthonormalize, keeping up vector
+	looku = -upu:Cross(rightu).Unit
+	return CFrame.new(0, 0, 0, rightu.x, upu.x, looku.x, rightu.y, upu.y, looku.y, rightu.z, upu.z, looku.z)
+end
+
+local Walking = {}
+Walking.__index = Walking
+
+function Walking.new(simulation)
+	local state = {
+		simulation = simulation,
+		character = simulation.character,
+		accumulatedTime = 0,
+		currentAccelerationX = 0,
+		currentAccelerationY = 0,
+		debugAdorns = {},
+	}
+
+	setmetatable(state, Walking)
+
+	return state
+end
+
+function Walking:enterState()
+	-- Elegance? Never heard of it.
+	self.character.instance.LeftFoot.CanCollide = false
+	self.character.instance.LeftLowerLeg.CanCollide = false
+	self.character.instance.LeftUpperLeg.CanCollide = false
+	self.character.instance.RightFoot.CanCollide = false
+	self.character.instance.RightLowerLeg.CanCollide = false
+	self.character.instance.RightUpperLeg.CanCollide = false
+
+	self.character.orientation.Enabled = true
+	self.character.vectorForce.Enabled = true
+end
+
+function Walking:leaveState()
+	self.character.instance.LeftFoot.CanCollide = true
+	self.character.instance.LeftLowerLeg.CanCollide = true
+	self.character.instance.LeftUpperLeg.CanCollide = true
+	self.character.instance.RightFoot.CanCollide = true
+	self.character.instance.RightLowerLeg.CanCollide = true
+	self.character.instance.RightUpperLeg.CanCollide = true
+
+	self.character.orientation.Enabled = false
+	self.character.vectorForce.Enabled = false
+	self.character.vectorForce.Force = Vector3.new(0, 0, 0)
+
+	for _, adorn in ipairs(self.debugAdorns) do
+		adorn.instance:Destroy()
+	end
+
+	self.debugAdorns = {}
+end
+
+function Walking:step(dt, input)
+	local characterMass = getModelMass(self.character.instance)
+
+	local targetX = TARGET_SPEED * input.movementX
+	local targetY = TARGET_SPEED * input.movementY
+
+	self.accumulatedTime = self.accumulatedTime + dt
+
+	local currentVelocity = self.character.instance.PrimaryPart.Velocity;
+	local currentX = currentVelocity.X
+	local currentY = currentVelocity.Z
+
+	while self.accumulatedTime >= FRAMERATE do
+		self.accumulatedTime = self.accumulatedTime - FRAMERATE
+
+		currentX, self.currentAccelerationX = stepSpring(
+			FRAMERATE,
+			currentX,
+			self.currentAccelerationX,
+			targetX,
+			STIFFNESS,
+			DAMPING,
+			PRECISION
+		)
+
+		currentY, self.currentAccelerationY = stepSpring(
+			FRAMERATE,
+			currentY,
+			self.currentAccelerationY,
+			targetY,
+			STIFFNESS,
+			DAMPING,
+			PRECISION
+		)
+	end
+
+	local vFactor = 0.075 -- fudge constant
+
+	local onGround, groundHeight = castCylinder({
+		origin = self.character.castPoint.WorldPosition,
+		direction = Vector3.new(0, -5, 0),
+		bias = Vector3.new(currentX*vFactor, 0, currentY*vFactor),
+		adorns = self.debugAdorns,
+		ignoreInstance = self.character.instance,
+		hipHeight = HIP_HEIGHT,
+	})
+
+	local targetHeight = groundHeight + HIP_HEIGHT
+	local currentHeight = self.character.castPoint.WorldPosition.Y
+
+	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
+	self.character.instance.PrimaryPart.Color = bottomColor
+
+	if onGround then
+		local up
+
+		local jumpHeight = 10
+		local jumpInitialVelocity = math.sqrt(Workspace.Gravity*2*jumpHeight)
+		if input.jump and currentVelocity.Y < jumpInitialVelocity then
+			up = 0
+			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
+		else
+			local t = POP_TIME
+			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
+			up = Workspace.Gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
+			-- very low downward acceleration cuttoff (limited ability to push yourself down)
+			if up < -1 then
+				up = 0
+			end
+			up = up*characterMass
+		end
+
+		self.character.vectorForce.Force = Vector3.new(
+			self.currentAccelerationX * characterMass,
+			up,
+			self.currentAccelerationY * characterMass
+		)
+	else
+		self.character.vectorForce.Force = Vector3.new(0, 0, 0)
+	end
+
+	local velocity = Vector3.new(currentX, 0, currentY)
+	local lookVector = self.character.instance.PrimaryPart.CFrame.lookVector
+
+	if velocity.Magnitude > 0.1 and lookVector.y < 0.9 then
+		-- Fix "tumbling" where AlignOrientation might pick the "wrong" axis when we cross through 0, lerp angles...
+		local currentAngle = math.atan2(lookVector.z, lookVector.x)
+		local targetAngle = math.atan2(currentY, currentX)
+		-- If we crossed through 0 (shortest arc angle is close to pi) then lerp the angle...
+		if math.abs(angleShortest(currentAngle, targetAngle)) > math.pi*0.95 then
+			targetAngle = lerpAngle(currentAngle, targetAngle, 0.95)
+		end
+
+		local up = Vector3.new(0, 1, 0)
+		local look = Vector3.new(math.cos(targetAngle), 0, math.sin(targetAngle))
+		self.character.orientationAttachment.CFrame = makeCFrame(up, look)
+	end
+
+	if input.ragdoll then
+		self.simulation:setState("Ragdoll")
+	end
+end
+
+return Walking]]></ProtectedString>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX9C4AF365E0EC421D9308EE4308464F71">
+					<Properties>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Ragdoll</string>
+						<string name="ScriptGuid">{2B49D147-E515-431A-A724-56FAF436814E}</string>
+						<ProtectedString name="Source"><![CDATA[local Ragdoll = {}
+Ragdoll.__index = Ragdoll
+
+function Ragdoll.new(simulation)
+	local state = {
+		simulation = simulation,
+	}
+
+	setmetatable(state, Ragdoll)
+
+	return state
+end
+
+function Ragdoll:step(dt, input)
+	if not input.ragdoll then
+		self.simulation:setState("Walking")
+	end
+end
+
+function Ragdoll:enterState()
+end
+
+function Ragdoll:leaveState()
+end
+
+return Ragdoll]]></ProtectedString>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="ModuleScript" referent="RBX3738C4A1A7B3481BBA8191199DC412B0">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">DebugHandle</string>
+					<string name="ScriptGuid">{B044ABEE-9BBF-467B-BA0B-12428F9B1E4B}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+	Renders points in the world for debugging things.
+
+	Usually used when dealing with finnicky 3D math.
+]]
+
+local Terrain = game:GetService("Workspace").Terrain
+
+local DebugHandle = {}
+DebugHandle.__index = DebugHandle
+
+function DebugHandle.new(color)
+	color = color or Color3.new(0, 0, 1)
+
+	local instance = Instance.new("SphereHandleAdornment")
+	instance.Color3 = color
+	instance.ZIndex = 1
+	instance.Name = "Debug Handle"
+	instance.AlwaysOnTop = true
+	instance.Radius = 0.12
+	instance.Adornee = Terrain
+	instance.Parent = Terrain
+
+	return setmetatable({
+		instance = instance,
+	}, DebugHandle)
+end
+
+function DebugHandle:move(pos)
+	if pos then
+		self.instance.Visible = true
+		self.instance.CFrame = CFrame.new(pos)
+	else
+		self.instance.Visible = false
+	end
+end
+
+function DebugHandle:setColor(color)
+	self.instance.Color3 = color
+end
+
+function DebugHandle:destroy()
+	self.instance:Destroy()
+end
+
+return DebugHandle]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXA844D979DEBC4C209A422EB34314345E">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">makeCharacter</string>
-					<string name="ScriptGuid">{CD294271-3EA5-4C1E-B928-5352262C06D8}</string>
+					<string name="ScriptGuid">{DA3A0F3F-B980-4C75-806F-ECE6764A6379}</string>
 					<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
 local StarterPlayer = game:GetService("StarterPlayer")
 
@@ -2715,111 +3218,11 @@ return makeCharacter]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX7F0B4801B64B4B94AB7955D0E208C3E7">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">getModelMass</string>
-					<string name="ScriptGuid">{8E7D0618-D922-4A52-8560-35156BA5ADF8}</string>
-					<ProtectedString name="Source"><![CDATA[local function getModelMass(model)
-	local mass = 0
-
-	for _, child in ipairs(model:GetChildren()) do
-		if child:IsA("BasePart") then
-			mass = mass + child:GetMass()
-		else
-			mass = mass + getModelMass(child)
-		end
-	end
-
-	return mass
-end
-
-return getModelMass]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXBC55A27E0EA0468EBFB78D8131A5B880">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">DebugHandle</string>
-					<string name="ScriptGuid">{BE11D846-76E1-4AF9-AB43-85214538C27B}</string>
-					<ProtectedString name="Source"><![CDATA[--[[
-	Renders points in the world for debugging things.
-
-	Usually used when dealing with finnicky 3D math.
-]]
-
-local Terrain = game:GetService("Workspace").Terrain
-
-local DebugHandle = {}
-DebugHandle.__index = DebugHandle
-
-function DebugHandle.new(color)
-	color = color or Color3.new(0, 0, 1)
-
-	local instance = Instance.new("SphereHandleAdornment")
-	instance.Color3 = color
-	instance.ZIndex = 1
-	instance.Name = "Debug Handle"
-	instance.AlwaysOnTop = true
-	instance.Radius = 0.12
-	instance.Adornee = Terrain
-	instance.Parent = Terrain
-
-	return setmetatable({
-		instance = instance,
-	}, DebugHandle)
-end
-
-function DebugHandle:move(pos)
-	if pos then
-		self.instance.Visible = true
-		self.instance.CFrame = CFrame.new(pos)
-	else
-		self.instance.Visible = false
-	end
-end
-
-function DebugHandle:setColor(color)
-	self.instance.Color3 = color
-end
-
-function DebugHandle:destroy()
-	self.instance:Destroy()
-end
-
-return DebugHandle]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBX11A1A95F6BC84571A5D31350027E115A">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">ApiSpec</string>
-					<string name="ScriptGuid">{76903C47-CCA5-4069-947E-06ED99CE82D0}</string>
-					<ProtectedString name="Source"><![CDATA[--[[
-	Defines the objects that should be created (server) or to wait to exist
-	(client) for facilitating client-server communication.
-
-	The individual client/server code should handle actually interacting with
-	this file, which should just serve as a specification.
-]]
-
-local ApiSpec = {
-	clientMethods = {
-		"requestMakeCharacter",
-	},
-}
-
-return ApiSpec]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBX07EF30DC8FE54ED7A065717011798A07">
+			<Item class="ModuleScript" referent="RBXBD818F9F4F1B476CAF94D2123795AE35">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">stepSpring</string>
-					<string name="ScriptGuid">{2F79E70F-A92F-4341-90FA-6CE40C834E3F}</string>
+					<string name="ScriptGuid">{E015F4F0-0A68-4C42-A188-1BD4EBEB5D6B}</string>
 					<ProtectedString name="Source"><![CDATA[--[[
 	Steps forward a spring one step. Handles rounding errors for us.
 
@@ -2853,267 +3256,26 @@ end]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX8BD37E06DDEA4802824ED042F206444C">
+			<Item class="ModuleScript" referent="RBX3631571633204732A0639F49002DDE21">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">Simulation</string>
-					<string name="ScriptGuid">{0B4DCAB7-21F1-4714-9FBC-A23B528CF32C}</string>
-					<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+					<string name="Name">ApiSpec</string>
+					<string name="ScriptGuid">{83CB2BC1-D5EF-4220-8F7F-C5A47BF40EDD}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+	Defines the objects that should be created (server) or to wait to exist
+	(client) for facilitating client-server communication.
 
-local stepSpring = require(script.Parent.stepSpring)
-local getModelMass = require(script.Parent.getModelMass)
-local DebugHandle = require(script.Parent.DebugHandle)
+	The individual client/server code should handle actually interacting with
+	this file, which should just serve as a specification.
+]]
 
-local TARGET_SPEED = 24
-local FRAMERATE = 1 / 240
-local STIFFNESS = 170
-local DAMPING = 26
-local PRECISION = 0.001
-local PI = math.pi
-local THETA = math.pi * 2
+local ApiSpec = {
+	clientMethods = {
+		"requestMakeCharacter",
+	},
+}
 
--- (1,0) = 0, (1, -1) = 5.4977871437821...
-local function atan2(x, y)
-	local atan = math.atan(y/x)
-	if x < 0 then
-		if atan > 0 then
-			return atan - PI
-		end
-		return atan + PI
-	end
-	return atan
-end
-
--- loop between 0 - 2*pi
-local function angleAbs(angle)
-	while angle < 0 do
-		angle = angle + THETA
-	end
-	while angle > THETA do
-		angle = angle - THETA
-	end
-	return angle
-end
-
-local function angleShortest(a0, a1)
-	local d1 = angleAbs(a1 - a0)
-	local d2 = -angleAbs(a0 - a1)
-	return math.abs(d1) > math.abs(d2) and d2 or d1
-end
-
-local function lerpAngle(a0, a1, alpha)
-	return a0 + angleShortest(a0, a1)*alpha
-end
-
-local function makeCFrame(up, look)
-	local upu = up.Unit
-	local looku = (Vector3.new() - look).Unit
-	local rightu = upu:Cross(looku).Unit
-	-- orthonormalize, keeping up vector
-	looku = -upu:Cross(rightu).Unit
-	return CFrame.new(0, 0, 0, rightu.x, upu.x, looku.x, rightu.y, upu.y, looku.y, rightu.z, upu.z, looku.z)
-end
-
--- TODO: more appropriate cast distribution algorithm
--- https://stackoverflow.com/a/28572551/367100
-local function radius(k,n,b)
-	if k > n - b then
-		return 1 -- put on the boundary
-	else
-		return math.sqrt(k - 1/2)/math.sqrt(n - (b + 1)/2) -- apply square root
-	end
-end
-
-local function sunflower(n, alpha) --  example: n=500, alpha=2
-	local b = math.ceil(alpha*math.sqrt(n)) -- number of boundary points
-	local phi = (math.sqrt(5) + 1)/2 -- golden ratio
-	local i = 1
-	return function()
-		if i <= n then
-			i = i + 1
-			local r = radius(i, n, b)
-			local theta = 2*math.pi*i/(phi*phi)
-			return i - 1, r*math.cos(theta), r*math.sin(theta)
-		end
-		return
-	end
-end
-
-local function createHandles(n)
-	local handles = {}
-	for i = 1, n do
-		handles[i] = DebugHandle.new()
-	end
-	return handles
-end
-
-local Simulation = {}
-Simulation.__index = Simulation
-
-function Simulation.new(character)
-	local castCount = 32
-	local simulation = {
-		character = character,
-		accumulatedTime = 0,
-		currentAccelerationX = 0,
-		currentAccelerationY = 0,
-		castCount = castCount,
-		adorns = createHandles(castCount),
-		maxHorAccel = TARGET_SPEED / 0.25, -- velocity / time to reach it squared
-		maxVerAccel = 50 / 0.1, -- massless max vertical force against gravity
-		hipHeight = 2.5,
-		popTime = 0.05, -- target time to reach target height
-	}
-
-	setmetatable(simulation, Simulation)
-
-	return simulation
-end
-
--- vector is direction + mag
-function Simulation:castCylinder(vector, bias)
-	-- max len, min length
-	-- update part points and part velocities
-	local radius = 2
-	local center = self.character.castPoint.WorldPosition
-
-	if bias.Magnitude > radius then
-		bias = bias.Unit * radius
-	end
-
-	local onGround = false
-	local totalWeight = 0
-	local totalHeight = 0
-	for i, x, z in sunflower(self.castCount, 2) do
-		local offset = Vector3.new(x*radius, 0, z*radius)
-		local start = center + offset
-		local ray = Ray.new(start, vector)
-
-		local part, point, normal = Workspace:FindPartOnRay(ray, self.character.instance)
-		local length = (point - start).Magnitude
-		local legHit = length <= self.hipHeight + 0.25
-		onGround = onGround or legHit
-
-		-- add to weighted average
-		local weight = 1
-		if part then
-			local biasDist = (offset - bias).Magnitude / radius
-			weight = 1 - biasDist*biasDist
-			-- can't let total be 0 if onGround
-			weight = math.max(weight, 0.1)
-			totalWeight = totalWeight + weight
-			totalHeight = totalHeight + point.y*weight
-		end
-
-		local adorn = self.adorns[i]
-		adorn:move(point)
-		if legHit then
-			adorn:setColor(Color3.new(0, weight, 0))
-		elseif part then
-			adorn:setColor(Color3.new(0, weight, weight))
-		else
-			adorn:setColor(Color3.new(1, 0, 0))
-		end
-	end
-
-	return onGround, totalHeight / totalWeight
-end
-
-function Simulation:step(dt, input)
-	local characterMass = getModelMass(self.character.instance)
-
-	local targetX = TARGET_SPEED * input.movementX
-	local targetY = TARGET_SPEED * input.movementY
-
-	self.accumulatedTime = self.accumulatedTime + dt
-
-	local currentVelocity = self.character.instance.PrimaryPart.Velocity;
-	local currentX = currentVelocity.X
-	local currentY = currentVelocity.Z
-	
-	while self.accumulatedTime >= FRAMERATE do
-		self.accumulatedTime = self.accumulatedTime - FRAMERATE
-		
-		currentX, self.currentAccelerationX = stepSpring(
-			FRAMERATE,
-			currentX,
-			self.currentAccelerationX,
-			targetX,
-			STIFFNESS,
-			DAMPING,
-			PRECISION
-		)
-		
-		currentY, self.currentAccelerationY = stepSpring(
-			FRAMERATE,
-			currentY,
-			self.currentAccelerationY,
-			targetY,
-			STIFFNESS,
-			DAMPING,
-			PRECISION
-		)
-	end
-
-	local vFactor = 0.075 -- fudge constant
-	local bias = Vector3.new(currentX*vFactor, 0, currentY*vFactor)
-
-	local onGround, groundHeight = self:castCylinder(Vector3.new(0, -5, 0), bias)
-	local targetHeight = groundHeight + self.hipHeight
-	local currentHeight = self.character.castPoint.WorldPosition.Y
-
-	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
-	self.character.instance.PrimaryPart.Color = bottomColor
-
-	self.character.orientation.Enabled = not input.ragdoll
-
-	if onGround and not input.ragdoll then
-		local up
-		
-		local jumpHeight = 10
-		local jumpInitialVelocity = math.sqrt(workspace.gravity*2*jumpHeight)
-		if input.jump and currentVelocity.Y < jumpInitialVelocity then
-			up = 0
-			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
-		else
-			local t = self.popTime
-			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
-			up = workspace.gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
-			-- very low downward acceleration cuttoff (limited ability to push yourself down)
-			if up < -1 then
-				up = 0
-			end
-			up = up*characterMass
-		end
-
-		self.character.vectorForce.Force = Vector3.new(
-			self.currentAccelerationX * characterMass,
-			up,
-			self.currentAccelerationY * characterMass
-		)
-	else
-		self.character.vectorForce.Force = Vector3.new(0, 0, 0)
-	end
-
-	local velocity = Vector3.new(currentX, 0, currentY)
-	local lookVector = self.character.instance.PrimaryPart.CFrame.lookVector
-
-	if velocity.Magnitude > 0.1 and lookVector.y < 0.9 then
-		-- Fix "tumbling" where AlignOrientation might pick the "wrong" axis when we cross through 0, lerp angles...
-		local currentAngle = atan2(lookVector.x, lookVector.z)
-		local targetAngle = atan2(currentX, currentY)
-		-- If we crossed through 0 (shortest arc angle is close to pi) then lerp the angle...
-		if math.abs(angleShortest(currentAngle, targetAngle)) > math.pi*0.95 then
-			targetAngle = lerpAngle(currentAngle, targetAngle, 0.95)
-		end
-
-		local up = Vector3.new(0, 1, 0)
-		local look = Vector3.new(math.cos(targetAngle), 0, math.sin(targetAngle))
-		self.character.orientationAttachment.CFrame = makeCFrame(up, look)
-	end
-end
-
-return Simulation]]></ProtectedString>
+return ApiSpec]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
@@ -6803,12 +6965,12 @@ return Api]]></ProtectedString>
 			<string name="Name">ServerScriptService</string>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Script" referent="RBX6437A41015BA49A78593994783951994">
+		<Item class="Script" referent="RBX995AD021E8F54B23B9D93F51E784796E">
 			<Properties>
 				<bool name="Disabled">false</bool>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">CharacterControllerServer</string>
-				<string name="ScriptGuid">{85B6DBAF-D04A-436B-A2BA-51D2548FA085}</string>
+				<string name="ScriptGuid">{8CAE580F-985F-4BFF-BA97-FB254242B109}</string>
 				<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
@@ -6831,11 +6993,11 @@ end
 Api.implement(ApiImplementation)]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBXF1E3AEC5DFE3468197906F9FF51BD4FC">
+			<Item class="ModuleScript" referent="RBXB0A3E1F792E14483A355A38DC0603413">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Api</string>
-					<string name="ScriptGuid">{BBDE6F89-584B-43A5-81A2-2D95F0F95D07}</string>
+					<string name="ScriptGuid">{0ECA4F4E-01C3-4DA7-8FEE-EB269964DB82}</string>
 					<ProtectedString name="Source"><![CDATA[local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
