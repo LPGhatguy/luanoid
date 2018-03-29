@@ -1,5 +1,6 @@
 local Workspace = game:GetService("Workspace")
 
+local Animation = require(script.Parent.Parent.Animation)
 local getModelMass = require(script.Parent.Parent.getModelMass)
 local stepSpring = require(script.Parent.Parent.stepSpring)
 local castCylinder = require(script.Parent.Parent.castCylinder)
@@ -90,6 +91,8 @@ function Walking.new(simulation)
 	local state = {
 		simulation = simulation,
 		character = simulation.character,
+		animation = simulation.animation,
+
 		accumulatedTime = 0,
 		currentAccelerationX = 0,
 		currentAccelerationY = 0,
@@ -120,9 +123,11 @@ function Walking:enterState()
 	debugPlane.ZIndex = 2
 	debugPlane.Transparency = 0.25
 	debugPlane.Size = Vector3.new(0.1, 0.1, 1)
-	debugPlane.Parent = workspace.Terrain
+	debugPlane.Parent = Workspace.Terrain
 	debugPlane.Adornee = debugPlane.Parent
 	self.debugPlane = debugPlane
+
+	self.animation:setState(Animation.State.Idle)
 end
 
 function Walking:leaveState()
@@ -151,6 +156,9 @@ function Walking:leaveState()
 	self.currentAccelerationY = 0
 
 	self.debugAdorns = {}
+
+	self.animation.animations.walk:AdjustSpeed(1)
+	self.animation:setState(Animation.State.None)
 end
 
 function Walking:step(dt, input)
@@ -252,6 +260,17 @@ function Walking:step(dt, input)
 
 	local velocity = Vector3.new(currentX, 0, currentY)
 	local lookVector = self.character.instance.PrimaryPart.CFrame.lookVector
+
+	if onGround then
+		if velocity.Magnitude <= 1 then
+			self.animation:setState(Animation.State.Idle)
+		else
+			self.animation:setState(Animation.State.Walking)
+			self.animation.animations.walk:AdjustSpeed(velocity.Magnitude / 16)
+		end
+	else
+		self.animation:setState(Animation.State.Falling)
+	end
 
 	if velocity.Magnitude > 0.1 and lookVector.y < 0.9 then
 		-- Fix "tumbling" where AlignOrientation might pick the "wrong" axis when we cross through 0, lerp angles...

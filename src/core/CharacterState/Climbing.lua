@@ -1,7 +1,9 @@
 local Workspace = game:GetService("Workspace")
 
+local Animation = require(script.Parent.Parent.Animation)
 local DebugHandle = require(script.Parent.Parent.DebugHandle)
 
+local CLIMB_DISTANCE = 1.5 -- How far away can you be from the surface to climb?
 local CLIMB_DEBOUNCE = 0.2
 
 local Climbing = {}
@@ -11,6 +13,8 @@ function Climbing.new(simulation)
 	local state = {
 		simulation = simulation,
 		character = simulation.character,
+		animation = simulation.animation,
+
 		checkAdorn = DebugHandle.new(),
 		objects = {},
 		refs = {},
@@ -25,7 +29,7 @@ end
 
 function Climbing:cast()
 	local rayOrigin = self.character.castPoint.WorldPosition
-	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * 1
+	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * CLIMB_DISTANCE
 
 	local climbRay = Ray.new(rayOrigin, rayDirection)
 	local hit, position, normal = Workspace:FindPartOnRay(climbRay, self.character.instance)
@@ -106,6 +110,8 @@ function Climbing:enterState(oldState, options)
 	align.Attachment1 = position1
 	align.Parent = self.character.instance.PrimaryPart
 	self.objects[align] = true
+
+	self.animation:setState(Animation.State.Climbing)
 end
 
 function Climbing:leaveState()
@@ -118,6 +124,9 @@ function Climbing:leaveState()
 	self.objects = {}
 
 	self.lastClimbTime = Workspace.DistributedGameTime
+
+	self.animation.animations.climb:AdjustSpeed(1)
+	self.animation:setState(Animation.State.None)
 end
 
 function Climbing:step(dt, input)
@@ -130,6 +139,8 @@ function Climbing:step(dt, input)
 		local change = Vector3.new(0, input.movementY * dt * 10, 0)
 		self.refs.positionAttachment.CFrame = self.refs.positionAttachment.CFrame + change
 	end
+
+	self.animation.animations.climb:AdjustSpeed(input.movementY)
 
 	local nextClimb = self:cast()
 
