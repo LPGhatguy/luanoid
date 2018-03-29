@@ -262,7 +262,7 @@ function Walking:step(dt, input)
 	local lookVector = self.character.instance.PrimaryPart.CFrame.lookVector
 
 	if onGround then
-		if velocity.Magnitude <= 1 then
+		if velocity.Magnitude <= 5 then
 			self.animation:setState(Animation.State.Idle)
 		else
 			self.animation:setState(Animation.State.Walking)
