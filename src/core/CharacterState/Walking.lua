@@ -253,12 +253,12 @@ function Walking:step(dt, input)
 
 		if isClimbable then
 			-- TODO: Communicate to climbing state what/where we're climbing
-			self.simulation:setState("Climbing")
+			return self.simulation:setState(self.simulation.states.Climbing)
 		end
 	end
 
 	if input.ragdoll then
-		self.simulation:setState("Ragdoll")
+		return self.simulation:setState(self.simulation.states.Ragdoll)
 	end
 end
 

@@ -45,6 +45,7 @@ RunService.Heartbeat:Connect(function(dt)
 		inputX = inputX + 1
 	end
 
+	-- TODO: Move transformation into Walking controller
 	if inputX ~= 0 or inputY ~= 0 then
 		local cameraLook = Workspace.CurrentCamera.CFrame.lookVector
 		local cameraAngle = math.atan2(cameraLook.x, cameraLook.z)
