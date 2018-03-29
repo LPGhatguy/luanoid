@@ -34,26 +34,26 @@
 		<Item class="Camera" referent="RBX3756E04643664949B917E8F0A9963824">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>23.9783821</X>
-					<Y>30.0538158</Y>
-					<Z>-32.4153099</Z>
-					<R00>0.423347533</R00>
-					<R01>-0.623400033</R01>
-					<R02>0.657380641</R02>
-					<R10>-0</R10>
-					<R11>0.725611925</R11>
-					<R12>0.688104212</R12>
-					<R20>-0.905967474</R20>
-					<R21>-0.291307211</R21>
-					<R22>0.307185948</R22>
+					<X>-44.4420204</X>
+					<Y>12.6383114</Y>
+					<Z>35.8526001</Z>
+					<R00>-0.92110306</R00>
+					<R01>-0.113365464</R01>
+					<R02>0.372447997</R02>
+					<R10>7.4505806e-09</R10>
+					<R11>0.956665635</R11>
+					<R12>0.291189224</R12>
+					<R20>-0.389318913</R20>
+					<R21>0.268215299</R21>
+					<R22>-0.881187558</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<CoordinateFrame name="Focus">
-					<X>22.66362</X>
-					<Y>28.6776066</Y>
-					<Z>-33.0296822</Z>
+					<X>-45.1869164</X>
+					<Y>12.055933</Y>
+					<Z>37.614975</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -601,6 +601,13 @@ gO4=]]></BinaryString>
 					<float name="TargetAngle">0</float>
 					<float name="UpperAngle">45</float>
 					<bool name="Visible">false</bool>
+				</Properties>
+			</Item>
+			<Item class="StringValue" referent="RBX1C3F5EF19B654DC5A0EDB8E12294C6F1">
+				<Properties>
+					<string name="Name">Climbable</string>
+					<BinaryString name="Tags"></BinaryString>
+					<string name="Value"></string>
 				</Properties>
 			</Item>
 		</Item>
@@ -2893,83 +2900,16 @@ gO4=]]></BinaryString>
 			<string name="Name">ReplicatedFirst</string>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Folder" referent="RBX7297C837C0A0441F9AA1A9C3783472DC">
+		<Item class="Folder" referent="RBX83F3AF2DE8C148BD98CCB197FF8FEE65">
 			<Properties>
 				<string name="Name">CharacterControllerCore</string>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBXB4BEC038CCE141F68E9A6CD5226DE327">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">Simulation</string>
-					<string name="ScriptGuid">{4A920C18-3F9C-4518-908B-47583248F955}</string>
-					<ProtectedString name="Source"><![CDATA[local Climbing = require(script.Parent.CharacterState.Climbing)
-local Ragdoll = require(script.Parent.CharacterState.Ragdoll)
-local Walking = require(script.Parent.CharacterState.Walking)
-
-local Simulation = {}
-Simulation.__index = Simulation
-
-function Simulation.new(character)
-	local simulation = {
-		character = character,
-	}
-
-	simulation.states = {
-		Climbing = Climbing.new(simulation),
-		Ragdoll = Ragdoll.new(simulation),
-		Walking = Walking.new(simulation),
-	}
-
-	simulation.currentStateName = "Walking"
-
-	simulation.states[simulation.currentStateName]:enterState()
-
-	setmetatable(simulation, Simulation)
-
-	return simulation
-end
-
-function Simulation:setState(stateName)
-	if stateName == self.currentStateName then
-		return
-	end
-
-	local oldState = self.states[self.currentStateName]
-	local newState = self.states[stateName]
-
-	if not newState then
-		error(("Invalid state %q"):format(stateName), 2)
-	end
-
-	if oldState.leaveState then
-		oldState:leaveState()
-	end
-
-	self.currentStateName = stateName
-
-	if newState.enterState then
-		newState:enterState()
-	end
-end
-
-function Simulation:step(dt, input)
-	local currentState = self.states[self.currentStateName]
-
-	if currentState.step then
-		currentState:step(dt, input)
-	end
-end
-
-return Simulation]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXA45C94410F2049628AF23232CF2575C0">
+			<Item class="ModuleScript" referent="RBX6DCCFD8260C04A89B0507DBF8569B59B">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">castCylinder</string>
-					<string name="ScriptGuid">{9CC75CB3-8D1B-45F2-9A56-5EC09C401EC5}</string>
+					<string name="ScriptGuid">{728B1504-EC6C-4F2A-82F4-A46616E092A3}</string>
 					<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
 
 local DebugHandle = require(script.Parent.DebugHandle)
@@ -3073,113 +3013,11 @@ return castCylinder]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX0DFDEFDD83594DC3BDA886993E7B9231">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">getModelMass</string>
-					<string name="ScriptGuid">{0252EE2D-9907-4831-9256-3FB33F00CF1F}</string>
-					<ProtectedString name="Source"><![CDATA[local function getModelMass(model)
-	local mass = 0
-
-	for _, child in ipairs(model:GetChildren()) do
-		if child:IsA("BasePart") then
-			mass = mass + child:GetMass()
-		else
-			mass = mass + getModelMass(child)
-		end
-	end
-
-	return mass
-end
-
-return getModelMass]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBX3738C4A1A7B3481BBA8191199DC412B0">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">DebugHandle</string>
-					<string name="ScriptGuid">{B044ABEE-9BBF-467B-BA0B-12428F9B1E4B}</string>
-					<ProtectedString name="Source"><![CDATA[--[[
-	Renders points in the world for debugging things.
-
-	Usually used when dealing with finnicky 3D math.
-]]
-
-local Terrain = game:GetService("Workspace").Terrain
-
-local DebugHandle = {}
-DebugHandle.__index = DebugHandle
-
-function DebugHandle.new(color)
-	color = color or Color3.new(0, 0, 1)
-
-	local instance = Instance.new("SphereHandleAdornment")
-	instance.Color3 = color
-	instance.ZIndex = 1
-	instance.Name = "Debug Handle"
-	instance.AlwaysOnTop = true
-	instance.Radius = 0.12
-	instance.Adornee = Terrain
-	instance.Parent = Terrain
-
-	return setmetatable({
-		instance = instance,
-	}, DebugHandle)
-end
-
-function DebugHandle:move(pos)
-	if pos then
-		self.instance.Visible = true
-		self.instance.CFrame = CFrame.new(pos)
-	else
-		self.instance.Visible = false
-	end
-end
-
-function DebugHandle:setColor(color)
-	self.instance.Color3 = color
-end
-
-function DebugHandle:destroy()
-	self.instance:Destroy()
-end
-
-return DebugHandle]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXA844D979DEBC4C209A422EB34314345E">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">makeCharacter</string>
-					<string name="ScriptGuid">{DA3A0F3F-B980-4C75-806F-ECE6764A6379}</string>
-					<ProtectedString name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
-
-local function makeCharacter(name)
-	name = name or "Unnamed Character"
-
-	local instance = StarterPlayer.StarterCharacter:Clone()
-	instance.Name = name
-
-	local castPoint = instance.PrimaryPart:WaitForChild("CastPoint")
-
-	return {
-		instance = instance,
-		castPoint = castPoint,
-	}
-end
-
-return makeCharacter]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXBD818F9F4F1B476CAF94D2123795AE35">
+			<Item class="ModuleScript" referent="RBX649473B43D1E466992EC1052254565E1">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">stepSpring</string>
-					<string name="ScriptGuid">{E015F4F0-0A68-4C42-A188-1BD4EBEB5D6B}</string>
+					<string name="ScriptGuid">{A6A4D632-9760-441B-9CD7-F8A51E2B2308}</string>
 					<ProtectedString name="Source"><![CDATA[--[[
 	Steps forward a spring one step. Handles rounding errors for us.
 
@@ -3213,11 +3051,11 @@ end]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX3631571633204732A0639F49002DDE21">
+			<Item class="ModuleScript" referent="RBXF66CB461FA1A431882E79D9F24EF0C82">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">ApiSpec</string>
-					<string name="ScriptGuid">{83CB2BC1-D5EF-4220-8F7F-C5A47BF40EDD}</string>
+					<string name="ScriptGuid">{D11AF7BF-BDC5-4B74-B68B-B40357C7729C}</string>
 					<ProtectedString name="Source"><![CDATA[--[[
 	Defines the objects that should be created (server) or to wait to exist
 	(client) for facilitating client-server communication.
@@ -3236,16 +3074,41 @@ return ApiSpec]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="Folder" referent="RBXE8DD0642CFCC4661A725B48CB74E2266">
+			<Item class="ModuleScript" referent="RBXB7A1C8141AC546BFA529C466825E4790">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">makeCharacter</string>
+					<string name="ScriptGuid">{91600D8C-36F9-4FE4-8153-1C12D78DF25C}</string>
+					<ProtectedString name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
+
+local function makeCharacter(name)
+	name = name or "Unnamed Character"
+
+	local instance = StarterPlayer.StarterCharacter:Clone()
+	instance.Name = name
+
+	local castPoint = instance.PrimaryPart:WaitForChild("CastPoint")
+
+	return {
+		instance = instance,
+		castPoint = castPoint,
+	}
+end
+
+return makeCharacter]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="Folder" referent="RBX3D3418918BCC4DC1953A0C40BC63BF73">
 				<Properties>
 					<string name="Name">CharacterState</string>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="ModuleScript" referent="RBX13AC6A2C8499452F9C9E31A62BABB1B3">
+				<Item class="ModuleScript" referent="RBX14931680B003432BB9E1B0E79E6E5480">
 					<Properties>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">Walking</string>
-						<string name="ScriptGuid">{3CA9BA75-CFCD-4B97-93B8-48F466E05B7F}</string>
+						<string name="ScriptGuid">{5CF6B88E-5F6F-4F2A-894E-BB32C76FE3B0}</string>
 						<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
 
 local getModelMass = require(script.Parent.Parent.getModelMass)
@@ -3360,8 +3223,6 @@ function Walking:enterState()
 	self.character.instance.RightFoot.CanCollide = false
 	self.character.instance.RightLowerLeg.CanCollide = false
 	self.character.instance.RightUpperLeg.CanCollide = false
-
-	self.debugAdorns.climbCheck = DebugHandle.new()
 end
 
 function Walking:leaveState()
@@ -3391,8 +3252,23 @@ end
 function Walking:step(dt, input)
 	local characterMass = getModelMass(self.character.instance)
 
-	local targetX = TARGET_SPEED * input.movementX
-	local targetY = TARGET_SPEED * input.movementY
+	local targetX = 0
+	local targetY = 0
+
+	if input.movementX ~= 0 or input.movementY ~= 0 then
+		local cameraLook = Workspace.CurrentCamera.CFrame.lookVector
+		local cameraAngle = math.atan2(cameraLook.x, cameraLook.z)
+
+		local magnitude = math.sqrt(input.movementX^2 + input.movementY^2)
+		local unitX = input.movementX / magnitude
+		local unitY = input.movementY / magnitude
+
+		local relativeX = unitX * math.cos(cameraAngle) + unitY * math.sin(cameraAngle)
+		local relativeY = -unitX * math.sin(cameraAngle) + unitY * math.cos(cameraAngle)
+
+		targetX = TARGET_SPEED * relativeX
+		targetY = TARGET_SPEED * relativeY
+	end
 
 	self.accumulatedTime = self.accumulatedTime + dt
 
@@ -3487,26 +3363,13 @@ function Walking:step(dt, input)
 	end
 
 	-- Climbing transition check
-	do
-		local rayOrigin = self.character.castPoint.WorldPosition
-		local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * 5
-
-		local climbRay = Ray.new(rayOrigin, rayDirection)
-		local hit, position = Workspace:FindPartOnRay(climbRay, self.character.instance)
-
-		self.debugAdorns.climbCheck:move(position)
-
-		-- TODO: Use CollectionService?
-		local isClimbable = hit and not not hit:FindFirstChild("Climbable")
-
-		if isClimbable then
-			-- TODO: Communicate to climbing state what/where we're climbing
-			self.simulation:setState("Climbing")
-		end
+	local climbOptions = self.simulation.states.Climbing:check()
+	if climbOptions then
+		return self.simulation:setState(self.simulation.states.Climbing, climbOptions)
 	end
 
 	if input.ragdoll then
-		self.simulation:setState("Ragdoll")
+		return self.simulation:setState(self.simulation.states.Ragdoll)
 	end
 end
 
@@ -3514,11 +3377,170 @@ return Walking]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBX5A644DBFBCFB41558276D9175A71CF1B">
+				<Item class="ModuleScript" referent="RBX09B6578DBD394BB0881D2148C0EEED57">
+					<Properties>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Climbing</string>
+						<string name="ScriptGuid">{AFDB93B1-ED03-4D05-955F-571E2BAB94F4}</string>
+						<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+
+local DebugHandle = require(script.Parent.Parent.DebugHandle)
+
+local CLIMB_DEBOUNCE = 0.2
+
+local Climbing = {}
+Climbing.__index = Climbing
+
+function Climbing.new(simulation)
+	local state = {
+		simulation = simulation,
+		character = simulation.character,
+		checkAdorn = DebugHandle.new(),
+		objects = {},
+		refs = {},
+		options = nil,
+		lastClimbTime = -math.huge,
+	}
+
+	setmetatable(state, Climbing)
+
+	return state
+end
+
+function Climbing:cast()
+	local rayOrigin = self.character.castPoint.WorldPosition
+	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * 1
+
+	local climbRay = Ray.new(rayOrigin, rayDirection)
+	local hit, position, normal = Workspace:FindPartOnRay(climbRay, self.character.instance)
+
+	-- TODO: Use CollectionService?
+	local isClimbable = hit and not not hit:FindFirstChild("Climbable")
+
+	local adornColor
+	if isClimbable then
+		adornColor = Color3.new(0, 1, 0)
+	elseif hit then
+		adornColor = Color3.new(0, 0, 1)
+	else
+		adornColor = Color3.new(1, 0, 0)
+	end
+
+	self.checkAdorn:setColor(adornColor)
+	self.checkAdorn:move(position)
+
+	if not isClimbable then
+		return nil
+	end
+
+	return {
+		object = hit,
+		position = position,
+		normal = normal,
+	}
+end
+
+--[[
+	Intended to be used to check whether it's appropriate to transition to the
+	Climbing state.
+]]
+function Climbing:check()
+	-- If we just stopped climbing, don't climb again yet
+	if Workspace.DistributedGameTime - self.lastClimbTime <= CLIMB_DEBOUNCE then
+		return nil
+	end
+
+	return self:cast()
+end
+
+function Climbing:enterState(oldState, options)
+	assert(options.object)
+	assert(options.position)
+	assert(options.normal)
+
+	self.options = options
+
+	self.checkAdorn:move(nil)
+
+	self.lastClimbTime = Workspace.DistributedGameTime
+
+	local position0 = Instance.new("Attachment")
+	position0.Parent = self.character.instance.PrimaryPart
+	position0.Position = Vector3.new(0, 0, -1)
+	self.objects[position0] = true
+
+	print(typeof(options.normal))
+
+	local orientation = CFrame.new(Vector3.new(), -options.normal) + options.position - options.object.Position
+
+	local position1 = Instance.new("Attachment")
+	position1.CFrame = orientation
+	position1.Parent = options.object
+	self.refs.positionAttachment = position1
+	self.objects[position1] = true
+
+	local position = Instance.new("AlignPosition")
+	position.Attachment0 = position0
+	position.Attachment1 = position1
+	position.Parent = self.character.instance.PrimaryPart
+	position.MaxForce = 50000
+	position.Responsiveness = 30
+	self.objects[position] = true
+
+	local align = Instance.new("AlignOrientation")
+	align.Attachment0 = position0
+	align.Attachment1 = position1
+	align.Parent = self.character.instance.PrimaryPart
+	self.objects[align] = true
+
+	print("Start climbing object", options.object)
+end
+
+function Climbing:leaveState()
+	self.refs = {}
+
+	for object in pairs(self.objects) do
+		object:Destroy()
+	end
+
+	self.objects = {}
+
+	self.lastClimbTime = Workspace.DistributedGameTime
+end
+
+function Climbing:step(dt, input)
+	if input.jump and Workspace.DistributedGameTime - self.lastClimbTime >= CLIMB_DEBOUNCE then
+		return self.simulation:setState(self.simulation.states.Walking)
+	end
+
+	-- TODO: Change this placeholder movement code
+	if input.movementY ~= 0 then
+		local change = Vector3.new(0, input.movementY * dt * 10, 0)
+		self.refs.positionAttachment.CFrame = self.refs.positionAttachment.CFrame + change
+	end
+
+	local nextClimb = self:cast()
+
+	-- We can't climb anymore!
+	if not nextClimb then
+		return self.simulation:setState(self.simulation.states.Walking)
+	end
+
+	-- We're transitioning to a new climbable
+	if nextClimb.object ~= self.options.object then
+		return self.simulation:setState(self, nextClimb)
+	end
+end
+
+return Climbing]]></ProtectedString>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX36A59A3764504187890E4ED3C3BF76E3">
 					<Properties>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">Ragdoll</string>
-						<string name="ScriptGuid">{A5B401AE-65FA-4744-A12E-A8428A8073FC}</string>
+						<string name="ScriptGuid">{F3E18A06-1FA8-4BDC-9A8D-EC0B5517B10E}</string>
 						<ProtectedString name="Source"><![CDATA[local Ragdoll = {}
 Ragdoll.__index = Ragdoll
 
@@ -3534,7 +3556,7 @@ end
 
 function Ragdoll:step(dt, input)
 	if not input.ragdoll then
-		self.simulation:setState("Walking")
+		self.simulation:setState(self.simulation.states.Walking)
 	end
 end
 
@@ -3542,38 +3564,140 @@ return Ragdoll]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBX988791E7196F4324B212FFC78B840789">
-					<Properties>
-						<Content name="LinkedSource"><null></null></Content>
-						<string name="Name">Climbing</string>
-						<string name="ScriptGuid">{723A232A-4F83-4BEA-BE93-2690577D401A}</string>
-						<ProtectedString name="Source"><![CDATA[local Climbing = {}
-Climbing.__index = Climbing
+			</Item>
+			<Item class="ModuleScript" referent="RBXA3FB11E223CB4862B702F0010204615F">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Simulation</string>
+					<string name="ScriptGuid">{3D39AE47-722E-4672-AEAE-0211DD597C33}</string>
+					<ProtectedString name="Source"><![CDATA[local Climbing = require(script.Parent.CharacterState.Climbing)
+local Ragdoll = require(script.Parent.CharacterState.Ragdoll)
+local Walking = require(script.Parent.CharacterState.Walking)
 
-function Climbing.new(simulation)
-	local state = {}
+local Simulation = {}
+Simulation.__index = Simulation
 
-	setmetatable(state, Climbing)
+function Simulation.new(character)
+	local simulation = {
+		character = character,
+	}
 
-	return state
+	simulation.states = {
+		Climbing = Climbing.new(simulation),
+		Ragdoll = Ragdoll.new(simulation),
+		Walking = Walking.new(simulation),
+	}
+
+	simulation.currentState = simulation.states.Walking
+	simulation.currentState:enterState()
+
+	setmetatable(simulation, Simulation)
+
+	return simulation
 end
 
-function Climbing:enterState()
-	-- TODO
+function Simulation:setState(newState, options)
+	assert(newState, "setState requires a state parameter!")
+
+	local oldState = self.currentState
+
+	if oldState.leaveState then
+		oldState:leaveState(newState)
+	end
+
+	self.currentState = newState
+
+	if newState.enterState then
+		newState:enterState(oldState, options)
+	end
 end
 
-function Climbing:leaveState()
-	-- TODO
+function Simulation:step(dt, input)
+	if self.currentState.step then
+		self.currentState:step(dt, input)
+	end
 end
 
-function Climbing:step(dt, input)
-	-- TODO
+return Simulation]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXDF9CD5FDB99C48E1979AAA6A7C6037F6">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">DebugHandle</string>
+					<string name="ScriptGuid">{4A6C11B0-2802-4A49-A0B5-FE509F3732C1}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+	Renders points in the world for debugging things.
+
+	Usually used when dealing with finnicky 3D math.
+]]
+
+local Terrain = game:GetService("Workspace").Terrain
+
+local DebugHandle = {}
+DebugHandle.__index = DebugHandle
+
+function DebugHandle.new(color)
+	color = color or Color3.new(0, 0, 1)
+
+	local instance = Instance.new("SphereHandleAdornment")
+	instance.Color3 = color
+	instance.ZIndex = 1
+	instance.Name = "Debug Handle"
+	instance.AlwaysOnTop = true
+	instance.Radius = 0.12
+	instance.Adornee = Terrain
+	instance.Parent = Terrain
+
+	return setmetatable({
+		instance = instance,
+	}, DebugHandle)
 end
 
-return Climbing]]></ProtectedString>
-						<BinaryString name="Tags"></BinaryString>
-					</Properties>
-				</Item>
+function DebugHandle:move(pos)
+	if pos then
+		self.instance.Visible = true
+		self.instance.CFrame = CFrame.new(pos)
+	else
+		self.instance.Visible = false
+	end
+end
+
+function DebugHandle:setColor(color)
+	self.instance.Color3 = color
+end
+
+function DebugHandle:destroy()
+	self.instance:Destroy()
+end
+
+return DebugHandle]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXBC7C5F51BBFD4DDDBB8624E20C1D7F9A">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">getModelMass</string>
+					<string name="ScriptGuid">{6EC49577-D6D2-4931-9F19-1A227F2882E8}</string>
+					<ProtectedString name="Source"><![CDATA[local function getModelMass(model)
+	local mass = 0
+
+	for _, child in ipairs(model:GetChildren()) do
+		if child:IsA("BasePart") then
+			mass = mass + child:GetMass()
+		else
+			mass = mass + getModelMass(child)
+		end
+	end
+
+	return mass
+end
+
+return getModelMass]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
 			</Item>
 		</Item>
 	</Item>
@@ -3686,35 +3810,20 @@ RunService.Heartbeat:Connect(function(dt)
 		ragdoll = Input.keysDown[Enum.KeyCode.F],
 	}
 
-	local inputX = 0
-	local inputY = 0
-
 	if Input.keysDown[Enum.KeyCode.W] then
-		inputY = inputY + 1
+		input.movementY = input.movementY + 1
 	end
 
 	if Input.keysDown[Enum.KeyCode.S] then
-		inputY = inputY - 1
+		input.movementY = input.movementY - 1
 	end
 
 	if Input.keysDown[Enum.KeyCode.D] then
-		inputX = inputX - 1
+		input.movementX = input.movementX - 1
 	end
 
 	if Input.keysDown[Enum.KeyCode.A] then
-		inputX = inputX + 1
-	end
-
-	if inputX ~= 0 or inputY ~= 0 then
-		local cameraLook = Workspace.CurrentCamera.CFrame.lookVector
-		local cameraAngle = math.atan2(cameraLook.x, cameraLook.z)
-
-		local magnitude = math.sqrt(inputX^2 + inputY^2)
-		local relativeX = inputX / magnitude
-		local relativeY = inputY / magnitude
-
-		input.movementX = relativeX * math.cos(cameraAngle) + relativeY * math.sin(cameraAngle)
-		input.movementY = -relativeX * math.sin(cameraAngle) + relativeY * math.cos(cameraAngle)
+		input.movementX = input.movementX + 1
 	end
 
 	simulation:step(dt, input)
