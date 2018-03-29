@@ -11,10 +11,46 @@ local PRECISION = 0.001
 local TARGET_SPEED = 24
 local HIP_HEIGHT = 2.352
 local MAX_HOR_ACCEL = TARGET_SPEED / 0.25 -- velocity / time to reach it squared
-local MAX_VER_ACCELT = 50 / 0.1 -- massless max vertical force against gravity
+local MAX_VER_ACCEL = 50 / 0.1 -- massless max vertical force against gravity
 local POP_TIME = 0.05 -- target time to reach target height
 
 local THETA = math.pi * 2
+
+local function createForces(character)
+	local orient0 = Instance.new("Attachment")
+	orient0.Name = "Align0"
+	orient0.Parent = character.instance.PrimaryPart
+
+	local orient1 = Instance.new("Attachment")
+	orient1.Name = "Align1"
+	orient1.Parent = Workspace.Terrain
+
+	local orientation = Instance.new("AlignOrientation")
+	orientation.RigidityEnabled = true
+	orientation.Attachment0 = orient0
+	orientation.Attachment1 = orient1
+	orientation.Parent = character.instance.PrimaryPart
+
+	local velocity0 = Instance.new("Attachment")
+	velocity0.Name = "Velocity0"
+	velocity0.Parent = character.instance.PrimaryPart
+
+	local vectorForce = Instance.new("VectorForce")
+	vectorForce.ApplyAtCenterOfMass = true
+	vectorForce.Force = Vector3.new(0, 0, 0)
+	vectorForce.RelativeTo = Enum.ActuatorRelativeTo.World
+	vectorForce.Attachment0 = velocity0
+	vectorForce.Parent = character.instance.PrimaryPart
+
+	return {
+		orient0 = orient0,
+		orient1 = orient1,
+		orientation = orientation,
+
+		velocity0 = velocity0,
+		vectorForce = vectorForce,
+	}
+end
 
 -- loop between 0 - 2*pi
 local function angleAbs(angle)
@@ -57,6 +93,7 @@ function Walking.new(simulation)
 		currentAccelerationX = 0,
 		currentAccelerationY = 0,
 		debugAdorns = {},
+		forces = nil, -- Defined in enterState
 	}
 
 	setmetatable(state, Walking)
@@ -65,6 +102,8 @@ function Walking.new(simulation)
 end
 
 function Walking:enterState()
+	self.forces = createForces(self.character)
+
 	-- Elegance? Never heard of it.
 	self.character.instance.LeftFoot.CanCollide = false
 	self.character.instance.LeftLowerLeg.CanCollide = false
@@ -72,22 +111,19 @@ function Walking:enterState()
 	self.character.instance.RightFoot.CanCollide = false
 	self.character.instance.RightLowerLeg.CanCollide = false
 	self.character.instance.RightUpperLeg.CanCollide = false
-
-	self.character.orientation.Enabled = true
-	self.character.vectorForce.Enabled = true
 end
 
 function Walking:leaveState()
+	for _, object in pairs(self.forces) do
+		object:Destroy()
+	end
+
 	self.character.instance.LeftFoot.CanCollide = true
 	self.character.instance.LeftLowerLeg.CanCollide = true
 	self.character.instance.LeftUpperLeg.CanCollide = true
 	self.character.instance.RightFoot.CanCollide = true
 	self.character.instance.RightLowerLeg.CanCollide = true
 	self.character.instance.RightUpperLeg.CanCollide = true
-
-	self.character.orientation.Enabled = false
-	self.character.vectorForce.Enabled = false
-	self.character.vectorForce.Force = Vector3.new(0, 0, 0)
 
 	for _, adorn in ipairs(self.debugAdorns) do
 		adorn.instance:Destroy()
@@ -168,13 +204,13 @@ function Walking:step(dt, input)
 			up = up*characterMass
 		end
 
-		self.character.vectorForce.Force = Vector3.new(
+		self.forces.vectorForce.Force = Vector3.new(
 			self.currentAccelerationX * characterMass,
 			up,
 			self.currentAccelerationY * characterMass
 		)
 	else
-		self.character.vectorForce.Force = Vector3.new(0, 0, 0)
+		self.forces.vectorForce.Force = Vector3.new(0, 0, 0)
 	end
 
 	local velocity = Vector3.new(currentX, 0, currentY)
@@ -191,7 +227,7 @@ function Walking:step(dt, input)
 
 		local up = Vector3.new(0, 1, 0)
 		local look = Vector3.new(math.cos(targetAngle), 0, math.sin(targetAngle))
-		self.character.orientationAttachment.CFrame = makeCFrame(up, look)
+		self.forces.orient1.CFrame = makeCFrame(up, look)
 	end
 
 	if input.ragdoll then
