@@ -2,6 +2,7 @@ local ANIMATIONS = {
 	idle = "http://www.roblox.com/asset/?id=507766666",
 	walk = "http://www.roblox.com/asset/?id=507767714",
 	climb = "http://www.roblox.com/asset/?id=507765644",
+	jump = "http://www.roblox.com/asset/?id=507765000",
 }
 
 local Animation = {}
@@ -40,10 +41,10 @@ Animation.State = {
 	},
 	Falling = {
 		enter = function(self)
-			self.animations.climb:Play()
+			self.animations.jump:Play()
 		end,
 		leave = function(self)
-			self.animations.climb:Stop()
+			self.animations.jump:Stop()
 		end,
 	},
 	Ragdoll = {

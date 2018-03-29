@@ -34,26 +34,26 @@
 		<Item class="Camera" referent="RBX3756E04643664949B917E8F0A9963824">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-44.4420204</X>
-					<Y>12.6383114</Y>
-					<Z>35.8526001</Z>
-					<R00>-0.92110306</R00>
-					<R01>-0.113365464</R01>
-					<R02>0.372447997</R02>
-					<R10>7.4505806e-09</R10>
-					<R11>0.956665635</R11>
-					<R12>0.291189224</R12>
-					<R20>-0.389318913</R20>
-					<R21>0.268215299</R21>
-					<R22>-0.881187558</R22>
+					<X>-34.9912033</X>
+					<Y>21.8315258</Y>
+					<Z>12.5802746</Z>
+					<R00>0.820034802</R00>
+					<R01>0.297580421</R01>
+					<R02>-0.488864809</R02>
+					<R10>-0</R10>
+					<R11>0.85419035</R11>
+					<R12>0.519960403</R12>
+					<R20>0.572313607</R20>
+					<R21>-0.426385641</R21>
+					<R22>0.700465858</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<CoordinateFrame name="Focus">
-					<X>-45.1869164</X>
-					<Y>12.055933</Y>
-					<Z>37.614975</Z>
+					<X>-34.0134773</X>
+					<Y>20.7916088</Y>
+					<Z>11.179348</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -2916,6 +2916,72 @@ local DebugHandle = require(script.Parent.DebugHandle)
 
 local CAST_COUNT = 32
 
+-- TODO: use normals to get a better plane with fewer points
+-- http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
+local function planeFromPoints(points, weights)
+	local n = 0
+	local sumX, sumY, sumZ = 0, 0, 0
+	for i, p in pairs(points) do
+		local w = weights[i]
+		n = n + w
+		sumX, sumY, sumZ = sumX + p.X*w, sumY + p.Y*w, sumZ + p.Z*w
+	end
+	local centroid = Vector3.new(sumX, sumY, sumZ) * (1.0/n)
+
+	if n < 3 then
+		-- at least three points required
+		return centroid, Vector3.new(0, 1, 0)
+	end
+
+	-- Calc full 3x3 covariance matrix, excluding symmetries:
+	local xx = 0.0 local xy = 0.0 local xz = 0.0
+	local yy = 0.0 local yz = 0.0 local zz = 0.0
+
+	for i, p in pairs(points) do
+		local w = weights[i]
+		local r = p - centroid
+		xx = xx + r.x*r.x*w
+		xy = xy + r.x*r.y*w
+		xz = xz + r.x*r.z*w
+		yy = yy + r.y*r.y*w
+		yz = yz + r.y*r.z*w
+		zz = zz + r.z*r.z*w
+	end
+
+	local det_x = yy*zz - yz*yz
+	local det_y = xx*zz - xz*xz
+	local det_z = xx*yy - xy*xy
+
+	local det_max = math.max(det_x, det_y, det_z)
+	if det_max <= 0 then
+		return
+	end
+
+	-- Pick path with best conditioning:
+    local dir
+	if det_max == det_x then
+		dir = Vector3.new(
+			det_x,
+			xz*yz - xy*zz,
+			xy*yz - xz*yy
+		)
+	elseif det_max == det_y then
+		dir = Vector3.new(
+			xz*yz - xy*zz,
+			det_y,
+			xy*xz - yz*xx
+		)
+	else
+		dir = Vector3.new(
+			xy*yz - xz*yy,
+			xy*xz - yz*xx,
+			det_z
+		)
+	end
+
+    return centroid, dir.Unit
+end
+
 -- TODO: more appropriate cast distribution algorithm
 -- https://stackoverflow.com/a/28572551/367100
 local function radius(k,n,b)
@@ -2962,6 +3028,8 @@ local function castCylinder(options)
 	local totalWeight = 0
 	local totalHeight = 0
 
+	local weights = {}
+	local points = {}
 	for index, x, z in sunflower(CAST_COUNT, 2) do
 		local offset = Vector3.new(x*radius, 0, z*radius)
 
@@ -2983,6 +3051,9 @@ local function castCylinder(options)
 			if part then
 				totalWeight = totalWeight + weight
 				totalHeight = totalHeight + point.y*weight
+
+				points[#points + 1] = point
+				weights[#weights + 1] = weight
 			end
 		end
 
@@ -3003,6 +3074,16 @@ local function castCylinder(options)
 			else
 				adorn:setColor(Color3.new(1, 0, 0))
 			end
+		end
+	end
+
+	local centroid, normal = planeFromPoints(points, weights)
+	if options.debugPlane then
+		if centroid then
+			options.debugPlane.Visible = true
+			options.debugPlane.CFrame = CFrame.new(centroid + normal*0.5, centroid + normal)
+		else
+			options.debugPlane.Visible = false
 		end
 	end
 
@@ -3099,472 +3180,6 @@ return makeCharacter]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="Folder" referent="RBX3D3418918BCC4DC1953A0C40BC63BF73">
-				<Properties>
-					<string name="Name">CharacterState</string>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-				<Item class="ModuleScript" referent="RBX14931680B003432BB9E1B0E79E6E5480">
-					<Properties>
-						<Content name="LinkedSource"><null></null></Content>
-						<string name="Name">Walking</string>
-						<string name="ScriptGuid">{5CF6B88E-5F6F-4F2A-894E-BB32C76FE3B0}</string>
-						<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
-
-local getModelMass = require(script.Parent.Parent.getModelMass)
-local stepSpring = require(script.Parent.Parent.stepSpring)
-local castCylinder = require(script.Parent.Parent.castCylinder)
-local DebugHandle = require(script.Parent.Parent.DebugHandle)
-
-local FRAMERATE = 1 / 240
-local STIFFNESS = 170
-local DAMPING = 26
-local PRECISION = 0.001
-local TARGET_SPEED = 24
-local HIP_HEIGHT = 2.352
-local MAX_HOR_ACCEL = TARGET_SPEED / 0.25 -- velocity / time to reach it squared
-local MAX_VER_ACCEL = 50 / 0.1 -- massless max vertical force against gravity
-local POP_TIME = 0.05 -- target time to reach target height
-
-local THETA = math.pi * 2
-
-local function createForces(character)
-	local orient0 = Instance.new("Attachment")
-	orient0.Name = "Align0"
-	orient0.Parent = character.instance.PrimaryPart
-
-	local orient1 = Instance.new("Attachment")
-	orient1.Name = "Align1"
-	orient1.Parent = Workspace.Terrain
-
-	local orientation = Instance.new("AlignOrientation")
-	orientation.RigidityEnabled = true
-	orientation.Attachment0 = orient0
-	orientation.Attachment1 = orient1
-	orientation.Parent = character.instance.PrimaryPart
-
-	local velocity0 = Instance.new("Attachment")
-	velocity0.Name = "Velocity0"
-	velocity0.Parent = character.instance.PrimaryPart
-
-	local vectorForce = Instance.new("VectorForce")
-	vectorForce.ApplyAtCenterOfMass = true
-	vectorForce.Force = Vector3.new(0, 0, 0)
-	vectorForce.RelativeTo = Enum.ActuatorRelativeTo.World
-	vectorForce.Attachment0 = velocity0
-	vectorForce.Parent = character.instance.PrimaryPart
-
-	return {
-		orient0 = orient0,
-		orient1 = orient1,
-		orientation = orientation,
-
-		velocity0 = velocity0,
-		vectorForce = vectorForce,
-	}
-end
-
--- loop between 0 - 2*pi
-local function angleAbs(angle)
-	while angle < 0 do
-		angle = angle + THETA
-	end
-	while angle > THETA do
-		angle = angle - THETA
-	end
-	return angle
-end
-
-local function angleShortest(a0, a1)
-	local d1 = angleAbs(a1 - a0)
-	local d2 = -angleAbs(a0 - a1)
-	return math.abs(d1) > math.abs(d2) and d2 or d1
-end
-
-local function lerpAngle(a0, a1, alpha)
-	return a0 + angleShortest(a0, a1)*alpha
-end
-
-local function makeCFrame(up, look)
-	local upu = up.Unit
-	local looku = (Vector3.new() - look).Unit
-	local rightu = upu:Cross(looku).Unit
-	-- orthonormalize, keeping up vector
-	looku = -upu:Cross(rightu).Unit
-	return CFrame.new(0, 0, 0, rightu.x, upu.x, looku.x, rightu.y, upu.y, looku.y, rightu.z, upu.z, looku.z)
-end
-
-local Walking = {}
-Walking.__index = Walking
-
-function Walking.new(simulation)
-	local state = {
-		simulation = simulation,
-		character = simulation.character,
-		accumulatedTime = 0,
-		currentAccelerationX = 0,
-		currentAccelerationY = 0,
-		debugAdorns = {},
-		forces = nil, -- Defined in enterState
-	}
-
-	setmetatable(state, Walking)
-
-	return state
-end
-
-function Walking:enterState()
-	self.forces = createForces(self.character)
-
-	-- Elegance? Never heard of it.
-	self.character.instance.LeftFoot.CanCollide = false
-	self.character.instance.LeftLowerLeg.CanCollide = false
-	self.character.instance.LeftUpperLeg.CanCollide = false
-	self.character.instance.RightFoot.CanCollide = false
-	self.character.instance.RightLowerLeg.CanCollide = false
-	self.character.instance.RightUpperLeg.CanCollide = false
-end
-
-function Walking:leaveState()
-	for _, object in pairs(self.forces) do
-		object:Destroy()
-	end
-
-	-- TODO: Be more robust in case joints are destroyed.
-	self.character.instance.LeftFoot.CanCollide = true
-	self.character.instance.LeftLowerLeg.CanCollide = true
-	self.character.instance.LeftUpperLeg.CanCollide = true
-	self.character.instance.RightFoot.CanCollide = true
-	self.character.instance.RightLowerLeg.CanCollide = true
-	self.character.instance.RightUpperLeg.CanCollide = true
-
-	for _, adorn in pairs(self.debugAdorns) do
-		adorn.instance:Destroy()
-	end
-
-	self.accumulatedTime = 0
-	self.currentAccelerationX = 0
-	self.currentAccelerationY = 0
-
-	self.debugAdorns = {}
-end
-
-function Walking:step(dt, input)
-	local characterMass = getModelMass(self.character.instance)
-
-	local targetX = 0
-	local targetY = 0
-
-	if input.movementX ~= 0 or input.movementY ~= 0 then
-		local cameraLook = Workspace.CurrentCamera.CFrame.lookVector
-		local cameraAngle = math.atan2(cameraLook.x, cameraLook.z)
-
-		local magnitude = math.sqrt(input.movementX^2 + input.movementY^2)
-		local unitX = input.movementX / magnitude
-		local unitY = input.movementY / magnitude
-
-		local relativeX = unitX * math.cos(cameraAngle) + unitY * math.sin(cameraAngle)
-		local relativeY = -unitX * math.sin(cameraAngle) + unitY * math.cos(cameraAngle)
-
-		targetX = TARGET_SPEED * relativeX
-		targetY = TARGET_SPEED * relativeY
-	end
-
-	self.accumulatedTime = self.accumulatedTime + dt
-
-	local currentVelocity = self.character.instance.PrimaryPart.Velocity;
-	local currentX = currentVelocity.X
-	local currentY = currentVelocity.Z
-
-	while self.accumulatedTime >= FRAMERATE do
-		self.accumulatedTime = self.accumulatedTime - FRAMERATE
-
-		currentX, self.currentAccelerationX = stepSpring(
-			FRAMERATE,
-			currentX,
-			self.currentAccelerationX,
-			targetX,
-			STIFFNESS,
-			DAMPING,
-			PRECISION
-		)
-
-		currentY, self.currentAccelerationY = stepSpring(
-			FRAMERATE,
-			currentY,
-			self.currentAccelerationY,
-			targetY,
-			STIFFNESS,
-			DAMPING,
-			PRECISION
-		)
-	end
-
-	local vFactor = 0.075 -- fudge constant
-
-	local onGround, groundHeight = castCylinder({
-		origin = self.character.castPoint.WorldPosition,
-		direction = Vector3.new(0, -5, 0),
-		bias = Vector3.new(currentX*vFactor, 0, currentY*vFactor),
-		adorns = self.debugAdorns,
-		ignoreInstance = self.character.instance,
-		hipHeight = HIP_HEIGHT,
-	})
-
-	local targetHeight = groundHeight + HIP_HEIGHT
-	local currentHeight = self.character.castPoint.WorldPosition.Y
-
-	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
-	self.character.instance.PrimaryPart.Color = bottomColor
-
-	if onGround then
-		local up
-
-		local jumpHeight = 10
-		local jumpInitialVelocity = math.sqrt(Workspace.Gravity*2*jumpHeight)
-		if input.jump and currentVelocity.Y < jumpInitialVelocity then
-			up = 0
-			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
-		else
-			local t = POP_TIME
-			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
-			up = Workspace.Gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
-			-- very low downward acceleration cuttoff (limited ability to push yourself down)
-			if up < -1 then
-				up = 0
-			end
-			up = up*characterMass
-		end
-
-		self.forces.vectorForce.Force = Vector3.new(
-			self.currentAccelerationX * characterMass,
-			up,
-			self.currentAccelerationY * characterMass
-		)
-	else
-		self.forces.vectorForce.Force = Vector3.new(0, 0, 0)
-	end
-
-	local velocity = Vector3.new(currentX, 0, currentY)
-	local lookVector = self.character.instance.PrimaryPart.CFrame.lookVector
-
-	if velocity.Magnitude > 0.1 and lookVector.y < 0.9 then
-		-- Fix "tumbling" where AlignOrientation might pick the "wrong" axis when we cross through 0, lerp angles...
-		local currentAngle = math.atan2(lookVector.z, lookVector.x)
-		local targetAngle = math.atan2(currentY, currentX)
-		-- If we crossed through 0 (shortest arc angle is close to pi) then lerp the angle...
-		if math.abs(angleShortest(currentAngle, targetAngle)) > math.pi*0.95 then
-			targetAngle = lerpAngle(currentAngle, targetAngle, 0.95)
-		end
-
-		local up = Vector3.new(0, 1, 0)
-		local look = Vector3.new(math.cos(targetAngle), 0, math.sin(targetAngle))
-		self.forces.orient1.CFrame = makeCFrame(up, look)
-	end
-
-	-- Climbing transition check
-	local climbOptions = self.simulation.states.Climbing:check()
-	if climbOptions then
-		return self.simulation:setState(self.simulation.states.Climbing, climbOptions)
-	end
-
-	if input.ragdoll then
-		return self.simulation:setState(self.simulation.states.Ragdoll)
-	end
-end
-
-return Walking]]></ProtectedString>
-						<BinaryString name="Tags"></BinaryString>
-					</Properties>
-				</Item>
-				<Item class="ModuleScript" referent="RBX09B6578DBD394BB0881D2148C0EEED57">
-					<Properties>
-						<Content name="LinkedSource"><null></null></Content>
-						<string name="Name">Climbing</string>
-						<string name="ScriptGuid">{AFDB93B1-ED03-4D05-955F-571E2BAB94F4}</string>
-						<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
-
-local DebugHandle = require(script.Parent.Parent.DebugHandle)
-
-local CLIMB_DEBOUNCE = 0.2
-
-local Climbing = {}
-Climbing.__index = Climbing
-
-function Climbing.new(simulation)
-	local state = {
-		simulation = simulation,
-		character = simulation.character,
-		checkAdorn = DebugHandle.new(),
-		objects = {},
-		refs = {},
-		options = nil,
-		lastClimbTime = -math.huge,
-	}
-
-	setmetatable(state, Climbing)
-
-	return state
-end
-
-function Climbing:cast()
-	local rayOrigin = self.character.castPoint.WorldPosition
-	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * 1
-
-	local climbRay = Ray.new(rayOrigin, rayDirection)
-	local hit, position, normal = Workspace:FindPartOnRay(climbRay, self.character.instance)
-
-	-- TODO: Use CollectionService?
-	local isClimbable = hit and not not hit:FindFirstChild("Climbable")
-
-	local adornColor
-	if isClimbable then
-		adornColor = Color3.new(0, 1, 0)
-	elseif hit then
-		adornColor = Color3.new(0, 0, 1)
-	else
-		adornColor = Color3.new(1, 0, 0)
-	end
-
-	self.checkAdorn:setColor(adornColor)
-	self.checkAdorn:move(position)
-
-	if not isClimbable then
-		return nil
-	end
-
-	return {
-		object = hit,
-		position = position,
-		normal = normal,
-	}
-end
-
---[[
-	Intended to be used to check whether it's appropriate to transition to the
-	Climbing state.
-]]
-function Climbing:check()
-	-- If we just stopped climbing, don't climb again yet
-	if Workspace.DistributedGameTime - self.lastClimbTime <= CLIMB_DEBOUNCE then
-		return nil
-	end
-
-	return self:cast()
-end
-
-function Climbing:enterState(oldState, options)
-	assert(options.object)
-	assert(options.position)
-	assert(options.normal)
-
-	self.options = options
-
-	self.checkAdorn:move(nil)
-
-	self.lastClimbTime = Workspace.DistributedGameTime
-
-	local position0 = Instance.new("Attachment")
-	position0.Parent = self.character.instance.PrimaryPart
-	position0.Position = Vector3.new(0, 0, -1)
-	self.objects[position0] = true
-
-	print(typeof(options.normal))
-
-	local orientation = CFrame.new(Vector3.new(), -options.normal) + options.position - options.object.Position
-
-	local position1 = Instance.new("Attachment")
-	position1.CFrame = orientation
-	position1.Parent = options.object
-	self.refs.positionAttachment = position1
-	self.objects[position1] = true
-
-	local position = Instance.new("AlignPosition")
-	position.Attachment0 = position0
-	position.Attachment1 = position1
-	position.Parent = self.character.instance.PrimaryPart
-	position.MaxForce = 50000
-	position.Responsiveness = 30
-	self.objects[position] = true
-
-	local align = Instance.new("AlignOrientation")
-	align.Attachment0 = position0
-	align.Attachment1 = position1
-	align.Parent = self.character.instance.PrimaryPart
-	self.objects[align] = true
-
-	print("Start climbing object", options.object)
-end
-
-function Climbing:leaveState()
-	self.refs = {}
-
-	for object in pairs(self.objects) do
-		object:Destroy()
-	end
-
-	self.objects = {}
-
-	self.lastClimbTime = Workspace.DistributedGameTime
-end
-
-function Climbing:step(dt, input)
-	if input.jump and Workspace.DistributedGameTime - self.lastClimbTime >= CLIMB_DEBOUNCE then
-		return self.simulation:setState(self.simulation.states.Walking)
-	end
-
-	-- TODO: Change this placeholder movement code
-	if input.movementY ~= 0 then
-		local change = Vector3.new(0, input.movementY * dt * 10, 0)
-		self.refs.positionAttachment.CFrame = self.refs.positionAttachment.CFrame + change
-	end
-
-	local nextClimb = self:cast()
-
-	-- We can't climb anymore!
-	if not nextClimb then
-		return self.simulation:setState(self.simulation.states.Walking)
-	end
-
-	-- We're transitioning to a new climbable
-	if nextClimb.object ~= self.options.object then
-		return self.simulation:setState(self, nextClimb)
-	end
-end
-
-return Climbing]]></ProtectedString>
-						<BinaryString name="Tags"></BinaryString>
-					</Properties>
-				</Item>
-				<Item class="ModuleScript" referent="RBX36A59A3764504187890E4ED3C3BF76E3">
-					<Properties>
-						<Content name="LinkedSource"><null></null></Content>
-						<string name="Name">Ragdoll</string>
-						<string name="ScriptGuid">{F3E18A06-1FA8-4BDC-9A8D-EC0B5517B10E}</string>
-						<ProtectedString name="Source"><![CDATA[local Ragdoll = {}
-Ragdoll.__index = Ragdoll
-
-function Ragdoll.new(simulation)
-	local state = {
-		simulation = simulation,
-	}
-
-	setmetatable(state, Ragdoll)
-
-	return state
-end
-
-function Ragdoll:step(dt, input)
-	if not input.ragdoll then
-		self.simulation:setState(self.simulation.states.Walking)
-	end
-end
-
-return Ragdoll]]></ProtectedString>
-						<BinaryString name="Tags"></BinaryString>
-					</Properties>
-				</Item>
-			</Item>
 			<Item class="ModuleScript" referent="RBXA3FB11E223CB4862B702F0010204615F">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
@@ -3574,6 +3189,8 @@ return Ragdoll]]></ProtectedString>
 local Ragdoll = require(script.Parent.CharacterState.Ragdoll)
 local Walking = require(script.Parent.CharacterState.Walking)
 
+local Animation = require(script.Parent.Animation)
+
 local Simulation = {}
 Simulation.__index = Simulation
 
@@ -3581,6 +3198,8 @@ function Simulation.new(character)
 	local simulation = {
 		character = character,
 	}
+
+	simulation.animation = Animation.new(simulation)
 
 	simulation.states = {
 		Climbing = Climbing.new(simulation),
@@ -3698,6 +3317,629 @@ end
 return getModelMass]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX69936D05646F4F22AEE45E0474458629">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Animation</string>
+					<string name="ScriptGuid">{658C7292-6C8D-4A59-8010-85C3887C255E}</string>
+					<ProtectedString name="Source"><![CDATA[local ANIMATIONS = {
+	idle = "http://www.roblox.com/asset/?id=507766666",
+	walk = "http://www.roblox.com/asset/?id=507767714",
+	climb = "http://www.roblox.com/asset/?id=507765644",
+	jump = "http://www.roblox.com/asset/?id=507765000",
+}
+
+local Animation = {}
+Animation.__index = Animation
+
+Animation.State = {
+	None = {
+		enter = function()
+		end,
+		leave = function()
+		end,
+	},
+	Idle = {
+		enter = function(self)
+			self.animations.idle:Play()
+		end,
+		leave = function(self)
+			self.animations.idle:Stop()
+		end,
+	},
+	Walking = {
+		enter = function(self)
+			self.animations.walk:Play()
+		end,
+		leave = function(self)
+			self.animations.walk:Stop()
+		end,
+	},
+	Climbing = {
+		enter = function(self)
+			self.animations.climb:Play()
+		end,
+		leave = function(self)
+			self.animations.climb:Stop()
+		end,
+	},
+	Falling = {
+		enter = function(self)
+			self.animations.jump:Play()
+		end,
+		leave = function(self)
+			self.animations.jump:Stop()
+		end,
+	},
+	Ragdoll = {
+		enter = function(self)
+			self.animations.climb:Play()
+		end,
+		leave = function(self)
+			self.animations.climb:Stop()
+		end,
+	},
+}
+
+function Animation.new(simulation)
+	local self = {
+		simulation = simulation,
+		character = simulation.character,
+		animations = {},
+		animationState = Animation.State.None,
+	}
+
+	self.controller = Instance.new("AnimationController")
+	self.controller.Parent = simulation.character.instance
+
+	for name, id in pairs(ANIMATIONS) do
+		local animation = Instance.new("Animation")
+		animation.AnimationId = id
+		animation.Parent = self.controller
+
+		self.animations[name] = self.controller:LoadAnimation(animation)
+	end
+
+	setmetatable(self, Animation)
+
+	return self
+end
+
+function Animation:setState(newState, options)
+	assert(newState, "Need to specify state for Animation:setState")
+
+	if newState == self.animationState then
+		return
+	end
+
+	self.animationState.leave(self)
+	self.animationState = newState
+	self.animationState.enter(self)
+end
+
+return Animation]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="Folder" referent="RBX654E7832310B4ECB942F74E1C46522A8">
+				<Properties>
+					<string name="Name">CharacterState</string>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="ModuleScript" referent="RBX6820F1FED5934A22BF617B60F43126FE">
+					<Properties>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Climbing</string>
+						<string name="ScriptGuid">{334E6666-A08A-4C42-B448-FEB5AEFDB446}</string>
+						<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+
+local Animation = require(script.Parent.Parent.Animation)
+local DebugHandle = require(script.Parent.Parent.DebugHandle)
+
+local CLIMB_DISTANCE = 1.5 -- How far away can you be from the surface to climb?
+local CLIMB_DEBOUNCE = 0.2
+
+local Climbing = {}
+Climbing.__index = Climbing
+
+function Climbing.new(simulation)
+	local state = {
+		simulation = simulation,
+		character = simulation.character,
+		animation = simulation.animation,
+
+		checkAdorn = DebugHandle.new(),
+		objects = {},
+		refs = {},
+		options = nil,
+		lastClimbTime = -math.huge,
+	}
+
+	setmetatable(state, Climbing)
+
+	return state
+end
+
+function Climbing:cast()
+	local rayOrigin = self.character.castPoint.WorldPosition
+	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * CLIMB_DISTANCE
+
+	local climbRay = Ray.new(rayOrigin, rayDirection)
+	local hit, position, normal = Workspace:FindPartOnRay(climbRay, self.character.instance)
+
+	-- TODO: Use CollectionService?
+	local isClimbable = hit and not not hit:FindFirstChild("Climbable")
+
+	local adornColor
+	if isClimbable then
+		adornColor = Color3.new(0, 1, 0)
+	elseif hit then
+		adornColor = Color3.new(0, 0, 1)
+	else
+		adornColor = Color3.new(1, 0, 0)
+	end
+
+	self.checkAdorn:setColor(adornColor)
+	self.checkAdorn:move(position)
+
+	if not isClimbable then
+		return nil
+	end
+
+	return {
+		object = hit,
+		position = position,
+		normal = normal,
+	}
+end
+
+--[[
+	Intended to be used to check whether it's appropriate to transition to the
+	Climbing state.
+]]
+function Climbing:check()
+	-- If we just stopped climbing, don't climb again yet
+	if Workspace.DistributedGameTime - self.lastClimbTime <= CLIMB_DEBOUNCE then
+		return nil
+	end
+
+	return self:cast()
+end
+
+function Climbing:enterState(oldState, options)
+	assert(options.object)
+	assert(options.position)
+	assert(options.normal)
+
+	self.options = options
+
+	self.checkAdorn:move(nil)
+
+	self.lastClimbTime = Workspace.DistributedGameTime
+
+	local position0 = Instance.new("Attachment")
+	position0.Parent = self.character.instance.PrimaryPart
+	position0.Position = Vector3.new(0, 0, -1)
+	self.objects[position0] = true
+
+	local orientation = CFrame.new(Vector3.new(), -options.normal) + options.position - options.object.Position
+
+	local position1 = Instance.new("Attachment")
+	position1.CFrame = orientation
+	position1.Parent = options.object
+	self.refs.positionAttachment = position1
+	self.objects[position1] = true
+
+	local position = Instance.new("AlignPosition")
+	position.Attachment0 = position0
+	position.Attachment1 = position1
+	position.Parent = self.character.instance.PrimaryPart
+	position.MaxForce = 50000
+	position.Responsiveness = 30
+	self.objects[position] = true
+
+	local align = Instance.new("AlignOrientation")
+	align.Attachment0 = position0
+	align.Attachment1 = position1
+	align.Parent = self.character.instance.PrimaryPart
+	self.objects[align] = true
+
+	self.animation:setState(Animation.State.Climbing)
+end
+
+function Climbing:leaveState()
+	self.refs = {}
+
+	for object in pairs(self.objects) do
+		object:Destroy()
+	end
+
+	self.objects = {}
+
+	self.lastClimbTime = Workspace.DistributedGameTime
+
+	self.animation.animations.climb:AdjustSpeed(1)
+	self.animation:setState(Animation.State.None)
+end
+
+function Climbing:step(dt, input)
+	if input.jump and Workspace.DistributedGameTime - self.lastClimbTime >= CLIMB_DEBOUNCE then
+		return self.simulation:setState(self.simulation.states.Walking)
+	end
+
+	-- TODO: Change this placeholder movement code
+	if input.movementY ~= 0 then
+		local change = Vector3.new(0, input.movementY * dt * 10, 0)
+		self.refs.positionAttachment.CFrame = self.refs.positionAttachment.CFrame + change
+	end
+
+	self.animation.animations.climb:AdjustSpeed(input.movementY)
+
+	local nextClimb = self:cast()
+
+	-- We can't climb anymore!
+	if not nextClimb then
+		return self.simulation:setState(self.simulation.states.Walking)
+	end
+
+	-- We're transitioning to a new climbable
+	if nextClimb.object ~= self.options.object then
+		return self.simulation:setState(self, nextClimb)
+	end
+end
+
+return Climbing]]></ProtectedString>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBXAF8975180D09420CAD063F19B82AEB43">
+					<Properties>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Walking</string>
+						<string name="ScriptGuid">{3C30F1A8-D0EC-47D5-A469-0D19500155B6}</string>
+						<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+
+local Animation = require(script.Parent.Parent.Animation)
+local getModelMass = require(script.Parent.Parent.getModelMass)
+local stepSpring = require(script.Parent.Parent.stepSpring)
+local castCylinder = require(script.Parent.Parent.castCylinder)
+local DebugHandle = require(script.Parent.Parent.DebugHandle)
+
+local FRAMERATE = 1 / 240
+local STIFFNESS = 170
+local DAMPING = 26
+local PRECISION = 0.001
+local TARGET_SPEED = 24
+local HIP_HEIGHT = 2.352
+local MAX_HOR_ACCEL = TARGET_SPEED / 0.25 -- velocity / time to reach it squared
+local MAX_VER_ACCEL = 50 / 0.1 -- massless max vertical force against gravity
+local POP_TIME = 0.05 -- target time to reach target height
+
+local THETA = math.pi * 2
+
+local function createForces(character)
+	local orient0 = Instance.new("Attachment")
+	orient0.Name = "Align0"
+	orient0.Parent = character.instance.PrimaryPart
+
+	local orient1 = Instance.new("Attachment")
+	orient1.Name = "Align1"
+	orient1.Parent = Workspace.Terrain
+
+	local orientation = Instance.new("AlignOrientation")
+	orientation.RigidityEnabled = true
+	orientation.Attachment0 = orient0
+	orientation.Attachment1 = orient1
+	orientation.Parent = character.instance.PrimaryPart
+
+	local velocity0 = Instance.new("Attachment")
+	velocity0.Name = "Velocity0"
+	velocity0.Parent = character.instance.PrimaryPart
+
+	local vectorForce = Instance.new("VectorForce")
+	vectorForce.ApplyAtCenterOfMass = true
+	vectorForce.Force = Vector3.new(0, 0, 0)
+	vectorForce.RelativeTo = Enum.ActuatorRelativeTo.World
+	vectorForce.Attachment0 = velocity0
+	vectorForce.Parent = character.instance.PrimaryPart
+
+	return {
+		orient0 = orient0,
+		orient1 = orient1,
+		orientation = orientation,
+
+		velocity0 = velocity0,
+		vectorForce = vectorForce,
+	}
+end
+
+-- loop between 0 - 2*pi
+local function angleAbs(angle)
+	while angle < 0 do
+		angle = angle + THETA
+	end
+	while angle > THETA do
+		angle = angle - THETA
+	end
+	return angle
+end
+
+local function angleShortest(a0, a1)
+	local d1 = angleAbs(a1 - a0)
+	local d2 = -angleAbs(a0 - a1)
+	return math.abs(d1) > math.abs(d2) and d2 or d1
+end
+
+local function lerpAngle(a0, a1, alpha)
+	return a0 + angleShortest(a0, a1)*alpha
+end
+
+local function makeCFrame(up, look)
+	local upu = up.Unit
+	local looku = (Vector3.new() - look).Unit
+	local rightu = upu:Cross(looku).Unit
+	-- orthonormalize, keeping up vector
+	looku = -upu:Cross(rightu).Unit
+	return CFrame.new(0, 0, 0, rightu.x, upu.x, looku.x, rightu.y, upu.y, looku.y, rightu.z, upu.z, looku.z)
+end
+
+local Walking = {}
+Walking.__index = Walking
+
+function Walking.new(simulation)
+	local state = {
+		simulation = simulation,
+		character = simulation.character,
+		animation = simulation.animation,
+
+		accumulatedTime = 0,
+		currentAccelerationX = 0,
+		currentAccelerationY = 0,
+		debugAdorns = {},
+		debugPlane = nil,
+		forces = nil, -- Defined in enterState
+	}
+
+	setmetatable(state, Walking)
+
+	return state
+end
+
+function Walking:enterState()
+	self.forces = createForces(self.character)
+
+	-- Elegance? Never heard of it.
+	self.character.instance.LeftFoot.CanCollide = false
+	self.character.instance.LeftLowerLeg.CanCollide = false
+	self.character.instance.LeftUpperLeg.CanCollide = false
+	self.character.instance.RightFoot.CanCollide = false
+	self.character.instance.RightLowerLeg.CanCollide = false
+	self.character.instance.RightUpperLeg.CanCollide = false
+
+	local debugPlane = Instance.new("BoxHandleAdornment")
+	debugPlane.Color3 = Color3.new(1, 1, 1)
+	debugPlane.AlwaysOnTop = true
+	debugPlane.ZIndex = 2
+	debugPlane.Transparency = 0.25
+	debugPlane.Size = Vector3.new(0.1, 0.1, 1)
+	debugPlane.Parent = Workspace.Terrain
+	debugPlane.Adornee = debugPlane.Parent
+	self.debugPlane = debugPlane
+
+	self.animation:setState(Animation.State.Idle)
+end
+
+function Walking:leaveState()
+	for _, object in pairs(self.forces) do
+		object:Destroy()
+	end
+
+	-- TODO: Be more robust in case joints are destroyed.
+	self.character.instance.LeftFoot.CanCollide = true
+	self.character.instance.LeftLowerLeg.CanCollide = true
+	self.character.instance.LeftUpperLeg.CanCollide = true
+	self.character.instance.RightFoot.CanCollide = true
+	self.character.instance.RightLowerLeg.CanCollide = true
+	self.character.instance.RightUpperLeg.CanCollide = true
+
+	for _, adorn in pairs(self.debugAdorns) do
+		adorn.instance:Destroy()
+	end
+
+	if self.debugPlane then
+		self.debugPlane:Destroy()
+	end
+
+	self.accumulatedTime = 0
+	self.currentAccelerationX = 0
+	self.currentAccelerationY = 0
+
+	self.debugAdorns = {}
+
+	self.animation.animations.walk:AdjustSpeed(1)
+	self.animation:setState(Animation.State.None)
+end
+
+function Walking:step(dt, input)
+	local characterMass = getModelMass(self.character.instance)
+
+	local targetX = 0
+	local targetY = 0
+
+	if input.movementX ~= 0 or input.movementY ~= 0 then
+		local cameraLook = Workspace.CurrentCamera.CFrame.lookVector
+		local cameraAngle = math.atan2(cameraLook.x, cameraLook.z)
+
+		local magnitude = math.sqrt(input.movementX^2 + input.movementY^2)
+		local unitX = input.movementX / magnitude
+		local unitY = input.movementY / magnitude
+
+		local relativeX = unitX * math.cos(cameraAngle) + unitY * math.sin(cameraAngle)
+		local relativeY = -unitX * math.sin(cameraAngle) + unitY * math.cos(cameraAngle)
+
+		targetX = TARGET_SPEED * relativeX
+		targetY = TARGET_SPEED * relativeY
+	end
+
+	self.accumulatedTime = self.accumulatedTime + dt
+
+	local currentVelocity = self.character.instance.PrimaryPart.Velocity;
+	local currentX = currentVelocity.X
+	local currentY = currentVelocity.Z
+
+	while self.accumulatedTime >= FRAMERATE do
+		self.accumulatedTime = self.accumulatedTime - FRAMERATE
+
+		currentX, self.currentAccelerationX = stepSpring(
+			FRAMERATE,
+			currentX,
+			self.currentAccelerationX,
+			targetX,
+			STIFFNESS,
+			DAMPING,
+			PRECISION
+		)
+
+		currentY, self.currentAccelerationY = stepSpring(
+			FRAMERATE,
+			currentY,
+			self.currentAccelerationY,
+			targetY,
+			STIFFNESS,
+			DAMPING,
+			PRECISION
+		)
+	end
+
+	local vFactor = 0.075 -- fudge constant
+
+	local onGround, groundHeight = castCylinder({
+		origin = self.character.castPoint.WorldPosition,
+		direction = Vector3.new(0, -5, 0),
+		bias = Vector3.new(currentX*vFactor, 0, currentY*vFactor),
+		adorns = self.debugAdorns,
+		debugPlane = self.debugPlane,
+		ignoreInstance = self.character.instance,
+		hipHeight = HIP_HEIGHT,
+	})
+
+	local targetHeight = groundHeight + HIP_HEIGHT
+	local currentHeight = self.character.castPoint.WorldPosition.Y
+
+	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
+	self.character.instance.PrimaryPart.Color = bottomColor
+
+	if onGround then
+		local up
+
+		local jumpHeight = 10
+		local jumpInitialVelocity = math.sqrt(Workspace.Gravity*2*jumpHeight)
+		if input.jump and currentVelocity.Y < jumpInitialVelocity then
+			up = 0
+			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
+		else
+			local t = POP_TIME
+			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
+			up = Workspace.Gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
+			-- very low downward acceleration cuttoff (limited ability to push yourself down)
+			if up < -1 then
+				up = 0
+			end
+			up = up*characterMass
+		end
+
+		self.forces.vectorForce.Force = Vector3.new(
+			self.currentAccelerationX * characterMass,
+			up,
+			self.currentAccelerationY * characterMass
+		)
+	else
+		self.forces.vectorForce.Force = Vector3.new(0, 0, 0)
+	end
+
+	local velocity = Vector3.new(currentX, 0, currentY)
+	local lookVector = self.character.instance.PrimaryPart.CFrame.lookVector
+
+	if onGround then
+		if velocity.Magnitude <= 4 then
+			self.animation:setState(Animation.State.Idle)
+		else
+			self.animation:setState(Animation.State.Walking)
+			self.animation.animations.walk:AdjustSpeed(velocity.Magnitude / 16)
+		end
+	else
+		self.animation:setState(Animation.State.Falling)
+	end
+
+	if velocity.Magnitude > 0.1 and lookVector.y < 0.9 then
+		-- Fix "tumbling" where AlignOrientation might pick the "wrong" axis when we cross through 0, lerp angles...
+		local currentAngle = math.atan2(lookVector.z, lookVector.x)
+		local targetAngle = math.atan2(currentY, currentX)
+		-- If we crossed through 0 (shortest arc angle is close to pi) then lerp the angle...
+		if math.abs(angleShortest(currentAngle, targetAngle)) > math.pi*0.95 then
+			targetAngle = lerpAngle(currentAngle, targetAngle, 0.95)
+		end
+
+		local up = Vector3.new(0, 1, 0)
+		local look = Vector3.new(math.cos(targetAngle), 0, math.sin(targetAngle))
+		self.forces.orient1.CFrame = makeCFrame(up, look)
+	end
+
+	-- Climbing transition check
+	local climbOptions = self.simulation.states.Climbing:check()
+	if climbOptions then
+		return self.simulation:setState(self.simulation.states.Climbing, climbOptions)
+	end
+
+	if input.ragdoll then
+		return self.simulation:setState(self.simulation.states.Ragdoll)
+	end
+end
+
+return Walking]]></ProtectedString>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX9D379D5D2EA64289AD5BBB84162F16F0">
+					<Properties>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Ragdoll</string>
+						<string name="ScriptGuid">{782B2D15-C28C-46DE-BD15-DD5A7B05BFE6}</string>
+						<ProtectedString name="Source"><![CDATA[local Animation = require(script.Parent.Parent.Animation)
+
+local Ragdoll = {}
+Ragdoll.__index = Ragdoll
+
+function Ragdoll.new(simulation)
+	local state = {
+		simulation = simulation,
+		animation = simulation.animation,
+	}
+
+	setmetatable(state, Ragdoll)
+
+	return state
+end
+
+function Ragdoll:enterState()
+	self.animation:setState(Animation.State.Ragdoll)
+end
+
+function Ragdoll:leaveState()
+	self.animation:setState(Animation.State.None)
+end
+
+function Ragdoll:step(dt, input)
+	if not input.ragdoll then
+		self.simulation:setState(self.simulation.states.Walking)
+	end
+end
+
+return Ragdoll]]></ProtectedString>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
 			</Item>
 		</Item>
 	</Item>
@@ -3944,7 +4186,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5186,7 +5428,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5507,7 +5749,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5680,7 +5922,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -5853,7 +6095,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -6026,7 +6268,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -6199,7 +6441,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -6393,7 +6635,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -6566,7 +6808,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -6739,7 +6981,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -6912,7 +7154,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
@@ -7085,7 +7327,7 @@ return Api]]></ProtectedString>
 						<R21>0</R21>
 						<R22>1</R22>
 					</CoordinateFrame>
-					<bool name="CanCollide">false</bool>
+					<bool name="CanCollide">true</bool>
 					<token name="CollisionFidelity">2</token>
 					<int name="CollisionGroupId">0</int>
 					<Color3uint8 name="Color3uint8">4288651692</Color3uint8>
