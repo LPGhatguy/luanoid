@@ -1,8 +1,9 @@
 local Workspace = game:GetService("Workspace")
 
-local stepSpring = require(script.Parent.stepSpring)
-local getModelMass = require(script.Parent.getModelMass)
+local CharacterState = require(script.Parent.CharacterState)
 local DebugHandle = require(script.Parent.DebugHandle)
+local getModelMass = require(script.Parent.getModelMass)
+local stepSpring = require(script.Parent.stepSpring)
 
 local TARGET_SPEED = 24
 local FRAMERATE = 1 / 240
@@ -82,6 +83,7 @@ function Simulation.new(character)
 	local castCount = 32
 	local simulation = {
 		character = character,
+		state = CharacterState.Stable,
 		accumulatedTime = 0,
 		currentAccelerationX = 0,
 		currentAccelerationY = 0,
@@ -96,6 +98,53 @@ function Simulation.new(character)
 	setmetatable(simulation, Simulation)
 
 	return simulation
+end
+
+function Simulation:getControlEnabled()
+	if self.state.controlEnabled ~= nil then
+		return self.state.controlEnabled
+	end
+
+	return CharacterState.Default.controlEnabled
+end
+
+function Simulation:setState(newState)
+	if newState == self.state then
+		return
+	end
+
+	-- Assign states here so that during state lifecycle, self.state is correct.
+	local oldState = self.state
+	self.state = newState
+
+	local orientationEnabled = newState.orientationEnabled
+	if newState.orientationEnabled == nil then
+		orientationEnabled = CharacterState.Default.orientationEnabled
+	end
+
+	self.character.orientation.Enabled = orientationEnabled
+
+	-- Undo previous collision values
+	if oldState.setCollisionForParts then
+		for name, value in pairs(oldState.setCollisionForParts) do
+			local part = self.character.instance:FindFirstChild(name)
+
+			if part then
+				part.CanCollide = not value
+			end
+		end
+	end
+
+	-- Apply new collision values
+	if newState.setCollisionForParts then
+		for name, value in pairs(newState.setCollisionForParts) do
+			local part = self.character.instance:FindFirstChild(name)
+
+			if part then
+				part.CanCollide = value
+			end
+		end
+	end
 end
 
 -- vector is direction + mag
@@ -148,6 +197,12 @@ function Simulation:castCylinder(vector, bias)
 end
 
 function Simulation:step(dt, input)
+	if input.ragdoll then
+		self:setState(CharacterState.Ragdoll)
+	else
+		self:setState(CharacterState.Stable)
+	end
+
 	local characterMass = getModelMass(self.character.instance)
 
 	local targetX = TARGET_SPEED * input.movementX
@@ -193,11 +248,9 @@ function Simulation:step(dt, input)
 	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
 	self.character.instance.PrimaryPart.Color = bottomColor
 
-	self.character.orientation.Enabled = not input.ragdoll
-
-	if onGround and not input.ragdoll then
+	if onGround and self:getControlEnabled() then
 		local up
-		
+
 		local jumpHeight = 10
 		local jumpInitialVelocity = math.sqrt(workspace.gravity*2*jumpHeight)
 		if input.jump and currentVelocity.Y < jumpInitialVelocity then
