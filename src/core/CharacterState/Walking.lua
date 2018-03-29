@@ -118,6 +118,7 @@ function Walking:leaveState()
 		object:Destroy()
 	end
 
+	-- TODO: Be more robust in case joints are destroyed.
 	self.character.instance.LeftFoot.CanCollide = true
 	self.character.instance.LeftLowerLeg.CanCollide = true
 	self.character.instance.LeftUpperLeg.CanCollide = true
@@ -128,6 +129,10 @@ function Walking:leaveState()
 	for _, adorn in ipairs(self.debugAdorns) do
 		adorn.instance:Destroy()
 	end
+
+	self.accumulatedTime = 0
+	self.currentAccelerationX = 0
+	self.currentAccelerationY = 0
 
 	self.debugAdorns = {}
 end

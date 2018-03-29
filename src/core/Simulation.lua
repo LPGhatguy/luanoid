@@ -1,4 +1,6 @@
-local CharacterState = require(script.Parent.CharacterState)
+local Climbing = require(script.Parent.CharacterState.Climbing)
+local Ragdoll = require(script.Parent.CharacterState.Ragdoll)
+local Walking = require(script.Parent.CharacterState.Walking)
 
 local Simulation = {}
 Simulation.__index = Simulation
@@ -9,8 +11,9 @@ function Simulation.new(character)
 	}
 
 	simulation.states = {
-		Walking = CharacterState.Walking.new(simulation),
-		Ragdoll = CharacterState.Ragdoll.new(simulation),
+		Climbing = Climbing.new(simulation),
+		Ragdoll = Ragdoll.new(simulation),
+		Walking = Walking.new(simulation),
 	}
 
 	simulation.state = "Walking"
