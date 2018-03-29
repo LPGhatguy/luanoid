@@ -2,6 +2,8 @@ local Workspace = game:GetService("Workspace")
 
 local DebugHandle = require(script.Parent.Parent.DebugHandle)
 
+local CLIMB_DEBOUNCE = 0.3
+
 local Climbing = {}
 Climbing.__index = Climbing
 
@@ -10,6 +12,8 @@ function Climbing.new(simulation)
 		simulation = simulation,
 		character = simulation.character,
 		checkAdorn = DebugHandle.new(),
+		objects = {},
+		lastClimbTime = nil,
 	}
 
 	setmetatable(state, Climbing)
@@ -19,7 +23,7 @@ end
 
 function Climbing:check()
 	local rayOrigin = self.character.castPoint.WorldPosition
-	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * 3
+	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * 1
 
 	local climbRay = Ray.new(rayOrigin, rayDirection)
 	local hit, position, normal = Workspace:FindPartOnRay(climbRay, self.character.instance)
@@ -43,6 +47,11 @@ function Climbing:check()
 		return nil
 	end
 
+	-- If we just stopped climbing, don't climb again yet
+	if self.lastClimbTime and Workspace.DistributedGameTime - self.lastClimbTime <= CLIMB_DEBOUNCE then
+		return nil
+	end
+
 	return {
 		object = hit,
 		position = position,
@@ -55,15 +64,46 @@ function Climbing:enterState(oldState, options)
 	assert(options.position)
 	assert(options.normal)
 
+	self.checkAdorn:move(nil)
+
+	self.lastClimbTime = Workspace.DistributedGameTime
+
+	local position0 = Instance.new("Attachment")
+	position0.Parent = self.character.instance.PrimaryPart
+	self.objects[position0] = true
+
+	local position1 = Instance.new("Attachment")
+	position1.CFrame = CFrame.new(options.position - options.object.Position)
+	position1.Parent = options.object
+	self.objects[position1] = true
+
+	local position = Instance.new("AlignPosition")
+	position.Attachment0 = position0
+	position.Attachment1 = position1
+	position.Parent = self.character.instance.PrimaryPart
+	self.objects[position] = true
+
+	local align = Instance.new("AlignOrientation")
+	align.Attachment0 = position0
+	align.Attachment1 = position1
+	align.Parent = self.character.instance.PrimaryPart
+	self.objects[align] = true
+
 	print("Start climbing object", options.object)
 end
 
 function Climbing:leaveState()
-	-- TODO
+	for object in pairs(self.objects) do
+		object:Destroy()
+	end
+
+	self.objects = {}
+
+	self.lastClimbTime = Workspace.DistributedGameTime
 end
 
 function Climbing:step(dt, input)
-	if input.jump then
+	if input.jump and Workspace.DistributedGameTime - self.lastClimbTime >= CLIMB_DEBOUNCE then
 		return self.simulation:setState(self.simulation.states.Walking)
 	end
 end
