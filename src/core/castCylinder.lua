@@ -67,6 +67,11 @@ local function planeFromPoints(points, weights)
 		)
 	end
 
+	-- quick fix for the plane normal sometimes being "upside down" from what we want
+	if dir.y < 0 then
+		dir = -dir
+	end
+
     return centroid, dir.Unit
 end
 
