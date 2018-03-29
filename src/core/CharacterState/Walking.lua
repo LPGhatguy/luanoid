@@ -94,6 +94,7 @@ function Walking.new(simulation)
 		currentAccelerationX = 0,
 		currentAccelerationY = 0,
 		debugAdorns = {},
+		debugPlane = nil,
 		forces = nil, -- Defined in enterState
 	}
 
@@ -112,6 +113,16 @@ function Walking:enterState()
 	self.character.instance.RightFoot.CanCollide = false
 	self.character.instance.RightLowerLeg.CanCollide = false
 	self.character.instance.RightUpperLeg.CanCollide = false
+
+	local debugPlane = Instance.new("BoxHandleAdornment")
+	debugPlane.Color3 = Color3.new(1, 1, 1)
+	debugPlane.AlwaysOnTop = true
+	debugPlane.ZIndex = 2
+	debugPlane.Transparency = 0.25
+	debugPlane.Size = Vector3.new(0.1, 0.1, 1)
+	debugPlane.Parent = workspace.Terrain
+	debugPlane.Adornee = debugPlane.Parent
+	self.debugPlane = debugPlane
 end
 
 function Walking:leaveState()
@@ -129,6 +140,10 @@ function Walking:leaveState()
 
 	for _, adorn in pairs(self.debugAdorns) do
 		adorn.instance:Destroy()
+	end
+
+	if self.debugPlane then
+		self.debugPlane:Destroy()
 	end
 
 	self.accumulatedTime = 0
@@ -196,6 +211,7 @@ function Walking:step(dt, input)
 		direction = Vector3.new(0, -5, 0),
 		bias = Vector3.new(currentX*vFactor, 0, currentY*vFactor),
 		adorns = self.debugAdorns,
+		debugPlane = self.debugPlane,
 		ignoreInstance = self.character.instance,
 		hipHeight = HIP_HEIGHT,
 	})

@@ -4,6 +4,72 @@ local DebugHandle = require(script.Parent.DebugHandle)
 
 local CAST_COUNT = 32
 
+-- TODO: use normals to get a better plane with fewer points
+-- http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
+local function planeFromPoints(points, weights)
+	local n = 0
+	local sumX, sumY, sumZ = 0, 0, 0
+	for i, p in pairs(points) do
+		local w = weights[i]
+		n = n + w
+		sumX, sumY, sumZ = sumX + p.X*w, sumY + p.Y*w, sumZ + p.Z*w
+	end
+	local centroid = Vector3.new(sumX, sumY, sumZ) * (1.0/n)
+
+	if n < 3 then
+		-- at least three points required
+		return centroid, Vector3.new(0, 1, 0)
+	end
+
+	-- Calc full 3x3 covariance matrix, excluding symmetries:
+	local xx = 0.0 local xy = 0.0 local xz = 0.0
+	local yy = 0.0 local yz = 0.0 local zz = 0.0
+
+	for i, p in pairs(points) do
+		local w = weights[i]
+		local r = p - centroid
+		xx = xx + r.x*r.x*w
+		xy = xy + r.x*r.y*w
+		xz = xz + r.x*r.z*w
+		yy = yy + r.y*r.y*w
+		yz = yz + r.y*r.z*w
+		zz = zz + r.z*r.z*w
+	end
+
+	local det_x = yy*zz - yz*yz
+	local det_y = xx*zz - xz*xz
+	local det_z = xx*yy - xy*xy
+
+	local det_max = math.max(det_x, det_y, det_z)
+	if det_max <= 0 then
+		return
+	end
+
+	-- Pick path with best conditioning:
+    local dir
+	if det_max == det_x then
+		dir = Vector3.new(
+			det_x,
+			xz*yz - xy*zz,
+			xy*yz - xz*yy
+		)
+	elseif det_max == det_y then
+		dir = Vector3.new(
+			xz*yz - xy*zz,
+			det_y,
+			xy*xz - yz*xx
+		)
+	else
+		dir = Vector3.new(
+			xy*yz - xz*yy,
+			xy*xz - yz*xx,
+			det_z
+		)
+	end
+
+    return centroid, dir.Unit
+end
+
 -- TODO: more appropriate cast distribution algorithm
 -- https://stackoverflow.com/a/28572551/367100
 local function radius(k,n,b)
@@ -50,6 +116,8 @@ local function castCylinder(options)
 	local totalWeight = 0
 	local totalHeight = 0
 
+	local weights = {}
+	local points = {}
 	for index, x, z in sunflower(CAST_COUNT, 2) do
 		local offset = Vector3.new(x*radius, 0, z*radius)
 
@@ -71,6 +139,9 @@ local function castCylinder(options)
 			if part then
 				totalWeight = totalWeight + weight
 				totalHeight = totalHeight + point.y*weight
+
+				points[#points + 1] = point
+				weights[#weights + 1] = weight
 			end
 		end
 
@@ -91,6 +162,16 @@ local function castCylinder(options)
 			else
 				adorn:setColor(Color3.new(1, 0, 0))
 			end
+		end
+	end
+
+	local centroid, normal = planeFromPoints(points, weights)
+	if options.debugPlane then
+		if centroid then
+			options.debugPlane.Visible = true
+			options.debugPlane.CFrame = CFrame.new(centroid + normal*0.5, centroid + normal)
+		else
+			options.debugPlane.Visible = false
 		end
 	end
 
