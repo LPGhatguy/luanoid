@@ -2608,6 +2608,240 @@ gO4=]]></BinaryString>
 				</Item>
 			</Item>
 		</Item>
+		<Item class="Model" referent="RBX2B8273CFCB024D0ABECCB54DA6DDC5D5">
+			<Properties>
+				<CoordinateFrame name="ModelInPrimary">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<string name="Name">Propeller</string>
+				<Ref name="PrimaryPart">null</Ref>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+			<Item class="Part" referent="RBX1DA5C079719F4E08B34F91B8C31AB77C">
+				<Properties>
+					<bool name="Anchored">false</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>29</X>
+						<Y>4.5</Y>
+						<Z>20</Z>
+						<R00>1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<float name="Elasticity">0.5</float>
+					<float name="Friction">0.300000012</float>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<token name="Material">256</token>
+					<string name="Name">Part</string>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<BinaryString name="Tags"></BinaryString>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<token name="formFactorRaw">1</token>
+					<token name="shape">1</token>
+					<Vector3 name="size">
+						<X>2</X>
+						<Y>1</Y>
+						<Z>20</Z>
+					</Vector3>
+				</Properties>
+				<Item class="Attachment" referent="RBX52E115295EA74324AC206AD0AFC6C32A">
+					<Properties>
+						<CoordinateFrame name="CFrame">
+							<X>0</X>
+							<Y>-0.5</Y>
+							<Z>0</Z>
+							<R00>0</R00>
+							<R01>-1</R01>
+							<R02>0</R02>
+							<R10>1</R10>
+							<R11>0</R11>
+							<R12>-0</R12>
+							<R20>0</R20>
+							<R21>0</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<string name="Name">Attachment1</string>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Part" referent="RBX0B5F3A62D5A24BDF88B78796B1C53D9D">
+				<Properties>
+					<bool name="Anchored">true</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>29</X>
+						<Y>1.5</Y>
+						<Z>20</Z>
+						<R00>1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<float name="Elasticity">0.5</float>
+					<float name="Friction">0.300000012</float>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<token name="Material">256</token>
+					<string name="Name">Part</string>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<BinaryString name="Tags"></BinaryString>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<token name="formFactorRaw">1</token>
+					<token name="shape">1</token>
+					<Vector3 name="size">
+						<X>2</X>
+						<Y>3</Y>
+						<Z>2</Z>
+					</Vector3>
+				</Properties>
+				<Item class="Attachment" referent="RBX747B8F69DB5140DDA19880265EB0F06D">
+					<Properties>
+						<CoordinateFrame name="CFrame">
+							<X>0</X>
+							<Y>1.5</Y>
+							<Z>0</Z>
+							<R00>0</R00>
+							<R01>-1</R01>
+							<R02>0</R02>
+							<R10>1</R10>
+							<R11>0</R11>
+							<R12>-0</R12>
+							<R20>0</R20>
+							<R21>0</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<string name="Name">Attachment0</string>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
+				<Item class="HingeConstraint" referent="RBX619BF5408EA84AB9AD65B9EEEC6BFD01">
+					<Properties>
+						<token name="ActuatorType">1</token>
+						<float name="AngularSpeed">0</float>
+						<float name="AngularVelocity">4</float>
+						<Ref name="Attachment0">RBX747B8F69DB5140DDA19880265EB0F06D</Ref>
+						<Ref name="Attachment1">RBX52E115295EA74324AC206AD0AFC6C32A</Ref>
+						<int name="Color">1009</int>
+						<bool name="Enabled">true</bool>
+						<bool name="LimitsEnabled">false</bool>
+						<float name="LowerAngle">-45</float>
+						<float name="MotorMaxAcceleration">INF</float>
+						<float name="MotorMaxTorque">2000</float>
+						<string name="Name">HingeConstraint</string>
+						<float name="Radius">0.150000006</float>
+						<float name="Restitution">0</float>
+						<float name="ServoMaxTorque">0</float>
+						<BinaryString name="Tags"></BinaryString>
+						<float name="TargetAngle">0</float>
+						<float name="UpperAngle">45</float>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
+			</Item>
+		</Item>
 	</Item>
 	<Item class="SoundService" referent="RBX329B1AB48AB34F8D8100822552DEEF4B">
 		<Properties>
@@ -2669,7 +2903,9 @@ gO4=]]></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Simulation</string>
 					<string name="ScriptGuid">{4A920C18-3F9C-4518-908B-47583248F955}</string>
-					<ProtectedString name="Source"><![CDATA[local CharacterState = require(script.Parent.CharacterState)
+					<ProtectedString name="Source"><![CDATA[local Climbing = require(script.Parent.CharacterState.Climbing)
+local Ragdoll = require(script.Parent.CharacterState.Ragdoll)
+local Walking = require(script.Parent.CharacterState.Walking)
 
 local Simulation = {}
 Simulation.__index = Simulation
@@ -2680,13 +2916,14 @@ function Simulation.new(character)
 	}
 
 	simulation.states = {
-		Walking = CharacterState.Walking.new(simulation),
-		Ragdoll = CharacterState.Ragdoll.new(simulation),
+		Climbing = Climbing.new(simulation),
+		Ragdoll = Ragdoll.new(simulation),
+		Walking = Walking.new(simulation),
 	}
 
-	simulation.state = "Walking"
+	simulation.currentStateName = "Walking"
 
-	simulation.states[simulation.state]:enterState()
+	simulation.states[simulation.currentStateName]:enterState()
 
 	setmetatable(simulation, Simulation)
 
@@ -2694,21 +2931,34 @@ function Simulation.new(character)
 end
 
 function Simulation:setState(stateName)
-	if stateName == self.state then
+	if stateName == self.currentStateName then
 		return
 	end
 
-	if not self.states[stateName] then
-		error("Invalid state name " .. stateName, 2)
+	local oldState = self.states[self.currentStateName]
+	local newState = self.states[stateName]
+
+	if not newState then
+		error(("Invalid state %q"):format(stateName), 2)
 	end
 
-	self.states[self.state]:leaveState()
-	self.state = stateName
-	self.states[self.state]:enterState()
+	if oldState.leaveState then
+		oldState:leaveState()
+	end
+
+	self.currentStateName = stateName
+
+	if newState.enterState then
+		newState:enterState()
+	end
 end
 
 function Simulation:step(dt, input)
-	self.states[self.state]:step(dt, input)
+	local currentState = self.states[self.currentStateName]
+
+	if currentState.step then
+		currentState:step(dt, input)
+	end
 end
 
 return Simulation]]></ProtectedString>
@@ -2764,8 +3014,8 @@ local function castCylinder(options)
 	-- update part points and part velocities
 	local radius = 1.5
 
-	if bias.Magnitude > radius then
-		bias = bias.Unit * radius
+	if bias.Magnitude > radius*0.75 then
+		bias = bias.Unit * radius*0.75
 	end
 
 	local onGround = false
@@ -2774,23 +3024,26 @@ local function castCylinder(options)
 
 	for index, x, z in sunflower(CAST_COUNT, 2) do
 		local offset = Vector3.new(x*radius, 0, z*radius)
+
+		local biasDist = (offset - bias).Magnitude / radius
+		local weight = 1 - biasDist*biasDist
+		-- weight = math.max(weight, 0.1)
+		
 		local start = origin + offset
 		local ray = Ray.new(start, direction)
-
+		
 		local part, point = Workspace:FindPartOnRay(ray, ignoreInstance)
 		local length = (point - start).Magnitude
 		local legHit = length <= hipHeight + 0.25
-		onGround = onGround or legHit
 
-		-- add to weighted average
-		local weight = 1
-		if part then
-			local biasDist = (offset - bias).Magnitude / radius
-			weight = 1 - biasDist*biasDist
-			-- can't let total be 0 if onGround
-			weight = math.max(weight, 0.1)
-			totalWeight = totalWeight + weight
-			totalHeight = totalHeight + point.y*weight
+		if weight > 0 then
+			onGround = onGround or legHit
+			
+			-- add to weighted average
+			if part then
+				totalWeight = totalWeight + weight
+				totalHeight = totalHeight + point.y*weight
+			end
 		end
 
 		if adorns then
@@ -2802,7 +3055,7 @@ local function castCylinder(options)
 			end
 
 			adorn:move(point)
-
+			
 			if legHit then
 				adorn:setColor(Color3.new(0, weight, 0))
 			elseif part then
@@ -2842,305 +3095,6 @@ end
 return getModelMass]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXDEFD9AA1A5B6461AAC50FA8ED2800E4D">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">CharacterState</string>
-					<string name="ScriptGuid">{28D7FBA1-FD62-4140-B08A-AE93C9C179A7}</string>
-					<ProtectedString name="Source"><![CDATA[--[[
-	Bundle up each CharacterState and expose it through one object
-]]
-
-local result = {}
-
-for _, instance in pairs(script:GetChildren()) do
-	result[instance.Name] = require(instance)
-end
-
-return result]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-				<Item class="ModuleScript" referent="RBXA25A4CEE1BE74B89A0FB19B7F3261D1A">
-					<Properties>
-						<Content name="LinkedSource"><null></null></Content>
-						<string name="Name">Walking</string>
-						<string name="ScriptGuid">{1188AA7F-B311-467E-9B16-1BF8C283E204}</string>
-						<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
-
-local getModelMass = require(script.Parent.Parent.getModelMass)
-local stepSpring = require(script.Parent.Parent.stepSpring)
-local castCylinder = require(script.Parent.Parent.castCylinder)
-
-local FRAMERATE = 1 / 240
-local STIFFNESS = 170
-local DAMPING = 26
-local PRECISION = 0.001
-local TARGET_SPEED = 24
-local HIP_HEIGHT = 2.352
-local MAX_HOR_ACCEL = TARGET_SPEED / 0.25 -- velocity / time to reach it squared
-local MAX_VER_ACCEL = 50 / 0.1 -- massless max vertical force against gravity
-local POP_TIME = 0.05 -- target time to reach target height
-
-local THETA = math.pi * 2
-
-local function createForces(character)
-	local orient0 = Instance.new("Attachment")
-	orient0.Name = "Align0"
-	orient0.Parent = character.instance.PrimaryPart
-
-	local orient1 = Instance.new("Attachment")
-	orient1.Name = "Align1"
-	orient1.Parent = Workspace.Terrain
-
-	local orientation = Instance.new("AlignOrientation")
-	orientation.RigidityEnabled = true
-	orientation.Attachment0 = orient0
-	orientation.Attachment1 = orient1
-	orientation.Parent = character.instance.PrimaryPart
-
-	local velocity0 = Instance.new("Attachment")
-	velocity0.Name = "Velocity0"
-	velocity0.Parent = character.instance.PrimaryPart
-
-	local vectorForce = Instance.new("VectorForce")
-	vectorForce.ApplyAtCenterOfMass = true
-	vectorForce.Force = Vector3.new(0, 0, 0)
-	vectorForce.RelativeTo = Enum.ActuatorRelativeTo.World
-	vectorForce.Attachment0 = velocity0
-	vectorForce.Parent = character.instance.PrimaryPart
-
-	return {
-		orient0 = orient0,
-		orient1 = orient1,
-		orientation = orientation,
-
-		velocity0 = velocity0,
-		vectorForce = vectorForce,
-	}
-end
-
--- loop between 0 - 2*pi
-local function angleAbs(angle)
-	while angle < 0 do
-		angle = angle + THETA
-	end
-	while angle > THETA do
-		angle = angle - THETA
-	end
-	return angle
-end
-
-local function angleShortest(a0, a1)
-	local d1 = angleAbs(a1 - a0)
-	local d2 = -angleAbs(a0 - a1)
-	return math.abs(d1) > math.abs(d2) and d2 or d1
-end
-
-local function lerpAngle(a0, a1, alpha)
-	return a0 + angleShortest(a0, a1)*alpha
-end
-
-local function makeCFrame(up, look)
-	local upu = up.Unit
-	local looku = (Vector3.new() - look).Unit
-	local rightu = upu:Cross(looku).Unit
-	-- orthonormalize, keeping up vector
-	looku = -upu:Cross(rightu).Unit
-	return CFrame.new(0, 0, 0, rightu.x, upu.x, looku.x, rightu.y, upu.y, looku.y, rightu.z, upu.z, looku.z)
-end
-
-local Walking = {}
-Walking.__index = Walking
-
-function Walking.new(simulation)
-	local state = {
-		simulation = simulation,
-		character = simulation.character,
-		accumulatedTime = 0,
-		currentAccelerationX = 0,
-		currentAccelerationY = 0,
-		debugAdorns = {},
-		forces = nil, -- Defined in enterState
-	}
-
-	setmetatable(state, Walking)
-
-	return state
-end
-
-function Walking:enterState()
-	self.forces = createForces(self.character)
-
-	-- Elegance? Never heard of it.
-	self.character.instance.LeftFoot.CanCollide = false
-	self.character.instance.LeftLowerLeg.CanCollide = false
-	self.character.instance.LeftUpperLeg.CanCollide = false
-	self.character.instance.RightFoot.CanCollide = false
-	self.character.instance.RightLowerLeg.CanCollide = false
-	self.character.instance.RightUpperLeg.CanCollide = false
-end
-
-function Walking:leaveState()
-	for _, object in pairs(self.forces) do
-		object:Destroy()
-	end
-
-	self.character.instance.LeftFoot.CanCollide = true
-	self.character.instance.LeftLowerLeg.CanCollide = true
-	self.character.instance.LeftUpperLeg.CanCollide = true
-	self.character.instance.RightFoot.CanCollide = true
-	self.character.instance.RightLowerLeg.CanCollide = true
-	self.character.instance.RightUpperLeg.CanCollide = true
-
-	for _, adorn in ipairs(self.debugAdorns) do
-		adorn.instance:Destroy()
-	end
-
-	self.debugAdorns = {}
-end
-
-function Walking:step(dt, input)
-	local characterMass = getModelMass(self.character.instance)
-
-	local targetX = TARGET_SPEED * input.movementX
-	local targetY = TARGET_SPEED * input.movementY
-
-	self.accumulatedTime = self.accumulatedTime + dt
-
-	local currentVelocity = self.character.instance.PrimaryPart.Velocity;
-	local currentX = currentVelocity.X
-	local currentY = currentVelocity.Z
-
-	while self.accumulatedTime >= FRAMERATE do
-		self.accumulatedTime = self.accumulatedTime - FRAMERATE
-
-		currentX, self.currentAccelerationX = stepSpring(
-			FRAMERATE,
-			currentX,
-			self.currentAccelerationX,
-			targetX,
-			STIFFNESS,
-			DAMPING,
-			PRECISION
-		)
-
-		currentY, self.currentAccelerationY = stepSpring(
-			FRAMERATE,
-			currentY,
-			self.currentAccelerationY,
-			targetY,
-			STIFFNESS,
-			DAMPING,
-			PRECISION
-		)
-	end
-
-	local vFactor = 0.075 -- fudge constant
-
-	local onGround, groundHeight = castCylinder({
-		origin = self.character.castPoint.WorldPosition,
-		direction = Vector3.new(0, -5, 0),
-		bias = Vector3.new(currentX*vFactor, 0, currentY*vFactor),
-		adorns = self.debugAdorns,
-		ignoreInstance = self.character.instance,
-		hipHeight = HIP_HEIGHT,
-	})
-
-	local targetHeight = groundHeight + HIP_HEIGHT
-	local currentHeight = self.character.castPoint.WorldPosition.Y
-
-	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
-	self.character.instance.PrimaryPart.Color = bottomColor
-
-	if onGround then
-		local up
-
-		local jumpHeight = 10
-		local jumpInitialVelocity = math.sqrt(Workspace.Gravity*2*jumpHeight)
-		if input.jump and currentVelocity.Y < jumpInitialVelocity then
-			up = 0
-			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
-		else
-			local t = POP_TIME
-			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
-			up = Workspace.Gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
-			-- very low downward acceleration cuttoff (limited ability to push yourself down)
-			if up < -1 then
-				up = 0
-			end
-			up = up*characterMass
-		end
-
-		self.forces.vectorForce.Force = Vector3.new(
-			self.currentAccelerationX * characterMass,
-			up,
-			self.currentAccelerationY * characterMass
-		)
-	else
-		self.forces.vectorForce.Force = Vector3.new(0, 0, 0)
-	end
-
-	local velocity = Vector3.new(currentX, 0, currentY)
-	local lookVector = self.character.instance.PrimaryPart.CFrame.lookVector
-
-	if velocity.Magnitude > 0.1 and lookVector.y < 0.9 then
-		-- Fix "tumbling" where AlignOrientation might pick the "wrong" axis when we cross through 0, lerp angles...
-		local currentAngle = math.atan2(lookVector.z, lookVector.x)
-		local targetAngle = math.atan2(currentY, currentX)
-		-- If we crossed through 0 (shortest arc angle is close to pi) then lerp the angle...
-		if math.abs(angleShortest(currentAngle, targetAngle)) > math.pi*0.95 then
-			targetAngle = lerpAngle(currentAngle, targetAngle, 0.95)
-		end
-
-		local up = Vector3.new(0, 1, 0)
-		local look = Vector3.new(math.cos(targetAngle), 0, math.sin(targetAngle))
-		self.forces.orient1.CFrame = makeCFrame(up, look)
-	end
-
-	if input.ragdoll then
-		self.simulation:setState("Ragdoll")
-	end
-end
-
-return Walking]]></ProtectedString>
-						<BinaryString name="Tags"></BinaryString>
-					</Properties>
-				</Item>
-				<Item class="ModuleScript" referent="RBX9C4AF365E0EC421D9308EE4308464F71">
-					<Properties>
-						<Content name="LinkedSource"><null></null></Content>
-						<string name="Name">Ragdoll</string>
-						<string name="ScriptGuid">{2B49D147-E515-431A-A724-56FAF436814E}</string>
-						<ProtectedString name="Source"><![CDATA[local Ragdoll = {}
-Ragdoll.__index = Ragdoll
-
-function Ragdoll.new(simulation)
-	local state = {
-		simulation = simulation,
-	}
-
-	setmetatable(state, Ragdoll)
-
-	return state
-end
-
-function Ragdoll:step(dt, input)
-	if not input.ragdoll then
-		self.simulation:setState("Walking")
-	end
-end
-
-function Ragdoll:enterState()
-end
-
-function Ragdoll:leaveState()
-end
-
-return Ragdoll]]></ProtectedString>
-						<BinaryString name="Tags"></BinaryString>
-					</Properties>
-				</Item>
 			</Item>
 			<Item class="ModuleScript" referent="RBX3738C4A1A7B3481BBA8191199DC412B0">
 				<Properties>
@@ -3281,6 +3235,345 @@ local ApiSpec = {
 return ApiSpec]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
+			</Item>
+			<Item class="Folder" referent="RBXE8DD0642CFCC4661A725B48CB74E2266">
+				<Properties>
+					<string name="Name">CharacterState</string>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="ModuleScript" referent="RBX13AC6A2C8499452F9C9E31A62BABB1B3">
+					<Properties>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Walking</string>
+						<string name="ScriptGuid">{3CA9BA75-CFCD-4B97-93B8-48F466E05B7F}</string>
+						<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+
+local getModelMass = require(script.Parent.Parent.getModelMass)
+local stepSpring = require(script.Parent.Parent.stepSpring)
+local castCylinder = require(script.Parent.Parent.castCylinder)
+local DebugHandle = require(script.Parent.Parent.DebugHandle)
+
+local FRAMERATE = 1 / 240
+local STIFFNESS = 170
+local DAMPING = 26
+local PRECISION = 0.001
+local TARGET_SPEED = 24
+local HIP_HEIGHT = 2.352
+local MAX_HOR_ACCEL = TARGET_SPEED / 0.25 -- velocity / time to reach it squared
+local MAX_VER_ACCEL = 50 / 0.1 -- massless max vertical force against gravity
+local POP_TIME = 0.05 -- target time to reach target height
+
+local THETA = math.pi * 2
+
+local function createForces(character)
+	local orient0 = Instance.new("Attachment")
+	orient0.Name = "Align0"
+	orient0.Parent = character.instance.PrimaryPart
+
+	local orient1 = Instance.new("Attachment")
+	orient1.Name = "Align1"
+	orient1.Parent = Workspace.Terrain
+
+	local orientation = Instance.new("AlignOrientation")
+	orientation.RigidityEnabled = true
+	orientation.Attachment0 = orient0
+	orientation.Attachment1 = orient1
+	orientation.Parent = character.instance.PrimaryPart
+
+	local velocity0 = Instance.new("Attachment")
+	velocity0.Name = "Velocity0"
+	velocity0.Parent = character.instance.PrimaryPart
+
+	local vectorForce = Instance.new("VectorForce")
+	vectorForce.ApplyAtCenterOfMass = true
+	vectorForce.Force = Vector3.new(0, 0, 0)
+	vectorForce.RelativeTo = Enum.ActuatorRelativeTo.World
+	vectorForce.Attachment0 = velocity0
+	vectorForce.Parent = character.instance.PrimaryPart
+
+	return {
+		orient0 = orient0,
+		orient1 = orient1,
+		orientation = orientation,
+
+		velocity0 = velocity0,
+		vectorForce = vectorForce,
+	}
+end
+
+-- loop between 0 - 2*pi
+local function angleAbs(angle)
+	while angle < 0 do
+		angle = angle + THETA
+	end
+	while angle > THETA do
+		angle = angle - THETA
+	end
+	return angle
+end
+
+local function angleShortest(a0, a1)
+	local d1 = angleAbs(a1 - a0)
+	local d2 = -angleAbs(a0 - a1)
+	return math.abs(d1) > math.abs(d2) and d2 or d1
+end
+
+local function lerpAngle(a0, a1, alpha)
+	return a0 + angleShortest(a0, a1)*alpha
+end
+
+local function makeCFrame(up, look)
+	local upu = up.Unit
+	local looku = (Vector3.new() - look).Unit
+	local rightu = upu:Cross(looku).Unit
+	-- orthonormalize, keeping up vector
+	looku = -upu:Cross(rightu).Unit
+	return CFrame.new(0, 0, 0, rightu.x, upu.x, looku.x, rightu.y, upu.y, looku.y, rightu.z, upu.z, looku.z)
+end
+
+local Walking = {}
+Walking.__index = Walking
+
+function Walking.new(simulation)
+	local state = {
+		simulation = simulation,
+		character = simulation.character,
+		accumulatedTime = 0,
+		currentAccelerationX = 0,
+		currentAccelerationY = 0,
+		debugAdorns = {},
+		forces = nil, -- Defined in enterState
+	}
+
+	setmetatable(state, Walking)
+
+	return state
+end
+
+function Walking:enterState()
+	self.forces = createForces(self.character)
+
+	-- Elegance? Never heard of it.
+	self.character.instance.LeftFoot.CanCollide = false
+	self.character.instance.LeftLowerLeg.CanCollide = false
+	self.character.instance.LeftUpperLeg.CanCollide = false
+	self.character.instance.RightFoot.CanCollide = false
+	self.character.instance.RightLowerLeg.CanCollide = false
+	self.character.instance.RightUpperLeg.CanCollide = false
+
+	self.debugAdorns.climbCheck = DebugHandle.new()
+end
+
+function Walking:leaveState()
+	for _, object in pairs(self.forces) do
+		object:Destroy()
+	end
+
+	-- TODO: Be more robust in case joints are destroyed.
+	self.character.instance.LeftFoot.CanCollide = true
+	self.character.instance.LeftLowerLeg.CanCollide = true
+	self.character.instance.LeftUpperLeg.CanCollide = true
+	self.character.instance.RightFoot.CanCollide = true
+	self.character.instance.RightLowerLeg.CanCollide = true
+	self.character.instance.RightUpperLeg.CanCollide = true
+
+	for _, adorn in pairs(self.debugAdorns) do
+		adorn.instance:Destroy()
+	end
+
+	self.accumulatedTime = 0
+	self.currentAccelerationX = 0
+	self.currentAccelerationY = 0
+
+	self.debugAdorns = {}
+end
+
+function Walking:step(dt, input)
+	local characterMass = getModelMass(self.character.instance)
+
+	local targetX = TARGET_SPEED * input.movementX
+	local targetY = TARGET_SPEED * input.movementY
+
+	self.accumulatedTime = self.accumulatedTime + dt
+
+	local currentVelocity = self.character.instance.PrimaryPart.Velocity;
+	local currentX = currentVelocity.X
+	local currentY = currentVelocity.Z
+
+	while self.accumulatedTime >= FRAMERATE do
+		self.accumulatedTime = self.accumulatedTime - FRAMERATE
+
+		currentX, self.currentAccelerationX = stepSpring(
+			FRAMERATE,
+			currentX,
+			self.currentAccelerationX,
+			targetX,
+			STIFFNESS,
+			DAMPING,
+			PRECISION
+		)
+
+		currentY, self.currentAccelerationY = stepSpring(
+			FRAMERATE,
+			currentY,
+			self.currentAccelerationY,
+			targetY,
+			STIFFNESS,
+			DAMPING,
+			PRECISION
+		)
+	end
+
+	local vFactor = 0.075 -- fudge constant
+
+	local onGround, groundHeight = castCylinder({
+		origin = self.character.castPoint.WorldPosition,
+		direction = Vector3.new(0, -5, 0),
+		bias = Vector3.new(currentX*vFactor, 0, currentY*vFactor),
+		adorns = self.debugAdorns,
+		ignoreInstance = self.character.instance,
+		hipHeight = HIP_HEIGHT,
+	})
+
+	local targetHeight = groundHeight + HIP_HEIGHT
+	local currentHeight = self.character.castPoint.WorldPosition.Y
+
+	local bottomColor = onGround and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
+	self.character.instance.PrimaryPart.Color = bottomColor
+
+	if onGround then
+		local up
+
+		local jumpHeight = 10
+		local jumpInitialVelocity = math.sqrt(Workspace.Gravity*2*jumpHeight)
+		if input.jump and currentVelocity.Y < jumpInitialVelocity then
+			up = 0
+			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
+		else
+			local t = POP_TIME
+			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
+			up = Workspace.Gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
+			-- very low downward acceleration cuttoff (limited ability to push yourself down)
+			if up < -1 then
+				up = 0
+			end
+			up = up*characterMass
+		end
+
+		self.forces.vectorForce.Force = Vector3.new(
+			self.currentAccelerationX * characterMass,
+			up,
+			self.currentAccelerationY * characterMass
+		)
+	else
+		self.forces.vectorForce.Force = Vector3.new(0, 0, 0)
+	end
+
+	local velocity = Vector3.new(currentX, 0, currentY)
+	local lookVector = self.character.instance.PrimaryPart.CFrame.lookVector
+
+	if velocity.Magnitude > 0.1 and lookVector.y < 0.9 then
+		-- Fix "tumbling" where AlignOrientation might pick the "wrong" axis when we cross through 0, lerp angles...
+		local currentAngle = math.atan2(lookVector.z, lookVector.x)
+		local targetAngle = math.atan2(currentY, currentX)
+		-- If we crossed through 0 (shortest arc angle is close to pi) then lerp the angle...
+		if math.abs(angleShortest(currentAngle, targetAngle)) > math.pi*0.95 then
+			targetAngle = lerpAngle(currentAngle, targetAngle, 0.95)
+		end
+
+		local up = Vector3.new(0, 1, 0)
+		local look = Vector3.new(math.cos(targetAngle), 0, math.sin(targetAngle))
+		self.forces.orient1.CFrame = makeCFrame(up, look)
+	end
+
+	-- Climbing transition check
+	do
+		local rayOrigin = self.character.castPoint.WorldPosition
+		local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * 5
+
+		local climbRay = Ray.new(rayOrigin, rayDirection)
+		local hit, position = Workspace:FindPartOnRay(climbRay, self.character.instance)
+
+		self.debugAdorns.climbCheck:move(position)
+
+		-- TODO: Use CollectionService?
+		local isClimbable = hit and not not hit:FindFirstChild("Climbable")
+
+		if isClimbable then
+			-- TODO: Communicate to climbing state what/where we're climbing
+			self.simulation:setState("Climbing")
+		end
+	end
+
+	if input.ragdoll then
+		self.simulation:setState("Ragdoll")
+	end
+end
+
+return Walking]]></ProtectedString>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX5A644DBFBCFB41558276D9175A71CF1B">
+					<Properties>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Ragdoll</string>
+						<string name="ScriptGuid">{A5B401AE-65FA-4744-A12E-A8428A8073FC}</string>
+						<ProtectedString name="Source"><![CDATA[local Ragdoll = {}
+Ragdoll.__index = Ragdoll
+
+function Ragdoll.new(simulation)
+	local state = {
+		simulation = simulation,
+	}
+
+	setmetatable(state, Ragdoll)
+
+	return state
+end
+
+function Ragdoll:step(dt, input)
+	if not input.ragdoll then
+		self.simulation:setState("Walking")
+	end
+end
+
+return Ragdoll]]></ProtectedString>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX988791E7196F4324B212FFC78B840789">
+					<Properties>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Climbing</string>
+						<string name="ScriptGuid">{723A232A-4F83-4BEA-BE93-2690577D401A}</string>
+						<ProtectedString name="Source"><![CDATA[local Climbing = {}
+Climbing.__index = Climbing
+
+function Climbing.new(simulation)
+	local state = {}
+
+	setmetatable(state, Climbing)
+
+	return state
+end
+
+function Climbing:enterState()
+	-- TODO
+end
+
+function Climbing:leaveState()
+	-- TODO
+end
+
+function Climbing:step(dt, input)
+	-- TODO
+end
+
+return Climbing]]></ProtectedString>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
 			</Item>
 		</Item>
 	</Item>
