@@ -141,8 +141,23 @@ end
 function Walking:step(dt, input)
 	local characterMass = getModelMass(self.character.instance)
 
-	local targetX = TARGET_SPEED * input.movementX
-	local targetY = TARGET_SPEED * input.movementY
+	local targetX = 0
+	local targetY = 0
+
+	if input.movementX ~= 0 or input.movementY ~= 0 then
+		local cameraLook = Workspace.CurrentCamera.CFrame.lookVector
+		local cameraAngle = math.atan2(cameraLook.x, cameraLook.z)
+
+		local magnitude = math.sqrt(input.movementX^2 + input.movementY^2)
+		local unitX = input.movementX / magnitude
+		local unitY = input.movementY / magnitude
+
+		local relativeX = unitX * math.cos(cameraAngle) + unitY * math.sin(cameraAngle)
+		local relativeY = -unitX * math.sin(cameraAngle) + unitY * math.cos(cameraAngle)
+
+		targetX = TARGET_SPEED * relativeX
+		targetY = TARGET_SPEED * relativeY
+	end
 
 	self.accumulatedTime = self.accumulatedTime + dt
 

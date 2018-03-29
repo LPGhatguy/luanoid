@@ -27,10 +27,6 @@ end
 function Simulation:setState(newState, options)
 	assert(newState, "setState requires a state parameter!")
 
-	if newState == self.currentState then
-		return
-	end
-
 	local oldState = self.currentState
 
 	if oldState.leaveState then

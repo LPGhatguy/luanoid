@@ -26,36 +26,20 @@ RunService.Heartbeat:Connect(function(dt)
 		ragdoll = Input.keysDown[Enum.KeyCode.F],
 	}
 
-	local inputX = 0
-	local inputY = 0
-
 	if Input.keysDown[Enum.KeyCode.W] then
-		inputY = inputY + 1
+		input.movementY = input.movementY + 1
 	end
 
 	if Input.keysDown[Enum.KeyCode.S] then
-		inputY = inputY - 1
+		input.movementY = input.movementY - 1
 	end
 
 	if Input.keysDown[Enum.KeyCode.D] then
-		inputX = inputX - 1
+		input.movementX = input.movementX - 1
 	end
 
 	if Input.keysDown[Enum.KeyCode.A] then
-		inputX = inputX + 1
-	end
-
-	-- TODO: Move transformation into Walking controller
-	if inputX ~= 0 or inputY ~= 0 then
-		local cameraLook = Workspace.CurrentCamera.CFrame.lookVector
-		local cameraAngle = math.atan2(cameraLook.x, cameraLook.z)
-
-		local magnitude = math.sqrt(inputX^2 + inputY^2)
-		local relativeX = inputX / magnitude
-		local relativeY = inputY / magnitude
-
-		input.movementX = relativeX * math.cos(cameraAngle) + relativeY * math.sin(cameraAngle)
-		input.movementY = -relativeX * math.sin(cameraAngle) + relativeY * math.cos(cameraAngle)
+		input.movementX = input.movementX + 1
 	end
 
 	simulation:step(dt, input)
