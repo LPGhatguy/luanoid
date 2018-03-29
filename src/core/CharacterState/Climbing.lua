@@ -10,12 +10,15 @@ function Climbing.new(simulation)
 end
 
 function Climbing:enterState()
+	-- TODO
 end
 
 function Climbing:leaveState()
+	-- TODO
 end
 
 function Climbing:step(dt, input)
+	-- TODO
 end
 
 return Climbing

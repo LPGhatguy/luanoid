@@ -17,10 +17,4 @@ function Ragdoll:step(dt, input)
 	end
 end
 
-function Ragdoll:enterState()
-end
-
-function Ragdoll:leaveState()
-end
-
 return Ragdoll
