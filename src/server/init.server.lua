@@ -9,10 +9,15 @@ local ApiImplementation = {}
 
 function ApiImplementation.requestMakeCharacter(player)
 	-- TODO: Validation
-	-- TODO: Mark ownership of character to this player
 
 	local character = makeCharacter(player.Name)
 	character.instance.Parent = Workspace
+
+	for _, object in ipairs(character.instance:GetDescendants()) do
+		if object:IsA("BasePart") then
+			object:SetNetworkOwner(player)
+		end
+	end
 
 	return character
 end
