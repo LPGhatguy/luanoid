@@ -13,7 +13,7 @@ end
 
 function Ragdoll:step(dt, input)
 	if not input.ragdoll then
-		self.simulation:setState("Walking")
+		self.simulation:setState(self.simulation.states.Walking)
 	end
 end
 

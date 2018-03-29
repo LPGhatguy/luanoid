@@ -112,8 +112,6 @@ function Walking:enterState()
 	self.character.instance.RightFoot.CanCollide = false
 	self.character.instance.RightLowerLeg.CanCollide = false
 	self.character.instance.RightUpperLeg.CanCollide = false
-
-	self.debugAdorns.climbCheck = DebugHandle.new()
 end
 
 function Walking:leaveState()
@@ -239,26 +237,13 @@ function Walking:step(dt, input)
 	end
 
 	-- Climbing transition check
-	do
-		local rayOrigin = self.character.castPoint.WorldPosition
-		local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * 5
-
-		local climbRay = Ray.new(rayOrigin, rayDirection)
-		local hit, position = Workspace:FindPartOnRay(climbRay, self.character.instance)
-
-		self.debugAdorns.climbCheck:move(position)
-
-		-- TODO: Use CollectionService?
-		local isClimbable = hit and not not hit:FindFirstChild("Climbable")
-
-		if isClimbable then
-			-- TODO: Communicate to climbing state what/where we're climbing
-			self.simulation:setState("Climbing")
-		end
+	local climbOptions = self.simulation.states.Climbing:check()
+	if climbOptions then
+		return self.simulation:setState(self.simulation.states.Climbing, climbOptions)
 	end
 
 	if input.ragdoll then
-		self.simulation:setState("Ragdoll")
+		return self.simulation:setState(self.simulation.states.Ragdoll)
 	end
 end
 

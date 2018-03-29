@@ -16,43 +16,37 @@ function Simulation.new(character)
 		Walking = Walking.new(simulation),
 	}
 
-	simulation.currentStateName = "Walking"
-
-	simulation.states[simulation.currentStateName]:enterState()
+	simulation.currentState = simulation.states.Walking
+	simulation.currentState:enterState()
 
 	setmetatable(simulation, Simulation)
 
 	return simulation
 end
 
-function Simulation:setState(stateName)
-	if stateName == self.currentStateName then
+function Simulation:setState(newState, options)
+	assert(newState, "setState requires a state parameter!")
+
+	if newState == self.currentState then
 		return
 	end
 
-	local oldState = self.states[self.currentStateName]
-	local newState = self.states[stateName]
-
-	if not newState then
-		error(("Invalid state %q"):format(stateName), 2)
-	end
+	local oldState = self.currentState
 
 	if oldState.leaveState then
-		oldState:leaveState()
+		oldState:leaveState(newState)
 	end
 
-	self.currentStateName = stateName
+	self.currentState = newState
 
 	if newState.enterState then
-		newState:enterState()
+		newState:enterState(oldState, options)
 	end
 end
 
 function Simulation:step(dt, input)
-	local currentState = self.states[self.currentStateName]
-
-	if currentState.step then
-		currentState:step(dt, input)
+	if self.currentState.step then
+		self.currentState:step(dt, input)
 	end
 end
 
