@@ -201,7 +201,7 @@ function Simulation:step(dt, input)
 		
 		local jumpHeight = 10
 		local jumpInitialVelocity = math.sqrt(workspace.gravity*2*jumpHeight)
-		if input.jump and currentVelocity.Y < jumpInitialVelocitythen
+		if input.jump and currentVelocity.Y < jumpInitialVelocity then
 			up = 0
 			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
 		else
