@@ -102,7 +102,7 @@ end
 function Simulation:castCylinder(vector, bias)
 	-- max len, min length
 	-- update part points and part velocities
-	local radius = 2
+	local radius = 1.5
 	local center = self.character.castPoint.WorldPosition
 
 	if bias.Magnitude > radius then
