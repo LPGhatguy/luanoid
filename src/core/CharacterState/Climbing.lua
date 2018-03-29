@@ -80,7 +80,14 @@ function Climbing:enterState(oldState, options)
 
 	self.options = options
 
-	self.checkAdorn:move(nil)
+	self.character.instance.LeftFoot.CanCollide = false
+	self.character.instance.LeftLowerLeg.CanCollide = false
+	self.character.instance.LeftHand.CanCollide = false
+	self.character.instance.LeftLowerArm.CanCollide = false
+	self.character.instance.RightFoot.CanCollide = false
+	self.character.instance.RightLowerLeg.CanCollide = false
+	self.character.instance.RightHand.CanCollide = false
+	self.character.instance.RightLowerArm.CanCollide = false
 
 	self.lastClimbTime = Workspace.DistributedGameTime
 
@@ -115,6 +122,15 @@ function Climbing:enterState(oldState, options)
 end
 
 function Climbing:leaveState()
+	self.character.instance.LeftFoot.CanCollide = true
+	self.character.instance.LeftLowerLeg.CanCollide = true
+	self.character.instance.LeftHand.CanCollide = true
+	self.character.instance.LeftLowerArm.CanCollide = true
+	self.character.instance.RightFoot.CanCollide = true
+	self.character.instance.RightLowerLeg.CanCollide = true
+	self.character.instance.RightHand.CanCollide = true
+	self.character.instance.RightLowerArm.CanCollide = true
+
 	self.refs = {}
 
 	for object in pairs(self.objects) do
