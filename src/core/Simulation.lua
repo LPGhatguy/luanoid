@@ -12,18 +12,6 @@ local PRECISION = 0.001
 local PI = math.pi
 local THETA = math.pi * 2
 
--- (1,0) = 0, (1, -1) = 5.4977871437821...
-local function atan2(x, y)
-	local atan = math.atan(y/x)
-	if x < 0 then
-		if atan > 0 then
-			return atan - PI
-		end
-		return atan + PI
-	end
-	return atan
-end
-
 -- loop between 0 - 2*pi
 local function angleAbs(angle)
 	while angle < 0 do
@@ -240,8 +228,8 @@ function Simulation:step(dt, input)
 
 	if velocity.Magnitude > 0.1 and lookVector.y < 0.9 then
 		-- Fix "tumbling" where AlignOrientation might pick the "wrong" axis when we cross through 0, lerp angles...
-		local currentAngle = atan2(lookVector.x, lookVector.z)
-		local targetAngle = atan2(currentX, currentY)
+		local currentAngle = math.atan2(lookVector.z, lookVector.x)
+		local targetAngle = math.atan2(currentY, currentX)
 		-- If we crossed through 0 (shortest arc angle is close to pi) then lerp the angle...
 		if math.abs(angleShortest(currentAngle, targetAngle)) > math.pi*0.95 then
 			targetAngle = lerpAngle(currentAngle, targetAngle, 0.95)
