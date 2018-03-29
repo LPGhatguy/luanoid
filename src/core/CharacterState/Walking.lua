@@ -49,19 +49,6 @@ end
 local Walking = {}
 Walking.__index = Walking
 
---[[
-	state = {
-		setCollisionForParts = {
-			LeftFoot = false,
-			LowerLeftLeg = false,
-			UpperLeftLeg = false,
-			RightFoot = false,
-			LowerRightLeg = false,
-			UpperRightLeg = false,
-		},
-	},
-]]
-
 function Walking.new(simulation)
 	local state = {
 		simulation = simulation,
@@ -77,11 +64,39 @@ function Walking.new(simulation)
 	return state
 end
 
-function Walking:step(dt, input)
-	if input.ragdoll then
-		-- TODO: transition to ragdoll
+function Walking:enterState()
+	-- Elegance? Never heard of it.
+	self.character.instance.LeftFoot.CanCollide = false
+	self.character.instance.LeftLowerLeg.CanCollide = false
+	self.character.instance.LeftUpperLeg.CanCollide = false
+	self.character.instance.RightFoot.CanCollide = false
+	self.character.instance.RightLowerLeg.CanCollide = false
+	self.character.instance.RightUpperLeg.CanCollide = false
+
+	self.character.orientation.Enabled = true
+	self.character.vectorForce.Enabled = true
+end
+
+function Walking:leaveState()
+	self.character.instance.LeftFoot.CanCollide = true
+	self.character.instance.LeftLowerLeg.CanCollide = true
+	self.character.instance.LeftUpperLeg.CanCollide = true
+	self.character.instance.RightFoot.CanCollide = true
+	self.character.instance.RightLowerLeg.CanCollide = true
+	self.character.instance.RightUpperLeg.CanCollide = true
+
+	self.character.orientation.Enabled = false
+	self.character.vectorForce.Enabled = false
+	self.character.vectorForce.Force = Vector3.new(0, 0, 0)
+
+	for _, adorn in ipairs(self.debugAdorns) do
+		adorn.instance:Destroy()
 	end
 
+	self.debugAdorns = {}
+end
+
+function Walking:step(dt, input)
 	local characterMass = getModelMass(self.character.instance)
 
 	local targetX = TARGET_SPEED * input.movementX
@@ -177,6 +192,10 @@ function Walking:step(dt, input)
 		local up = Vector3.new(0, 1, 0)
 		local look = Vector3.new(math.cos(targetAngle), 0, math.sin(targetAngle))
 		self.character.orientationAttachment.CFrame = makeCFrame(up, look)
+	end
+
+	if input.ragdoll then
+		self.simulation:setState("Ragdoll")
 	end
 end
 

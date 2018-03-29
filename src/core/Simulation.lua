@@ -8,15 +8,36 @@ function Simulation.new(character)
 		character = character,
 	}
 
-	simulation.state = CharacterState.Walking.new(simulation)
+	simulation.states = {
+		Walking = CharacterState.Walking.new(simulation),
+		Ragdoll = CharacterState.Ragdoll.new(simulation),
+	}
+
+	simulation.state = "Walking"
+
+	simulation.states[simulation.state]:enterState()
 
 	setmetatable(simulation, Simulation)
 
 	return simulation
 end
 
+function Simulation:setState(stateName)
+	if stateName == self.state then
+		return
+	end
+
+	if not self.states[stateName] then
+		error("Invalid state name " .. stateName, 2)
+	end
+
+	self.states[self.state]:leaveState()
+	self.state = stateName
+	self.states[self.state]:enterState()
+end
+
 function Simulation:step(dt, input)
-	self.state:step(dt, input)
+	self.states[self.state]:step(dt, input)
 end
 
 return Simulation
