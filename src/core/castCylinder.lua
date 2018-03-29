@@ -42,8 +42,8 @@ local function castCylinder(options)
 	-- update part points and part velocities
 	local radius = 1.5
 
-	if bias.Magnitude > radius then
-		bias = bias.Unit * radius
+	if bias.Magnitude > radius*0.75 then
+		bias = bias.Unit * radius*0.75
 	end
 
 	local onGround = false
@@ -52,23 +52,26 @@ local function castCylinder(options)
 
 	for index, x, z in sunflower(CAST_COUNT, 2) do
 		local offset = Vector3.new(x*radius, 0, z*radius)
+
+		local biasDist = (offset - bias).Magnitude / radius
+		local weight = 1 - biasDist*biasDist
+		-- weight = math.max(weight, 0.1)
+		
 		local start = origin + offset
 		local ray = Ray.new(start, direction)
-
+		
 		local part, point = Workspace:FindPartOnRay(ray, ignoreInstance)
 		local length = (point - start).Magnitude
 		local legHit = length <= hipHeight + 0.25
-		onGround = onGround or legHit
 
-		-- add to weighted average
-		local weight = 1
-		if part then
-			local biasDist = (offset - bias).Magnitude / radius
-			weight = 1 - biasDist*biasDist
-			-- can't let total be 0 if onGround
-			weight = math.max(weight, 0.1)
-			totalWeight = totalWeight + weight
-			totalHeight = totalHeight + point.y*weight
+		if weight > 0 then
+			onGround = onGround or legHit
+			
+			-- add to weighted average
+			if part then
+				totalWeight = totalWeight + weight
+				totalHeight = totalHeight + point.y*weight
+			end
 		end
 
 		if adorns then
@@ -80,7 +83,7 @@ local function castCylinder(options)
 			end
 
 			adorn:move(point)
-
+			
 			if legHit then
 				adorn:setColor(Color3.new(0, weight, 0))
 			elseif part then
