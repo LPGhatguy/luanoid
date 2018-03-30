@@ -3,10 +3,11 @@ local Workspace = game:GetService("Workspace")
 local Animation = require(script.Parent.Parent.Animation)
 local DebugHandle = require(script.Parent.Parent.DebugHandle)
 
-local START_CLIMB_DISTANCE = 1.5
-local KEEP_CLIMB_DISTANCE = 2
+local START_CLIMB_DISTANCE = 2.5
+local KEEP_CLIMB_DISTANCE = 3
 local FLOOR_DISTANCE = 2.2
 local CLIMB_DEBOUNCE = 0.2
+local CLIMB_OFFSET = Vector3.new(0, 0, 0.5) -- In object space
 
 local function getClimbCFrame(result)
 	return CFrame.new(Vector3.new(), -result.normal) + result.position - result.object.Position
@@ -22,6 +23,7 @@ function Climbing.new(simulation)
 		animation = simulation.animation,
 
 		checkAdorn = DebugHandle.new(),
+		checkAdorn2 = DebugHandle.new(Color3.new(1, 1, 1)),
 		objects = {},
 		refs = {},
 		options = nil,
@@ -46,7 +48,7 @@ end
 function Climbing:cast(distance)
 	distance = distance or START_CLIMB_DISTANCE
 
-	local rayOrigin = self.character.castPoint.WorldPosition
+	local rayOrigin = self.character.instance.PrimaryPart.Position + self.character.instance.PrimaryPart.CFrame:vectorToWorldSpace(CLIMB_OFFSET)
 	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * distance
 
 	local climbRay = Ray.new(rayOrigin, rayDirection)
@@ -64,6 +66,7 @@ function Climbing:cast(distance)
 		adornColor = Color3.new(1, 0, 0)
 	end
 
+	self.checkAdorn2:move(rayOrigin)
 	self.checkAdorn:setColor(adornColor)
 	self.checkAdorn:move(position)
 
@@ -115,7 +118,7 @@ function Climbing:enterState(oldState, options)
 
 	local position0 = Instance.new("Attachment")
 	position0.Parent = self.character.instance.PrimaryPart
-	position0.Position = Vector3.new(0, 0, -0.5)
+	position0.Position = -CLIMB_OFFSET
 	self.objects[position0] = true
 
 	local position1 = Instance.new("Attachment")
@@ -128,8 +131,9 @@ function Climbing:enterState(oldState, options)
 	position.Attachment0 = position0
 	position.Attachment1 = position1
 	position.Parent = self.character.instance.PrimaryPart
-	position.MaxForce = 50000
-	position.Responsiveness = 30
+	position.MaxForce = 100000
+	position.Responsiveness = 50
+	position.MaxVelocity = 7
 	self.objects[position] = true
 
 	local align = Instance.new("AlignOrientation")
