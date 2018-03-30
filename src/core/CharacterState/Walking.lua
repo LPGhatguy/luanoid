@@ -54,6 +54,10 @@ local function createForces(character)
 	}
 end
 
+local function lerp(a, b, t)
+	return a + (b - a) * t
+end
+
 -- loop between 0 - 2*pi
 local function angleAbs(angle)
 	while angle < 0 do
@@ -89,7 +93,8 @@ Walking.__index = Walking
 
 function Walking.new(simulation)
 	local steepestInclineAngle = 60*(math.pi/180)
-	local steepestInclineTan = math.tan(steepestInclineAngle) 
+	local maxInclineTan = math.tan(steepestInclineAngle)
+	local maxInclineStartTan = math.tan(math.max(0, steepestInclineAngle - 2.5*(math.pi/180)))
 
 	local state = {
 		simulation = simulation,
@@ -99,7 +104,8 @@ function Walking.new(simulation)
 		accumulatedTime = 0,
 		currentAccelerationX = 0,
 		currentAccelerationY = 0,
-		steepestInclineTan = steepestInclineTan,
+		maxInclineTan = maxInclineTan,
+		maxInclineStartTan = maxInclineStartTan,
 		debugAdorns = {},
 		debugPlane = nil,
 		forces = nil, -- Defined in enterState
@@ -235,10 +241,11 @@ function Walking:step(dt, input)
 	local biasVelicityFactor = 0.075 -- fudge constant
 	local biasRadius = math.max(speed/TARGET_SPEED*2, 1)
 
-	local onGround, groundHeight, steep, centroid, normal = castCylinder({
+	local onGround, groundHeight, steepness, centroid, normal = castCylinder({
 		origin = self.character.castPoint.WorldPosition,
 		direction = Vector3.new(0, -HIP_HEIGHT*2, 0),
-		steepTan = self.steepestInclineTan,
+		steepTan = self.maxInclineTan,
+		steepStartTan = self.maxInclineStartTan,
 		radius = radius,
 		biasCenter = Vector3.new(currentX*biasVelicityFactor, 0, currentY*biasVelicityFactor),
 		biasRadius = biasRadius,
@@ -272,7 +279,7 @@ function Walking:step(dt, input)
 		
 		local aX = self.currentAccelerationX
 		local aY = self.currentAccelerationY
-		if steep then
+		if steepness > 0 then
 			-- deflect control acceleration off slope normal, discard parallell component (wall run)
 			local wall = Vector2.new(normal.x, normal.z).Unit
 			local a = Vector2.new(aX, aY)
@@ -280,6 +287,9 @@ function Walking:step(dt, input)
 			local aParallel = wall*dot
 			local aPerp = a - aParallel
 			local aNew = aPerp
+
+			local aNewMag = lerp(a.Magnitude, aNew.Magnitude, steepness)
+			local aNew = Vector2.new(lerp(aX, aNew.X, steepness), lerp(aY, aNew.Y, steepness)).Unit*aNewMag
 			aX, aY = aNew.X, aNew.Y
 
 			-- mass on a frictionless incline: net acceleration = g * sin(incline angle)
@@ -290,8 +300,8 @@ function Walking:step(dt, input)
 			local cosSlopeAngle = Vector2.new(normal.x, normal.z).Magnitude
 			local aNew = aPerp*workspace.Gravity*cosSlopeAngle
 
-			aX, aY = aX + aNew.X, aY + aNew.Z
-			aUp = aUp + aNew.Y
+			aX, aY = aX + aNew.X*steepness, aY + aNew.Z*steepness
+			aUp = aUp + aNew.Y*steepness
 			aUp = math.max(0, aUp)
 
 			--aUp = math.min(aUp, Workspace.Gravity * normal.y)

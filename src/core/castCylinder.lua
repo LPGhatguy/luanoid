@@ -109,6 +109,7 @@ local function castCylinder(options)
 	local biasRadius = assert(options.biasRadius)
 	local hipHeight = assert(options.hipHeight)
 	local steepTan = assert(options.steepTan)
+	local steepStartTan = assert(options.steepStartTan)
 	local adorns = options.adorns
 	local ignoreInstance = options.ignoreInstance
 
@@ -184,24 +185,26 @@ local function castCylinder(options)
 
 	local centroid, normal = planeFromPoints(points, weights)
 
+	local steepness = 0
 	local steep = false
 	if centroid then
 		local y = normal.y
 		local x = Vector2.new(normal.x, normal.z).Magnitude
-		steep = x/y > steepTan
+		steep = x/y > steepStartTan
+		steepness = math.min(1, math.max(0, x/y - steepStartTan) / (steepTan - steepStartTan))
 	end
 
 	if options.debugPlane then
 		if centroid then
 			options.debugPlane.Visible = true
 			options.debugPlane.CFrame = CFrame.new(centroid + normal*0.5, centroid + normal)
-			options.debugPlane.Color3 = steep and Color3.new(1, 0, 1) or Color3.new(1, 1, 1)
+			options.debugPlane.Color3 = Color3.new(1, 1 - steepness, 1)
 		else
 			options.debugPlane.Visible = false
 		end
 	end
 
-	return onGround, totalHeight / totalWeight, steep, centroid, normal
+	return onGround, totalHeight / totalWeight, steepness, centroid, normal
 end
 
 return castCylinder
