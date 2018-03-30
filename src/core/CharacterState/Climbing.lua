@@ -188,7 +188,10 @@ function Climbing:step(dt, input)
 	-- We ran out of surface to climb!
 	if not nextStep then
 		-- TODO: Pop character up?
-		return self.simulation:setState(self.simulation.states.Walking)
+		local options = {
+			biasImpulse = self.character.instance.PrimaryPart.CFrame.lookVector*3
+		}
+		return self.simulation:setState(self.simulation.states.Walking, options)
 	end
 
 	self.animation.animations.climb:AdjustSpeed(input.movementY * 2)

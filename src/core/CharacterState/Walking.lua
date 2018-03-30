@@ -116,7 +116,7 @@ function Walking.new(simulation)
 	return state
 end
 
-function Walking:enterState()
+function Walking:enterState(oldState, options)
 	self.forces = createForces(self.character)
 
 	-- Elegance? Never heard of it.
@@ -143,6 +143,10 @@ function Walking:enterState()
 	debugPlane.Parent = Workspace.Terrain
 	debugPlane.Adornee = debugPlane.Parent
 	self.debugPlane = debugPlane
+
+	if options and options.biasImpulse then
+		self.biasImpulse = options.biasImpulse
+	end
 
 	self.animation:setState(Animation.State.Idle)
 end
@@ -240,6 +244,12 @@ function Walking:step(dt, input)
 	local radius = math.min(2, math.max(1.5, speed/TARGET_SPEED*2))
 	local biasVelicityFactor = 0.075 -- fudge constant
 	local biasRadius = math.max(speed/TARGET_SPEED*2, 1)
+	local biasCenter = Vector3.new(currentX*biasVelicityFactor, 0, currentY*biasVelicityFactor)
+
+	if self.biasImpulse then
+		biasCenter = biasCenter + self.biasImpulse
+		self.biasImpulse = self.biasImpulse * 0.9
+	end
 
 	local onGround, groundHeight, steepness, centroid, normal = castCylinder({
 		origin = self.character.castPoint.WorldPosition,
@@ -247,7 +257,7 @@ function Walking:step(dt, input)
 		steepTan = self.maxInclineTan,
 		steepStartTan = self.maxInclineStartTan,
 		radius = radius,
-		biasCenter = Vector3.new(currentX*biasVelicityFactor, 0, currentY*biasVelicityFactor),
+		biasCenter = biasCenter,
 		biasRadius = biasRadius,
 		adorns = self.debugAdorns,
 		debugPlane = self.debugPlane,
