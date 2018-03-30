@@ -144,15 +144,20 @@ local function castCylinder(options)
 		local steep = lift*0.95/offsetDist > steepTan
 
 		if part then
+			if steep then
+				weight = 0.1*weight
+			end
 			if weight > 0 then
 				onGround = onGround or legHit
-				-- add to weighted average
-				totalWeight = totalWeight + weight
-				totalHeight = totalHeight + point.y*weight
+				local groundWeight = weight
+				-- add to weighted average for target ground height
+				totalWeight = totalWeight + groundWeight
+				totalHeight = totalHeight + point.y*groundWeight
 			end
-			weight = math.max(0, weight)
+
+			local normalWeight = math.max(0.01, weight) -- alow 0 weight as last resort data
 			points[#points + 1] = point
-			weights[#weights + 1] = weight
+			weights[#weights + 1] = normalWeight
 		end
 
 		if adorns then
