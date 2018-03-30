@@ -11,7 +11,7 @@ local STIFFNESS = 170
 local DAMPING = 26
 local PRECISION = 0.001
 local TARGET_SPEED = 24
-local HIP_HEIGHT = 2.352
+local HIP_HEIGHT = 3.1
 local MAX_HOR_ACCEL = TARGET_SPEED / 0.25 -- velocity / time to reach it squared
 local MAX_VER_ACCEL = 50 / 0.1 -- massless max vertical force against gravity
 local POP_TIME = 0.05 -- target time to reach target height
@@ -89,6 +89,7 @@ Walking.__index = Walking
 
 function Walking.new(simulation)
 	local steepestInclineAngle = 60*(math.pi/180)
+	local steepestInclineTan = math.tan(steepestInclineAngle) 
 
 	local state = {
 		simulation = simulation,
@@ -98,6 +99,7 @@ function Walking.new(simulation)
 		accumulatedTime = 0,
 		currentAccelerationX = 0,
 		currentAccelerationY = 0,
+		steepestInclineTan = steepestInclineTan,
 		debugAdorns = {},
 		debugPlane = nil,
 		forces = nil, -- Defined in enterState
@@ -232,9 +234,11 @@ function Walking:step(dt, input)
 	local radius = math.min(2, math.max(1.5, speed/TARGET_SPEED*2))
 	local biasVelicityFactor = 0.075 -- fudge constant
 	local biasRadius = math.max(speed/TARGET_SPEED*2, 1)
-	local onGround, groundHeight = castCylinder({
+
+	local onGround, groundHeight, steep, centroid, normal = castCylinder({
 		origin = self.character.castPoint.WorldPosition,
-		direction = Vector3.new(0, -5, 0),
+		direction = Vector3.new(0, -HIP_HEIGHT*2, 0),
+		steepTan = self.steepestInclineTan,
 		radius = radius,
 		biasCenter = Vector3.new(currentX*biasVelicityFactor, 0, currentY*biasVelicityFactor),
 		biasRadius = biasRadius,
@@ -251,29 +255,51 @@ function Walking:step(dt, input)
 	self.character.instance.PrimaryPart.Color = bottomColor
 
 	if onGround then
-		local up
+		local aUp
 
 		local jumpHeight = 10
 		local jumpInitialVelocity = math.sqrt(Workspace.Gravity*2*jumpHeight)
 		if input.jump and currentVelocity.Y < jumpInitialVelocity then
-			up = 0
+			aUp = 0
 			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
 		else
 			local t = POP_TIME
 			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
-			up = Workspace.Gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
-			-- very low downward acceleration cuttoff (limited ability to push yourself down)
-			if up < -1 then
-				up = 0
-			end
-			up = up*characterMass
+			aUp = Workspace.Gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
+		end
+		-- downward acceleration cuttoff (limited ability to push yourself down)
+		aUp = math.max(-1, aUp)
+		
+		local aX = self.currentAccelerationX
+		local aY = self.currentAccelerationY
+		if steep then
+			-- deflect control acceleration off slope normal, discard parallell component (wall run)
+			local wall = Vector2.new(normal.x, normal.z).Unit
+			local a = Vector2.new(aX, aY)
+			local dot = wall:Dot(a)
+			local aParallel = wall*dot
+			local aPerp = a - aParallel
+			local aNew = aPerp
+			aX, aY = aNew.X, aNew.Y
+
+			-- mass on a frictionless incline: net acceleration = g * sin(incline angle)
+			local g = Vector3.new(0, -1, 0)
+			local dot = normal:Dot(g)
+			local aParallel = normal*dot
+			local aPerp = g - aParallel
+			local cosSlopeAngle = Vector2.new(normal.x, normal.z).Magnitude
+			local aNew = aPerp*workspace.Gravity*cosSlopeAngle
+
+			aX, aY = aX + aNew.X, aY + aNew.Z
+			aUp = aUp + aNew.Y
+			aUp = math.max(0, aUp)
+
+			--aUp = math.min(aUp, Workspace.Gravity * normal.y)
+			-- aX = aX + normal.x*20
+			-- aY = aY + normal.z*20
 		end
 
-		self.forces.vectorForce.Force = Vector3.new(
-			self.currentAccelerationX * characterMass,
-			up,
-			self.currentAccelerationY * characterMass
-		)
+		self.forces.vectorForce.Force = Vector3.new(aX*characterMass, aUp*characterMass, aY*characterMass)
 	else
 		self.forces.vectorForce.Force = Vector3.new(0, 0, 0)
 	end

@@ -108,6 +108,7 @@ local function castCylinder(options)
 	local biasCenter = assert(options.biasCenter)
 	local biasRadius = assert(options.biasRadius)
 	local hipHeight = assert(options.hipHeight)
+	local steepTan = assert(options.steepTan)
 	local adorns = options.adorns
 	local ignoreInstance = options.ignoreInstance
 
@@ -125,6 +126,7 @@ local function castCylinder(options)
 	local points = {}
 	for index, x, z in sunflower(CAST_COUNT, 2) do
 		local offset = Vector3.new(x*radius, 0, z*radius)
+		local offsetDist = offset.Magnitude
 
 		local biasDist = (offset - biasCenter).Magnitude / biasRadius
 		local weight = 1 - biasDist*biasDist
@@ -136,6 +138,10 @@ local function castCylinder(options)
 		local part, point = Workspace:FindPartOnRay(ray, ignoreInstance, false, true)
 		local length = (point - start).Magnitude
 		local legHit = length <= hipHeight + 0.25
+
+		local lift = hipHeight - length
+		-- is the angle way higher than the steepest angle?
+		local steep = lift*0.95/offsetDist > steepTan
 
 		if part then
 			if weight > 0 then
@@ -159,7 +165,9 @@ local function castCylinder(options)
 
 			adorn:move(point)
 			
-			if legHit then
+			if steep then 
+				adorn:setColor(Color3.new(weight, 0, weight))
+			elseif legHit then
 				adorn:setColor(Color3.new(0, weight, 0))
 			elseif part then
 				adorn:setColor(Color3.new(0, weight, weight))
@@ -170,16 +178,25 @@ local function castCylinder(options)
 	end
 
 	local centroid, normal = planeFromPoints(points, weights)
+
+	local steep = false
+	if centroid then
+		local y = normal.y
+		local x = Vector2.new(normal.x, normal.z).Magnitude
+		steep = x/y > steepTan
+	end
+
 	if options.debugPlane then
 		if centroid then
 			options.debugPlane.Visible = true
 			options.debugPlane.CFrame = CFrame.new(centroid + normal*0.5, centroid + normal)
+			options.debugPlane.Color3 = steep and Color3.new(1, 0, 1) or Color3.new(1, 1, 1)
 		else
 			options.debugPlane.Visible = false
 		end
 	end
 
-	return onGround, totalHeight / totalWeight
+	return onGround, totalHeight / totalWeight, steep, centroid, normal
 end
 
 return castCylinder

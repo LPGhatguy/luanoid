@@ -6071,7 +6071,7 @@ return Api]]></ProtectedString>
 					<Properties>
 						<CoordinateFrame name="CFrame">
 							<X>0</X>
-							<Y>0</Y>
+							<Y>0.747514486</Y>
 							<Z>0</Z>
 							<R00>1</R00>
 							<R01>0</R01>
