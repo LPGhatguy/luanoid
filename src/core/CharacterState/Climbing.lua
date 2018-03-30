@@ -4,6 +4,7 @@ local Animation = require(script.Parent.Parent.Animation)
 local DebugHandle = require(script.Parent.Parent.DebugHandle)
 
 local CLIMB_DISTANCE = 1.5 -- How far away can you be from the surface to climb?
+local FLOOR_DISTANCE = 2.2
 local CLIMB_DEBOUNCE = 0.2
 
 local Climbing = {}
@@ -25,6 +26,16 @@ function Climbing.new(simulation)
 	setmetatable(state, Climbing)
 
 	return state
+end
+
+function Climbing:nearFloor()
+	local rayOrigin = self.character.castPoint.WorldPosition
+	local rayDirection = Vector3.new(0, -FLOOR_DISTANCE, 0)
+
+	local climbRay = Ray.new(rayOrigin, rayDirection)
+	local hit = Workspace:FindPartOnRay(climbRay, self.character.instance)
+
+	return not not hit
 end
 
 function Climbing:cast()
@@ -147,6 +158,11 @@ end
 
 function Climbing:step(dt, input)
 	if input.jump and Workspace.DistributedGameTime - self.lastClimbTime >= CLIMB_DEBOUNCE then
+		return self.simulation:setState(self.simulation.states.Walking)
+	end
+
+	-- If the user is moving down, check if they could be hitting the floor
+	if input.movementY < 0 and self:nearFloor() then
 		return self.simulation:setState(self.simulation.states.Walking)
 	end
 
