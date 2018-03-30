@@ -160,7 +160,7 @@ function Walking:leaveState()
 	self.character.instance.RightUpperArm.CanCollide = true
 
 	for _, adorn in pairs(self.debugAdorns) do
-		adorn.instance:Destroy()
+		adorn:destroy()
 	end
 
 	if self.debugPlane then
