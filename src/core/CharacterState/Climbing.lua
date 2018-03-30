@@ -9,6 +9,10 @@ local FLOOR_DISTANCE = 2.2
 local CLIMB_DEBOUNCE = 0.2
 local CLIMB_OFFSET = Vector3.new(0, 0, 0.5) -- In object space
 
+local FALLING_DANGER_THRESHOLD = 0.2 -- How many seconds can we hold onto a bad climbing surface?
+local CLIMB_NOT_STEEP_ENOUGH = 0.45
+local CLIMB_TOO_OVERHANGY = -0.8
+
 local function getClimbCFrame(result)
 	return CFrame.new(Vector3.new(), -result.normal) + result.position - result.object.Position
 end
@@ -26,8 +30,12 @@ function Climbing.new(simulation)
 		checkAdorn2 = DebugHandle.new(Color3.new(1, 1, 1)),
 		objects = {},
 		refs = {},
-		options = nil,
+		lastStep = nil,
 		lastClimbTime = -math.huge,
+
+		-- Raises each frame when we're climbing an unsuitable surface, lowers
+		-- each frame when we're climbing a good surface.
+		fallingDangerTime = 0,
 	}
 
 	setmetatable(state, Climbing)
@@ -99,7 +107,7 @@ function Climbing:enterState(oldState, options)
 	assert(options.position)
 	assert(options.normal)
 
-	self.options = options
+	self.lastStep = options
 
 	self.character.instance.LeftFoot.CanCollide = false
 	self.character.instance.LeftLowerLeg.CanCollide = false
@@ -168,6 +176,7 @@ function Climbing:leaveState()
 	self.objects = {}
 
 	self.lastClimbTime = Workspace.DistributedGameTime
+	self.fallingDangerTime = 0
 
 	self.animation.animations.climb:AdjustSpeed(1)
 	self.animation:setState(Animation.State.None)
@@ -183,23 +192,34 @@ function Climbing:step(dt, input)
 		return self.simulation:setState(self.simulation.states.Walking)
 	end
 
+	-- If we've been climbing on a bad surface for too long, fall off!
+	if self.fallingDangerTime >= FALLING_DANGER_THRESHOLD then
+		return self.simulation:setState(self.simulation.states.Walking)
+	end
+
 	local nextStep = self:cast(KEEP_CLIMB_DISTANCE)
 
 	-- We ran out of surface to climb!
 	if not nextStep then
-		-- TODO: Pop character up?
 		return self.simulation:setState(self.simulation.states.Walking)
+	end
+
+	-- Is the surface the wrong angle for climbing?
+	local steepness = nextStep.normal:Dot(Vector3.new(0, 1, 0))
+	if steepness >= CLIMB_NOT_STEEP_ENOUGH or steepness <= CLIMB_TOO_OVERHANGY then
+		self.fallingDangerTime = self.fallingDangerTime + dt * math.abs(steepness)
+	else
+		self.fallingDangerTime = math.max(0, self.fallingDangerTime - dt)
 	end
 
 	self.animation.animations.climb:AdjustSpeed(input.movementY * 2)
 
 	-- We're transitioning to a new climbable
-	if nextStep.object ~= self.options.object then
+	if nextStep.object ~= self.lastStep.object then
 		return self.simulation:setState(self, nextStep)
 	end
 
 	local reference = self.character.instance.PrimaryPart.CFrame
-
 	local change = reference.upVector * input.movementY - reference.rightVector * input.movementX
 
 	if input.movementX ~= 0 or input.movementY ~= 0 then
