@@ -88,6 +88,8 @@ local Walking = {}
 Walking.__index = Walking
 
 function Walking.new(simulation)
+	local steepestInclineAngle = 60*(math.pi/180)
+
 	local state = {
 		simulation = simulation,
 		character = simulation.character,
@@ -117,6 +119,13 @@ function Walking:enterState()
 	self.character.instance.RightLowerLeg.CanCollide = false
 	self.character.instance.RightUpperLeg.CanCollide = false
 
+	self.character.instance.LeftHand.CanCollide = false
+	self.character.instance.LeftLowerArm.CanCollide = false
+	self.character.instance.LeftUpperArm.CanCollide = false
+	self.character.instance.RightHand.CanCollide = false
+	self.character.instance.RightLowerArm.CanCollide = false
+	self.character.instance.RightUpperArm.CanCollide = false
+
 	local debugPlane = Instance.new("BoxHandleAdornment")
 	debugPlane.Color3 = Color3.new(1, 1, 1)
 	debugPlane.AlwaysOnTop = true
@@ -142,6 +151,13 @@ function Walking:leaveState()
 	self.character.instance.RightFoot.CanCollide = true
 	self.character.instance.RightLowerLeg.CanCollide = true
 	self.character.instance.RightUpperLeg.CanCollide = true
+
+	self.character.instance.LeftHand.CanCollide = true
+	self.character.instance.LeftLowerArm.CanCollide = true
+	self.character.instance.LeftUpperArm.CanCollide = true
+	self.character.instance.RightHand.CanCollide = true
+	self.character.instance.RightLowerArm.CanCollide = true
+	self.character.instance.RightUpperArm.CanCollide = true
 
 	for _, adorn in pairs(self.debugAdorns) do
 		adorn.instance:Destroy()
@@ -212,12 +228,16 @@ function Walking:step(dt, input)
 		)
 	end
 
-	local vFactor = 0.075 -- fudge constant
-
+	local speed = Vector3.new(currentX, 0, currentY).Magnitude
+	local radius = math.min(2, math.max(1.5, speed/TARGET_SPEED*2))
+	local biasVelicityFactor = 0.075 -- fudge constant
+	local biasRadius = math.max(speed/TARGET_SPEED*2, 1)
 	local onGround, groundHeight = castCylinder({
 		origin = self.character.castPoint.WorldPosition,
 		direction = Vector3.new(0, -5, 0),
-		bias = Vector3.new(currentX*vFactor, 0, currentY*vFactor),
+		radius = radius,
+		biasCenter = Vector3.new(currentX*biasVelicityFactor, 0, currentY*biasVelicityFactor),
+		biasRadius = biasRadius,
 		adorns = self.debugAdorns,
 		debugPlane = self.debugPlane,
 		ignoreInstance = self.character.instance,

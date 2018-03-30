@@ -7,6 +7,11 @@ local CAST_COUNT = 32
 -- TODO: use normals to get a better plane with fewer points
 -- http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 local function planeFromPoints(points, weights)
+	if #points < 3 then
+		-- at least three points required
+		return
+	end
+
 	local n = 0
 	local sumX, sumY, sumZ = 0, 0, 0
 	for i, p in pairs(points) do
@@ -15,11 +20,6 @@ local function planeFromPoints(points, weights)
 		sumX, sumY, sumZ = sumX + p.X*w, sumY + p.Y*w, sumZ + p.Z*w
 	end
 	local centroid = Vector3.new(sumX, sumY, sumZ) * (1.0/n)
-
-	if n < 3 then
-		-- at least three points required
-		return centroid, Vector3.new(0, 1, 0)
-	end
 
 	-- Calc full 3x3 covariance matrix, excluding symmetries:
 	local xx = 0.0 local xy = 0.0 local xz = 0.0
@@ -104,17 +104,17 @@ end
 local function castCylinder(options)
 	local origin = assert(options.origin)
 	local direction = assert(options.direction)
-	local bias = assert(options.bias)
+	local radius = assert(options.radius)
+	local biasCenter = assert(options.biasCenter)
+	local biasRadius = assert(options.biasRadius)
 	local hipHeight = assert(options.hipHeight)
 	local adorns = options.adorns
 	local ignoreInstance = options.ignoreInstance
 
-	-- max len, min length
-	-- update part points and part velocities
-	local radius = 1.5
-
-	if bias.Magnitude > radius*0.75 then
-		bias = bias.Unit * radius*0.75
+	-- clamp bias params
+	biasRadius = math.max(biasRadius, 0.25)
+	if biasCenter.Magnitude > radius*0.75 then
+		biasCenter = biasCenter.Unit * radius*0.75
 	end
 
 	local onGround = false
@@ -126,28 +126,27 @@ local function castCylinder(options)
 	for index, x, z in sunflower(CAST_COUNT, 2) do
 		local offset = Vector3.new(x*radius, 0, z*radius)
 
-		local biasDist = (offset - bias).Magnitude / radius
+		local biasDist = (offset - biasCenter).Magnitude / biasRadius
 		local weight = 1 - biasDist*biasDist
 		-- weight = math.max(weight, 0.1)
 		
 		local start = origin + offset
 		local ray = Ray.new(start, direction)
 		
-		local part, point = Workspace:FindPartOnRay(ray, ignoreInstance)
+		local part, point = Workspace:FindPartOnRay(ray, ignoreInstance, false, true)
 		local length = (point - start).Magnitude
 		local legHit = length <= hipHeight + 0.25
 
-		if weight > 0 then
-			onGround = onGround or legHit
-			
-			-- add to weighted average
-			if part then
+		if part then
+			if weight > 0 then
+				onGround = onGround or legHit
+				-- add to weighted average
 				totalWeight = totalWeight + weight
 				totalHeight = totalHeight + point.y*weight
-
-				points[#points + 1] = point
-				weights[#weights + 1] = weight
 			end
+			weight = math.max(0, weight)
+			points[#points + 1] = point
+			weights[#weights + 1] = weight
 		end
 
 		if adorns then
