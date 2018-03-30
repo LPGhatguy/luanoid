@@ -186,12 +186,15 @@ local function castCylinder(options)
 	local centroid, normal = planeFromPoints(points, weights)
 
 	local steepness = 0
-	local steep = false
 	if centroid then
 		local y = normal.y
 		local x = Vector2.new(normal.x, normal.z).Magnitude
-		steep = x/y > steepStartTan
-		steepness = math.min(1, math.max(0, x/y - steepStartTan) / (steepTan - steepStartTan))
+		if math.abs(x) > 0 then
+			steepness = math.min(1, math.max(0, x/y - steepStartTan) / (steepTan - steepStartTan))
+		elseif y < 0 then
+			-- straight down
+			steepness = 1
+		end
 	end
 
 	if options.debugPlane then
