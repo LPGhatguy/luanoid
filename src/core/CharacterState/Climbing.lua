@@ -3,9 +3,14 @@ local Workspace = game:GetService("Workspace")
 local Animation = require(script.Parent.Parent.Animation)
 local DebugHandle = require(script.Parent.Parent.DebugHandle)
 
-local CLIMB_DISTANCE = 1.5 -- How far away can you be from the surface to climb?
+local START_CLIMB_DISTANCE = 1.5
+local KEEP_CLIMB_DISTANCE = 2
 local FLOOR_DISTANCE = 2.2
 local CLIMB_DEBOUNCE = 0.2
+
+local function getClimbCFrame(result)
+	return CFrame.new(Vector3.new(), -result.normal) + result.position - result.object.Position
+end
 
 local Climbing = {}
 Climbing.__index = Climbing
@@ -33,25 +38,27 @@ function Climbing:nearFloor()
 	local rayDirection = Vector3.new(0, -FLOOR_DISTANCE, 0)
 
 	local climbRay = Ray.new(rayOrigin, rayDirection)
-	local hit = Workspace:FindPartOnRay(climbRay, self.character.instance)
+	local object = Workspace:FindPartOnRay(climbRay, self.character.instance)
 
-	return not not hit
+	return not not object
 end
 
-function Climbing:cast()
+function Climbing:cast(distance)
+	distance = distance or START_CLIMB_DISTANCE
+
 	local rayOrigin = self.character.castPoint.WorldPosition
-	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * CLIMB_DISTANCE
+	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * distance
 
 	local climbRay = Ray.new(rayOrigin, rayDirection)
-	local hit, position, normal = Workspace:FindPartOnRay(climbRay, self.character.instance)
+	local object, position, normal = Workspace:FindPartOnRay(climbRay, self.character.instance)
 
 	-- TODO: Use CollectionService?
-	local isClimbable = hit and not not hit:FindFirstChild("Climbable")
+	local isClimbable = object and not not object:FindFirstChild("Climbable")
 
 	local adornColor
 	if isClimbable then
 		adornColor = Color3.new(0, 1, 0)
-	elseif hit then
+	elseif object then
 		adornColor = Color3.new(0, 0, 1)
 	else
 		adornColor = Color3.new(1, 0, 0)
@@ -65,7 +72,7 @@ function Climbing:cast()
 	end
 
 	return {
-		object = hit,
+		object = object,
 		position = position,
 		normal = normal,
 	}
@@ -93,24 +100,26 @@ function Climbing:enterState(oldState, options)
 
 	self.character.instance.LeftFoot.CanCollide = false
 	self.character.instance.LeftLowerLeg.CanCollide = false
+	self.character.instance.LeftUpperLeg.CanCollide = false
 	self.character.instance.LeftHand.CanCollide = false
 	self.character.instance.LeftLowerArm.CanCollide = false
+	self.character.instance.LeftUpperArm.CanCollide = false
 	self.character.instance.RightFoot.CanCollide = false
 	self.character.instance.RightLowerLeg.CanCollide = false
+	self.character.instance.RightUpperLeg.CanCollide = false
 	self.character.instance.RightHand.CanCollide = false
 	self.character.instance.RightLowerArm.CanCollide = false
+	self.character.instance.RightUpperArm.CanCollide = false
 
 	self.lastClimbTime = Workspace.DistributedGameTime
 
 	local position0 = Instance.new("Attachment")
 	position0.Parent = self.character.instance.PrimaryPart
-	position0.Position = Vector3.new(0, 0, -1)
+	position0.Position = Vector3.new(0, 0, -0.5)
 	self.objects[position0] = true
 
-	local orientation = CFrame.new(Vector3.new(), -options.normal) + options.position - options.object.Position
-
 	local position1 = Instance.new("Attachment")
-	position1.CFrame = orientation
+	position1.CFrame = getClimbCFrame(options)
 	position1.Parent = options.object
 	self.refs.positionAttachment = position1
 	self.objects[position1] = true
@@ -135,12 +144,16 @@ end
 function Climbing:leaveState()
 	self.character.instance.LeftFoot.CanCollide = true
 	self.character.instance.LeftLowerLeg.CanCollide = true
+	self.character.instance.LeftUpperLeg.CanCollide = true
 	self.character.instance.LeftHand.CanCollide = true
 	self.character.instance.LeftLowerArm.CanCollide = true
+	self.character.instance.LeftUpperArm.CanCollide = true
 	self.character.instance.RightFoot.CanCollide = true
 	self.character.instance.RightLowerLeg.CanCollide = true
+	self.character.instance.RightUpperLeg.CanCollide = true
 	self.character.instance.RightHand.CanCollide = true
 	self.character.instance.RightLowerArm.CanCollide = true
+	self.character.instance.RightUpperArm.CanCollide = true
 
 	self.refs = {}
 
@@ -166,24 +179,27 @@ function Climbing:step(dt, input)
 		return self.simulation:setState(self.simulation.states.Walking)
 	end
 
-	-- TODO: Change this placeholder movement code
-	if input.movementY ~= 0 then
-		local change = Vector3.new(0, input.movementY * dt * 10, 0)
-		self.refs.positionAttachment.CFrame = self.refs.positionAttachment.CFrame + change
-	end
+	local nextStep = self:cast(KEEP_CLIMB_DISTANCE)
 
-	self.animation.animations.climb:AdjustSpeed(input.movementY)
-
-	local nextClimb = self:cast()
-
-	-- We can't climb anymore!
-	if not nextClimb then
+	-- We ran out of surface to climb!
+	if not nextStep then
+		-- TODO: Pop character up?
 		return self.simulation:setState(self.simulation.states.Walking)
 	end
 
+	self.animation.animations.climb:AdjustSpeed(input.movementY * 2)
+
 	-- We're transitioning to a new climbable
-	if nextClimb.object ~= self.options.object then
-		return self.simulation:setState(self, nextClimb)
+	if nextStep.object ~= self.options.object then
+		return self.simulation:setState(self, nextStep)
+	end
+
+	local reference = self.character.instance.PrimaryPart.CFrame
+
+	local change = reference.upVector * input.movementY - reference.rightVector * input.movementX
+
+	if input.movementX ~= 0 or input.movementY ~= 0 then
+		self.refs.positionAttachment.CFrame = getClimbCFrame(nextStep) + change.unit
 	end
 end
 
