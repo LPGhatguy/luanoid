@@ -289,34 +289,26 @@ function Walking:step(dt, input)
 		
 		local aX = self.currentAccelerationX
 		local aY = self.currentAccelerationY
-		if steepness > 0 then
-			-- deflect control acceleration off slope normal, discard parallell component (wall run)
-			local wall = Vector2.new(normal.x, normal.z).Unit
-			local a = Vector2.new(aX, aY)
-			local dot = wall:Dot(a)
-			local aParallel = wall*dot
-			local aPerp = a - aParallel
+		if normal and steepness > 0 then
+			-- deflect control acceleration off slope normal, discarding the parallell component
+			local aControl = Vector3.new(aX, 0, aY)
+			local dot = math.min(0, normal:Dot(aControl)) -- clamp below 0, don't subtract forces away from normal
+			local aInto = normal*dot
+			local aPerp = aControl - aInto
 			local aNew = aPerp
-
-			local aNewMag = lerp(a.Magnitude, aNew.Magnitude, steepness)
-			local aNew = Vector2.new(lerp(aX, aNew.X, steepness), lerp(aY, aNew.Y, steepness)).Unit*aNewMag
-			aX, aY = aNew.X, aNew.Y
+			local aNew = aControl:Lerp(aNew, steepness)
+			aX, aY = aNew.X, aNew.Z
 
 			-- mass on a frictionless incline: net acceleration = g * sin(incline angle)
-			local g = Vector3.new(0, -1, 0)
-			local dot = normal:Dot(g)
-			local aParallel = normal*dot
-			local aPerp = g - aParallel
-			local cosSlopeAngle = Vector2.new(normal.x, normal.z).Magnitude
-			local aNew = aPerp*workspace.Gravity*cosSlopeAngle
-
+			local aGravity = Vector3.new(0, -workspace.Gravity, 0)
+			local dot = math.min(0, normal:Dot(aGravity))
+			local aInto = normal*dot
+			local aPerp = aGravity - aInto
+			local aNew = aPerp
 			aX, aY = aX + aNew.X*steepness, aY + aNew.Z*steepness
 			aUp = aUp + aNew.Y*steepness
-			aUp = math.max(0, aUp)
 
-			--aUp = math.min(aUp, Workspace.Gravity * normal.y)
-			-- aX = aX + normal.x*20
-			-- aY = aY + normal.z*20
+			aUp = math.max(0, aUp)
 		end
 
 		self.forces.vectorForce.Force = Vector3.new(aX*characterMass, aUp*characterMass, aY*characterMass)
