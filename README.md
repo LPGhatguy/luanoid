@@ -8,5 +8,8 @@ New character controller intended as a replacement for Humanoid for developers w
 	* Rational slope behavior
 * Suitability for NPCs
 
+## Non-Goals
+* Support for Humanoid-specific APIs or concepts like `Tool`
+
 ## License
 Luanoid is available under the [TODO] license.
