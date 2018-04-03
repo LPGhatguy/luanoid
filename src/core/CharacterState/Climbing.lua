@@ -29,8 +29,21 @@ local COLLISION_MASK = {
 	RightUpperArm = false,
 }
 
-local function getClimbCFrame(result)
-	return CFrame.new(Vector3.new(), -result.normal) + result.position - result.object.Position
+local function getClimbAttachmentCFrame(options)
+	local normal = options.normal -- look at the wall
+	local worldPosition = options.position
+	local part = options.object 
+	-- TODO: terrible behavior if look colinear with up (use character up instead?)
+	local yAxis = Vector3.new(0, 1, 0) -- up
+	local zAxis = normal -- -look (look is -z)
+	local xAxis = yAxis:Cross(zAxis).Unit -- right
+	-- orthonormalize, keeping look vector
+	yAxis = zAxis:Cross(xAxis).Unit
+	return part.CFrame:inverse() * CFrame.new(
+		worldPosition.x, worldPosition.y, worldPosition.z, 
+		xAxis.x, yAxis.x, zAxis.x, 
+		xAxis.y, yAxis.y, zAxis.y, 
+		xAxis.z, yAxis.z, zAxis.z)
 end
 
 local Climbing = {}
@@ -133,7 +146,7 @@ function Climbing:enterState(oldState, options)
 	self.objects[position0] = true
 
 	local position1 = Instance.new("Attachment")
-	position1.CFrame = getClimbCFrame(options)
+	position1.CFrame = getClimbAttachmentCFrame(options)
 	position1.Parent = options.object
 	self.refs.positionAttachment = position1
 	self.objects[position1] = true
@@ -214,11 +227,11 @@ function Climbing:step(dt, input)
 		return self.simulation:setState(self, nextStep)
 	end
 
-	local reference = self.character.instance.PrimaryPart.CFrame
-	local change = reference.upVector * input.movementY - reference.rightVector * input.movementX
-
 	if input.movementX ~= 0 or input.movementY ~= 0 then
-		self.refs.positionAttachment.CFrame = getClimbCFrame(nextStep) + change.unit
+		local reference = self.character.instance.PrimaryPart.CFrame
+		local change = reference.upVector * input.movementY - reference.rightVector * input.movementX
+
+		self.refs.positionAttachment.CFrame = getClimbAttachmentCFrame(nextStep) + nextStep.object.CFrame:vectorToObjectSpace(change)
 	end
 end
 
