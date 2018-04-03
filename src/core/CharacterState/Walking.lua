@@ -1,9 +1,10 @@
 local Workspace = game:GetService("Workspace")
 
 local Animation = require(script.Parent.Parent.Animation)
+local castCylinder = require(script.Parent.Parent.castCylinder)
+local CollisionMask = require(script.Parent.Parent.CollisionMask)
 local getModelMass = require(script.Parent.Parent.getModelMass)
 local stepSpring = require(script.Parent.Parent.stepSpring)
-local castCylinder = require(script.Parent.Parent.castCylinder)
 
 local FRAMERATE = 1 / 240
 local STIFFNESS = 170
@@ -12,6 +13,21 @@ local PRECISION = 0.001
 local TARGET_SPEED = 24
 local HIP_HEIGHT = 3.1
 local POP_TIME = 0.05 -- target time to reach target height
+
+local COLLISION_MASK = {
+	LeftFoot = false,
+	LeftLowerLeg = false,
+	LeftUpperLeg = false,
+	LeftHand = false,
+	LeftLowerArm = false,
+	LeftUpperArm = false,
+	RightFoot = false,
+	RightLowerLeg = false,
+	RightUpperLeg = false,
+	RightHand = false,
+	RightLowerArm = false,
+	RightUpperArm = false,
+}
 
 local THETA = math.pi * 2
 
@@ -111,20 +127,7 @@ end
 function Walking:enterState(oldState, options)
 	self.forces = createForces(self.character)
 
-	-- Elegance? Never heard of it.
-	self.character.instance.LeftFoot.CanCollide = false
-	self.character.instance.LeftLowerLeg.CanCollide = false
-	self.character.instance.LeftUpperLeg.CanCollide = false
-	self.character.instance.RightFoot.CanCollide = false
-	self.character.instance.RightLowerLeg.CanCollide = false
-	self.character.instance.RightUpperLeg.CanCollide = false
-
-	self.character.instance.LeftHand.CanCollide = false
-	self.character.instance.LeftLowerArm.CanCollide = false
-	self.character.instance.LeftUpperArm.CanCollide = false
-	self.character.instance.RightHand.CanCollide = false
-	self.character.instance.RightLowerArm.CanCollide = false
-	self.character.instance.RightUpperArm.CanCollide = false
+	CollisionMask.apply(self.character.instance, COLLISION_MASK)
 
 	if options and options.biasImpulse then
 		self.biasImpulse = options.biasImpulse
@@ -138,20 +141,7 @@ function Walking:leaveState()
 		object:Destroy()
 	end
 
-	-- TODO: Be more robust in case joints are destroyed.
-	self.character.instance.LeftFoot.CanCollide = true
-	self.character.instance.LeftLowerLeg.CanCollide = true
-	self.character.instance.LeftUpperLeg.CanCollide = true
-	self.character.instance.RightFoot.CanCollide = true
-	self.character.instance.RightLowerLeg.CanCollide = true
-	self.character.instance.RightUpperLeg.CanCollide = true
-
-	self.character.instance.LeftHand.CanCollide = true
-	self.character.instance.LeftLowerArm.CanCollide = true
-	self.character.instance.LeftUpperArm.CanCollide = true
-	self.character.instance.RightHand.CanCollide = true
-	self.character.instance.RightLowerArm.CanCollide = true
-	self.character.instance.RightUpperArm.CanCollide = true
+	CollisionMask.revert(self.character.instance, COLLISION_MASK)
 
 	for _, adorn in pairs(self.debugAdorns) do
 		adorn:destroy()

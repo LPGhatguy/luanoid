@@ -2,6 +2,7 @@ local Workspace = game:GetService("Workspace")
 
 local Animation = require(script.Parent.Parent.Animation)
 local DebugVisualize = require(script.Parent.Parent.DebugVisualize)
+local CollisionMask = require(script.Parent.Parent.CollisionMask)
 
 local START_CLIMB_DISTANCE = 2.5
 local KEEP_CLIMB_DISTANCE = 3
@@ -12,6 +13,21 @@ local CLIMB_OFFSET = Vector3.new(0, 0, 0.5) -- In object space
 local FALLING_DANGER_THRESHOLD = 0.2 -- How many seconds can we hold onto a bad climbing surface?
 local CLIMB_NOT_STEEP_ENOUGH = 0.45
 local CLIMB_TOO_OVERHANGY = -0.8
+
+local COLLISION_MASK = {
+	LeftFoot = false,
+	LeftLowerLeg = false,
+	LeftUpperLeg = false,
+	LeftHand = false,
+	LeftLowerArm = false,
+	LeftUpperArm = false,
+	RightFoot = false,
+	RightLowerLeg = false,
+	RightUpperLeg = false,
+	RightHand = false,
+	RightLowerArm = false,
+	RightUpperArm = false,
+}
 
 local function getClimbCFrame(result)
 	return CFrame.new(Vector3.new(), -result.normal) + result.position - result.object.Position
@@ -107,18 +123,7 @@ function Climbing:enterState(oldState, options)
 
 	self.lastStep = options
 
-	self.character.instance.LeftFoot.CanCollide = false
-	self.character.instance.LeftLowerLeg.CanCollide = false
-	self.character.instance.LeftUpperLeg.CanCollide = false
-	self.character.instance.LeftHand.CanCollide = false
-	self.character.instance.LeftLowerArm.CanCollide = false
-	self.character.instance.LeftUpperArm.CanCollide = false
-	self.character.instance.RightFoot.CanCollide = false
-	self.character.instance.RightLowerLeg.CanCollide = false
-	self.character.instance.RightUpperLeg.CanCollide = false
-	self.character.instance.RightHand.CanCollide = false
-	self.character.instance.RightLowerArm.CanCollide = false
-	self.character.instance.RightUpperArm.CanCollide = false
+	CollisionMask.apply(self.character.instance, COLLISION_MASK)
 
 	self.lastClimbTime = Workspace.DistributedGameTime
 
@@ -152,18 +157,7 @@ function Climbing:enterState(oldState, options)
 end
 
 function Climbing:leaveState()
-	self.character.instance.LeftFoot.CanCollide = true
-	self.character.instance.LeftLowerLeg.CanCollide = true
-	self.character.instance.LeftUpperLeg.CanCollide = true
-	self.character.instance.LeftHand.CanCollide = true
-	self.character.instance.LeftLowerArm.CanCollide = true
-	self.character.instance.LeftUpperArm.CanCollide = true
-	self.character.instance.RightFoot.CanCollide = true
-	self.character.instance.RightLowerLeg.CanCollide = true
-	self.character.instance.RightUpperLeg.CanCollide = true
-	self.character.instance.RightHand.CanCollide = true
-	self.character.instance.RightLowerArm.CanCollide = true
-	self.character.instance.RightUpperArm.CanCollide = true
+	CollisionMask.revert(self.character.instance, COLLISION_MASK)
 
 	self.refs = {}
 
