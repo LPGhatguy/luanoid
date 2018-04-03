@@ -4,7 +4,6 @@ local Animation = require(script.Parent.Parent.Animation)
 local getModelMass = require(script.Parent.Parent.getModelMass)
 local stepSpring = require(script.Parent.Parent.stepSpring)
 local castCylinder = require(script.Parent.Parent.castCylinder)
-local DebugHandle = require(script.Parent.Parent.DebugHandle)
 
 local FRAMERATE = 1 / 240
 local STIFFNESS = 170
@@ -12,8 +11,6 @@ local DAMPING = 26
 local PRECISION = 0.001
 local TARGET_SPEED = 24
 local HIP_HEIGHT = 3.1
-local MAX_HOR_ACCEL = TARGET_SPEED / 0.25 -- velocity / time to reach it squared
-local MAX_VER_ACCEL = 50 / 0.1 -- massless max vertical force against gravity
 local POP_TIME = 0.05 -- target time to reach target height
 
 local THETA = math.pi * 2
@@ -52,10 +49,6 @@ local function createForces(character)
 		velocity0 = velocity0,
 		vectorForce = vectorForce,
 	}
-end
-
-local function lerp(a, b, t)
-	return a + (b - a) * t
 end
 
 -- loop between 0 - 2*pi
@@ -107,7 +100,6 @@ function Walking.new(simulation)
 		maxInclineTan = maxInclineTan,
 		maxInclineStartTan = maxInclineStartTan,
 		debugAdorns = {},
-		debugPlane = nil,
 		forces = nil, -- Defined in enterState
 	}
 
@@ -133,16 +125,6 @@ function Walking:enterState(oldState, options)
 	self.character.instance.RightHand.CanCollide = false
 	self.character.instance.RightLowerArm.CanCollide = false
 	self.character.instance.RightUpperArm.CanCollide = false
-
-	local debugPlane = Instance.new("BoxHandleAdornment")
-	debugPlane.Color3 = Color3.new(1, 1, 1)
-	debugPlane.AlwaysOnTop = true
-	debugPlane.ZIndex = 2
-	debugPlane.Transparency = 0.25
-	debugPlane.Size = Vector3.new(0.1, 0.1, 1)
-	debugPlane.Parent = Workspace.Terrain
-	debugPlane.Adornee = debugPlane.Parent
-	self.debugPlane = debugPlane
 
 	if options and options.biasImpulse then
 		self.biasImpulse = options.biasImpulse
@@ -173,10 +155,6 @@ function Walking:leaveState()
 
 	for _, adorn in pairs(self.debugAdorns) do
 		adorn:destroy()
-	end
-
-	if self.debugPlane then
-		self.debugPlane:Destroy()
 	end
 
 	self.accumulatedTime = 0
@@ -260,7 +238,6 @@ function Walking:step(dt, input)
 		biasCenter = biasCenter,
 		biasRadius = biasRadius,
 		adorns = self.debugAdorns,
-		debugPlane = self.debugPlane,
 		ignoreInstance = self.character.instance,
 		hipHeight = HIP_HEIGHT,
 	})
@@ -286,7 +263,7 @@ function Walking:step(dt, input)
 		end
 		-- downward acceleration cuttoff (limited ability to push yourself down)
 		aUp = math.max(-1, aUp)
-		
+
 		local aX = self.currentAccelerationX
 		local aY = self.currentAccelerationY
 		if normal and steepness > 0 then

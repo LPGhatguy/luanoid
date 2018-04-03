@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local Simulation = require(ReplicatedFirst.CharacterControllerCore.Simulation)
+local DebugVisualize = require(ReplicatedFirst.CharacterControllerCore.DebugVisualize)
 
 local Input = require(script.Input)
 local Api = require(script.Api)
@@ -44,6 +45,7 @@ RunService.Heartbeat:Connect(function(dt)
 
 	simulation:step(dt, input)
 	Input.step()
+	DebugVisualize.step()
 end)
 
 Input.start()

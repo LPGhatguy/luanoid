@@ -1,7 +1,7 @@
 local Workspace = game:GetService("Workspace")
 
 local Animation = require(script.Parent.Parent.Animation)
-local DebugHandle = require(script.Parent.Parent.DebugHandle)
+local DebugVisualize = require(script.Parent.Parent.DebugVisualize)
 
 local START_CLIMB_DISTANCE = 2.5
 local KEEP_CLIMB_DISTANCE = 3
@@ -26,8 +26,6 @@ function Climbing.new(simulation)
 		character = simulation.character,
 		animation = simulation.animation,
 
-		checkAdorn = DebugHandle.new(),
-		checkAdorn2 = DebugHandle.new(Color3.new(1, 1, 1)),
 		objects = {},
 		refs = {},
 		lastStep = nil,
@@ -74,9 +72,8 @@ function Climbing:cast(distance)
 		adornColor = Color3.new(1, 0, 0)
 	end
 
-	self.checkAdorn2:move(rayOrigin)
-	self.checkAdorn:setColor(adornColor)
-	self.checkAdorn:move(position)
+	DebugVisualize.point(rayOrigin, Color3.new(1, 1, 1))
+	DebugVisualize.point(position, adornColor)
 
 	if not isClimbable then
 		return nil

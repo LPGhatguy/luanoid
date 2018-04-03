@@ -1,6 +1,6 @@
 local Workspace = game:GetService("Workspace")
 
-local DebugHandle = require(script.Parent.DebugHandle)
+local DebugVisualize = require(script.Parent.DebugVisualize)
 
 local CAST_COUNT = 32
 
@@ -110,7 +110,6 @@ local function castCylinder(options)
 	local hipHeight = assert(options.hipHeight)
 	local steepTan = assert(options.steepTan)
 	local steepStartTan = assert(options.steepStartTan)
-	local adorns = options.adorns
 	local ignoreInstance = options.ignoreInstance
 
 	-- clamp bias params
@@ -125,17 +124,17 @@ local function castCylinder(options)
 
 	local weights = {}
 	local points = {}
-	for index, x, z in sunflower(CAST_COUNT, 2) do
+	for _, x, z in sunflower(CAST_COUNT, 2) do
 		local offset = Vector3.new(x*radius, 0, z*radius)
 		local offsetDist = offset.Magnitude
 
 		local biasDist = (offset - biasCenter).Magnitude / biasRadius
 		local weight = 1 - biasDist*biasDist
 		-- weight = math.max(weight, 0.1)
-		
+
 		local start = origin + offset
 		local ray = Ray.new(start, direction)
-		
+
 		local part, point = Workspace:FindPartOnRay(ray, ignoreInstance, false, true)
 		local length = (point - start).Magnitude
 		local legHit = length <= hipHeight + 0.25
@@ -161,26 +160,18 @@ local function castCylinder(options)
 			weights[#weights + 1] = normalWeight
 		end
 
-		if adorns then
-			local adorn = adorns[index]
-
-			if not adorn then
-				adorn = DebugHandle.new()
-				adorns[index] = adorn
-			end
-
-			adorn:move(point)
-			
-			if steep then 
-				adorn:setColor(Color3.new(weight, 0, weight))
-			elseif legHit then
-				adorn:setColor(Color3.new(0, weight, 0))
-			elseif part then
-				adorn:setColor(Color3.new(0, weight, weight))
-			else
-				adorn:setColor(Color3.new(1, 0, 0))
-			end
+		local pointColor
+		if steep then
+			pointColor = Color3.new(weight, 0, weight)
+		elseif legHit then
+			pointColor = Color3.new(0, weight, 0)
+		elseif part then
+			pointColor = Color3.new(0, weight, weight)
+		else
+			pointColor = Color3.new(1, 0, 0)
 		end
+
+		DebugVisualize.point(point, pointColor)
 	end
 
 	local centroid, normal = planeFromPoints(points, weights)
@@ -197,14 +188,12 @@ local function castCylinder(options)
 		end
 	end
 
-	if options.debugPlane then
-		if centroid then
-			options.debugPlane.Visible = true
-			options.debugPlane.CFrame = CFrame.new(centroid + normal*0.5, centroid + normal)
-			options.debugPlane.Color3 = Color3.new(1, 1 - steepness, 1)
-		else
-			options.debugPlane.Visible = false
-		end
+	if centroid then
+		DebugVisualize.vector(
+			centroid + normal * 0.5,
+			normal,
+			Color3.new(1, 1 - steepness, 1)
+		)
 	end
 
 	return onGround, totalHeight / totalWeight, steepness, centroid, normal
