@@ -27,6 +27,10 @@ RunService.Heartbeat:Connect(function(dt)
 		ragdoll = Input.keysDown[Enum.KeyCode.F],
 	}
 
+	if Input.keysDown[Enum.KeyCode.Y] and not Input.previousKeysDown[Enum.KeyCode.Y] then
+		DebugVisualize.enabled = not DebugVisualize.enabled
+	end
+
 	if Input.keysDown[Enum.KeyCode.W] then
 		input.movementY = input.movementY + 1
 	end
