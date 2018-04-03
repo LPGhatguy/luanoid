@@ -229,7 +229,7 @@ function Walking:step(dt, input)
 		self.biasImpulse = self.biasImpulse * 0.9
 	end
 
-	local onGround, groundHeight, steepness, centroid, normal = castCylinder({
+	local onGround, groundHeight, steepness, _, normal = castCylinder({
 		origin = self.character.castPoint.WorldPosition,
 		direction = Vector3.new(0, -HIP_HEIGHT*2, 0),
 		steepTan = self.maxInclineTan,
@@ -258,7 +258,8 @@ function Walking:step(dt, input)
 			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
 		else
 			local t = POP_TIME
-			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
+			-- counter gravity and then solve constant acceleration eq
+			-- (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
 			aUp = Workspace.Gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
 		end
 		-- downward acceleration cuttoff (limited ability to push yourself down)
@@ -273,15 +274,15 @@ function Walking:step(dt, input)
 			local aInto = normal*dot
 			local aPerp = aControl - aInto
 			local aNew = aPerp
-			local aNew = aControl:Lerp(aNew, steepness)
+			aNew = aControl:Lerp(aNew, steepness)
 			aX, aY = aNew.X, aNew.Z
 
 			-- mass on a frictionless incline: net acceleration = g * sin(incline angle)
-			local aGravity = Vector3.new(0, -workspace.Gravity, 0)
-			local dot = math.min(0, normal:Dot(aGravity))
-			local aInto = normal*dot
-			local aPerp = aGravity - aInto
-			local aNew = aPerp
+			local aGravity = Vector3.new(0, -Workspace.Gravity, 0)
+			dot = math.min(0, normal:Dot(aGravity))
+			aInto = normal*dot
+			aPerp = aGravity - aInto
+			aNew = aPerp
 			aX, aY = aX + aNew.X*steepness, aY + aNew.Z*steepness
 			aUp = aUp + aNew.Y*steepness
 

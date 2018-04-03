@@ -54,7 +54,8 @@ end
 function Climbing:cast(distance)
 	distance = distance or START_CLIMB_DISTANCE
 
-	local rayOrigin = self.character.instance.PrimaryPart.Position + self.character.instance.PrimaryPart.CFrame:vectorToWorldSpace(CLIMB_OFFSET)
+	local rayOrigin = self.character.instance.PrimaryPart.Position
+		+ self.character.instance.PrimaryPart.CFrame:vectorToWorldSpace(CLIMB_OFFSET)
 	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * distance
 
 	local climbRay = Ray.new(rayOrigin, rayDirection)
