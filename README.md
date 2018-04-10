@@ -1,6 +1,11 @@
 # Luanoid
 New character controller intended as a replacement for Humanoid for developers who want more flexibility or control over their characters.
 
+## Usage
+The latest source is available in the `src` directory. The rig and test playground is available in `luanoid-test-place.rbxlx`, but the version of the controller in the place may not be up-to-date at all times.
+
+To work on Luanoid, use [Rojo](https://github.com/LPGhatguy/rojo) to sync the project into the test place continually.
+
 ## Goals
 * Keep state machine and controls entirely in Lua
 * More predictable physics
