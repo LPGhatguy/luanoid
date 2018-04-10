@@ -3192,7 +3192,7 @@ gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+A/4D/gP+AiA==]]></Bin
 					<string name="ScriptGuid">{728B1504-EC6C-4F2A-82F4-A46616E092A3}</string>
 					<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
 
-local DebugHandle = require(script.Parent.DebugHandle)
+local DebugVisualize = require(script.Parent.DebugVisualize)
 
 local CAST_COUNT = 32
 
@@ -3300,7 +3300,8 @@ local function castCylinder(options)
 	local biasCenter = assert(options.biasCenter)
 	local biasRadius = assert(options.biasRadius)
 	local hipHeight = assert(options.hipHeight)
-	local adorns = options.adorns
+	local steepTan = assert(options.steepTan)
+	local steepStartTan = assert(options.steepStartTan)
 	local ignoreInstance = options.ignoreInstance
 
 	-- clamp bias params
@@ -3315,63 +3316,79 @@ local function castCylinder(options)
 
 	local weights = {}
 	local points = {}
-	for index, x, z in sunflower(CAST_COUNT, 2) do
+	for _, x, z in sunflower(CAST_COUNT, 2) do
 		local offset = Vector3.new(x*radius, 0, z*radius)
+		local offsetDist = offset.Magnitude
 
 		local biasDist = (offset - biasCenter).Magnitude / biasRadius
 		local weight = 1 - biasDist*biasDist
 		-- weight = math.max(weight, 0.1)
-		
+
 		local start = origin + offset
 		local ray = Ray.new(start, direction)
-		
+
 		local part, point = Workspace:FindPartOnRay(ray, ignoreInstance, false, true)
 		local length = (point - start).Magnitude
 		local legHit = length <= hipHeight + 0.25
 
+		local lift = hipHeight - length
+		-- is the angle way higher than the steepest angle?
+		local steep = lift*0.95/offsetDist > steepTan
+
 		if part then
+			if steep then
+				weight = 0.1*weight
+			end
 			if weight > 0 then
 				onGround = onGround or legHit
-				-- add to weighted average
-				totalWeight = totalWeight + weight
-				totalHeight = totalHeight + point.y*weight
+				local groundWeight = weight
+				-- add to weighted average for target ground height
+				totalWeight = totalWeight + groundWeight
+				totalHeight = totalHeight + point.y*groundWeight
 			end
-			weight = math.max(0, weight)
+
+			local normalWeight = math.max(0.01, weight) -- alow 0 weight as last resort data
 			points[#points + 1] = point
-			weights[#weights + 1] = weight
+			weights[#weights + 1] = normalWeight
 		end
 
-		if adorns then
-			local adorn = adorns[index]
-
-			if not adorn then
-				adorn = DebugHandle.new()
-				adorns[index] = adorn
-			end
-
-			adorn:move(point)
-			
-			if legHit then
-				adorn:setColor(Color3.new(0, weight, 0))
-			elseif part then
-				adorn:setColor(Color3.new(0, weight, weight))
-			else
-				adorn:setColor(Color3.new(1, 0, 0))
-			end
+		local pointColor
+		if steep then
+			pointColor = Color3.new(weight, 0, weight)
+		elseif legHit then
+			pointColor = Color3.new(0, weight, 0)
+		elseif part then
+			pointColor = Color3.new(0, weight, weight)
+		else
+			pointColor = Color3.new(1, 0, 0)
 		end
+
+		DebugVisualize.point(point, pointColor)
 	end
 
 	local centroid, normal = planeFromPoints(points, weights)
-	if options.debugPlane then
-		if centroid then
-			options.debugPlane.Visible = true
-			options.debugPlane.CFrame = CFrame.new(centroid + normal*0.5, centroid + normal)
-		else
-			options.debugPlane.Visible = false
+
+	local steepness = 0
+	if centroid and normal then
+		local y = normal.y
+		local x = Vector2.new(normal.x, normal.z).Magnitude
+		if math.abs(x) > 0 then
+			steepness = math.min(1, math.max(0, x/y - steepStartTan) / (steepTan - steepStartTan))
+		elseif y < 0 then
+			-- straight down
+			steepness = 1
 		end
 	end
 
-	return onGround, totalHeight / totalWeight
+	if centroid then
+		DebugVisualize.vector(
+			centroid + normal * 0.5,
+			normal,
+			Color3.new(1, 1 - steepness, 1)
+		)
+	end
+
+	return onGround, totalHeight / totalWeight, steepness, centroid, normal
 end
 
 return castCylinder]]></ProtectedString>
@@ -3525,60 +3542,6 @@ return Simulation]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXDF9CD5FDB99C48E1979AAA6A7C6037F6">
-				<Properties>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">DebugHandle</string>
-					<string name="ScriptGuid">{4A6C11B0-2802-4A49-A0B5-FE509F3732C1}</string>
-					<ProtectedString name="Source"><![CDATA[--[[
-	Renders points in the world for debugging things.
-
-	Usually used when dealing with finnicky 3D math.
-]]
-
-local Terrain = game:GetService("Workspace").Terrain
-
-local DebugHandle = {}
-DebugHandle.__index = DebugHandle
-
-function DebugHandle.new(color)
-	color = color or Color3.new(0, 0, 1)
-
-	local instance = Instance.new("SphereHandleAdornment")
-	instance.Color3 = color
-	instance.ZIndex = 1
-	instance.Name = "Debug Handle"
-	instance.AlwaysOnTop = true
-	instance.Radius = 0.12
-	instance.Adornee = Terrain
-	instance.Parent = Terrain
-
-	return setmetatable({
-		instance = instance,
-	}, DebugHandle)
-end
-
-function DebugHandle:move(pos)
-	if pos then
-		self.instance.Visible = true
-		self.instance.CFrame = CFrame.new(pos)
-	else
-		self.instance.Visible = false
-	end
-end
-
-function DebugHandle:setColor(color)
-	self.instance.Color3 = color
-end
-
-function DebugHandle:destroy()
-	self.instance:Destroy()
-end
-
-return DebugHandle]]></ProtectedString>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
 			<Item class="ModuleScript" referent="RBXBC7C5F51BBFD4DDDBB8624E20C1D7F9A">
 				<Properties>
 					<Content name="LinkedSource"><null></null></Content>
@@ -3706,28 +3669,181 @@ return Animation]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="Folder" referent="RBX166F6C29AD4E4B9795D608EFD586CE4B">
+			<Item class="ModuleScript" referent="RBXE9FC3DF9B96546F08468F84D8165217A">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">CollisionMask</string>
+					<string name="ScriptGuid">{BBDF9830-6D09-47AD-99D3-89B5B88798A2}</string>
+					<ProtectedString name="Source"><![CDATA[local CollisionMask = {}
+
+function CollisionMask.apply(root, mask)
+	CollisionMask._applyInternal(root, mask, false)
+end
+
+function CollisionMask.revert(root, mask)
+	CollisionMask._applyInternal(root, mask, true)
+end
+
+function CollisionMask._applyInternal(root, mask, invert)
+	for name, collisionValue in pairs(mask) do
+		if invert then
+			collisionValue = not collisionValue
+		end
+
+		local part = root:FindFirstChild(name)
+
+		if part then
+			if part:IsA("BasePart") then
+				part.CanCollide = collisionValue
+			else
+				warn(string.format("Instance named %q was not a BasePart! Skipping...", name))
+			end
+		else
+			warn(string.format("Couldn't find part named %q in collision mask! Skipping...", name))
+		end
+	end
+end
+
+return CollisionMask]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX28CDB7A064AD4D17B0F26BC256438215">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">DebugVisualize</string>
+					<string name="ScriptGuid">{F809FADD-732E-4051-BBDA-BC9E88CC6A65}</string>
+					<ProtectedString name="Source"><![CDATA[local Terrain = game:GetService("Workspace").Terrain
+
+local unusedPoints = {}
+local usedPoints = {}
+local unusedVectors = {}
+local usedVectors = {}
+
+local DebugVisualize = {
+	enabled = true,
+}
+
+function DebugVisualize.point(position, color)
+	if not DebugVisualize.enabled then
+		return
+	end
+
+	local instance = table.remove(unusedPoints)
+
+	if not instance then
+		instance = Instance.new("SphereHandleAdornment")
+		instance.ZIndex = 1
+		instance.Name = "Debug Handle"
+		instance.AlwaysOnTop = true
+		instance.Radius = 0.12
+		instance.Adornee = Terrain
+		instance.Parent = Terrain
+	end
+
+	instance.CFrame = CFrame.new(position)
+	instance.Color3 = color
+
+	table.insert(usedPoints, instance)
+end
+
+function DebugVisualize.vector(position, direction, color)
+	if not DebugVisualize.enabled then
+		return
+	end
+
+	local instance = table.remove(unusedVectors)
+
+	if not instance then
+		instance = Instance.new("BoxHandleAdornment")
+		instance.Color3 = Color3.new(1, 1, 1)
+		instance.AlwaysOnTop = true
+		instance.ZIndex = 2
+		instance.Transparency = 0.25
+		instance.Size = Vector3.new(0.1, 0.1, 1)
+		instance.Parent = Terrain
+		instance.Adornee = Terrain
+	end
+
+	instance.CFrame = CFrame.new(position, position + direction)
+	instance.Color3 = color
+
+	table.insert(usedVectors, instance)
+end
+
+function DebugVisualize.step()
+	while #unusedPoints > 0 do
+		table.remove(unusedPoints):Destroy()
+	end
+
+	while #unusedVectors > 0 do
+		table.remove(unusedVectors):Destroy()
+	end
+
+	usedPoints, unusedPoints = unusedPoints, usedPoints
+	usedVectors, unusedVectors = unusedVectors, usedVectors
+end
+
+return DebugVisualize]]></ProtectedString>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="Folder" referent="RBX3E225324571743748D821F9EDEF7AAD2">
 				<Properties>
 					<string name="Name">CharacterState</string>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="ModuleScript" referent="RBXDB1A3CA6BE1D42BB959A1BBD7D012F52">
+				<Item class="ModuleScript" referent="RBX053BA214485248EDB0F854F8BB69066C">
 					<Properties>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">Climbing</string>
-						<string name="ScriptGuid">{082E292A-606A-4B74-8C1F-56A86A7FD5A4}</string>
+						<string name="ScriptGuid">{28993F0D-19F0-4AB0-B036-0A2C06408701}</string>
 						<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
 
 local Animation = require(script.Parent.Parent.Animation)
-local DebugHandle = require(script.Parent.Parent.DebugHandle)
+local DebugVisualize = require(script.Parent.Parent.DebugVisualize)
+local CollisionMask = require(script.Parent.Parent.CollisionMask)
 
-local START_CLIMB_DISTANCE = 1.5
-local KEEP_CLIMB_DISTANCE = 2
+local START_CLIMB_DISTANCE = 2.5
+local KEEP_CLIMB_DISTANCE = 3
 local FLOOR_DISTANCE = 2.2
 local CLIMB_DEBOUNCE = 0.2
+local CLIMB_OFFSET = Vector3.new(0, 0, 0.5) -- In object space
 
-local function getClimbCFrame(result)
-	return CFrame.new(Vector3.new(), -result.normal) + result.position - result.object.Position
+local FALLING_DANGER_THRESHOLD = 0.2 -- How many seconds can we hold onto a bad climbing surface?
+local CLIMB_NOT_STEEP_ENOUGH = 0.45
+local CLIMB_TOO_OVERHANGY = -0.8
+
+local COLLISION_MASK = {
+	LeftFoot = false,
+	LeftLowerLeg = false,
+	LeftUpperLeg = false,
+	LeftHand = false,
+	LeftLowerArm = false,
+	LeftUpperArm = false,
+	RightFoot = false,
+	RightLowerLeg = false,
+	RightUpperLeg = false,
+	RightHand = false,
+	RightLowerArm = false,
+	RightUpperArm = false,
+}
+
+local function getClimbAttachmentCFrame(options)
+	local normal = options.normal -- look at the wall
+	local worldPosition = options.position
+	local part = options.object 
+	-- TODO: terrible behavior if look colinear with up (use character up instead?)
+	local yAxis = Vector3.new(0, 1, 0) -- up
+	local zAxis = normal -- -look (look is -z)
+	local xAxis = yAxis:Cross(zAxis).Unit -- right
+	-- orthonormalize, keeping look vector
+	yAxis = zAxis:Cross(xAxis).Unit
+	return part.CFrame:inverse() * CFrame.new(
+		worldPosition.x, worldPosition.y, worldPosition.z, 
+		xAxis.x, yAxis.x, zAxis.x, 
+		xAxis.y, yAxis.y, zAxis.y, 
+		xAxis.z, yAxis.z, zAxis.z)
 end
 
 local Climbing = {}
@@ -3739,11 +3855,14 @@ function Climbing.new(simulation)
 		character = simulation.character,
 		animation = simulation.animation,
 
-		checkAdorn = DebugHandle.new(),
 		objects = {},
 		refs = {},
-		options = nil,
+		lastStep = nil,
 		lastClimbTime = -math.huge,
+
+		-- Raises each frame when we're climbing an unsuitable surface, lowers
+		-- each frame when we're climbing a good surface.
+		fallingDangerTime = 0,
 	}
 
 	setmetatable(state, Climbing)
@@ -3764,7 +3883,8 @@ end
 function Climbing:cast(distance)
 	distance = distance or START_CLIMB_DISTANCE
 
-	local rayOrigin = self.character.castPoint.WorldPosition
+	local rayOrigin = self.character.instance.PrimaryPart.Position
+		+ self.character.instance.PrimaryPart.CFrame:vectorToWorldSpace(CLIMB_OFFSET)
 	local rayDirection = self.character.instance.PrimaryPart.CFrame.lookVector * distance
 
 	local climbRay = Ray.new(rayOrigin, rayDirection)
@@ -3782,8 +3902,8 @@ function Climbing:cast(distance)
 		adornColor = Color3.new(1, 0, 0)
 	end
 
-	self.checkAdorn:setColor(adornColor)
-	self.checkAdorn:move(position)
+	DebugVisualize.point(rayOrigin, Color3.new(1, 1, 1))
+	DebugVisualize.point(position, adornColor)
 
 	if not isClimbable then
 		return nil
@@ -3814,30 +3934,19 @@ function Climbing:enterState(oldState, options)
 	assert(options.position)
 	assert(options.normal)
 
-	self.options = options
+	self.lastStep = options
 
-	self.character.instance.LeftFoot.CanCollide = false
-	self.character.instance.LeftLowerLeg.CanCollide = false
-	self.character.instance.LeftUpperLeg.CanCollide = false
-	self.character.instance.LeftHand.CanCollide = false
-	self.character.instance.LeftLowerArm.CanCollide = false
-	self.character.instance.LeftUpperArm.CanCollide = false
-	self.character.instance.RightFoot.CanCollide = false
-	self.character.instance.RightLowerLeg.CanCollide = false
-	self.character.instance.RightUpperLeg.CanCollide = false
-	self.character.instance.RightHand.CanCollide = false
-	self.character.instance.RightLowerArm.CanCollide = false
-	self.character.instance.RightUpperArm.CanCollide = false
+	CollisionMask.apply(self.character.instance, COLLISION_MASK)
 
 	self.lastClimbTime = Workspace.DistributedGameTime
 
 	local position0 = Instance.new("Attachment")
 	position0.Parent = self.character.instance.PrimaryPart
-	position0.Position = Vector3.new(0, 0, -0.5)
+	position0.Position = -CLIMB_OFFSET
 	self.objects[position0] = true
 
 	local position1 = Instance.new("Attachment")
-	position1.CFrame = getClimbCFrame(options)
+	position1.CFrame = getClimbAttachmentCFrame(options)
 	position1.Parent = options.object
 	self.refs.positionAttachment = position1
 	self.objects[position1] = true
@@ -3846,8 +3955,9 @@ function Climbing:enterState(oldState, options)
 	position.Attachment0 = position0
 	position.Attachment1 = position1
 	position.Parent = self.character.instance.PrimaryPart
-	position.MaxForce = 50000
-	position.Responsiveness = 30
+	position.MaxForce = 100000
+	position.Responsiveness = 50
+	position.MaxVelocity = 7
 	self.objects[position] = true
 
 	local align = Instance.new("AlignOrientation")
@@ -3860,18 +3970,7 @@ function Climbing:enterState(oldState, options)
 end
 
 function Climbing:leaveState()
-	self.character.instance.LeftFoot.CanCollide = true
-	self.character.instance.LeftLowerLeg.CanCollide = true
-	self.character.instance.LeftUpperLeg.CanCollide = true
-	self.character.instance.LeftHand.CanCollide = true
-	self.character.instance.LeftLowerArm.CanCollide = true
-	self.character.instance.LeftUpperArm.CanCollide = true
-	self.character.instance.RightFoot.CanCollide = true
-	self.character.instance.RightLowerLeg.CanCollide = true
-	self.character.instance.RightUpperLeg.CanCollide = true
-	self.character.instance.RightHand.CanCollide = true
-	self.character.instance.RightLowerArm.CanCollide = true
-	self.character.instance.RightUpperArm.CanCollide = true
+	CollisionMask.revert(self.character.instance, COLLISION_MASK)
 
 	self.refs = {}
 
@@ -3882,6 +3981,7 @@ function Climbing:leaveState()
 	self.objects = {}
 
 	self.lastClimbTime = Workspace.DistributedGameTime
+	self.fallingDangerTime = 0
 
 	self.animation.animations.climb:AdjustSpeed(1)
 	self.animation:setState(Animation.State.None)
@@ -3897,27 +3997,41 @@ function Climbing:step(dt, input)
 		return self.simulation:setState(self.simulation.states.Walking)
 	end
 
+	-- If we've been climbing on a bad surface for too long, fall off!
+	if self.fallingDangerTime >= FALLING_DANGER_THRESHOLD then
+		return self.simulation:setState(self.simulation.states.Walking)
+	end
+
 	local nextStep = self:cast(KEEP_CLIMB_DISTANCE)
 
 	-- We ran out of surface to climb!
 	if not nextStep then
-		-- TODO: Pop character up?
-		return self.simulation:setState(self.simulation.states.Walking)
+		local options = {
+			biasImpulse = self.character.instance.PrimaryPart.CFrame.lookVector*3
+		}
+		return self.simulation:setState(self.simulation.states.Walking, options)
+	end
+
+	-- Is the surface the wrong angle for climbing?
+	local steepness = nextStep.normal:Dot(Vector3.new(0, 1, 0))
+	if steepness >= CLIMB_NOT_STEEP_ENOUGH or steepness <= CLIMB_TOO_OVERHANGY then
+		self.fallingDangerTime = self.fallingDangerTime + dt * math.abs(steepness)
+	else
+		self.fallingDangerTime = math.max(0, self.fallingDangerTime - dt)
 	end
 
 	self.animation.animations.climb:AdjustSpeed(input.movementY * 2)
 
 	-- We're transitioning to a new climbable
-	if nextStep.object ~= self.options.object then
+	if nextStep.object ~= self.lastStep.object then
 		return self.simulation:setState(self, nextStep)
 	end
 
-	local reference = self.character.instance.PrimaryPart.CFrame
-
-	local change = reference.upVector * input.movementY - reference.rightVector * input.movementX
-
 	if input.movementX ~= 0 or input.movementY ~= 0 then
-		self.refs.positionAttachment.CFrame = getClimbCFrame(nextStep) + change.unit
+		local reference = self.character.instance.PrimaryPart.CFrame
+		local change = reference.upVector * input.movementY - reference.rightVector * input.movementX
+
+		self.refs.positionAttachment.CFrame = getClimbAttachmentCFrame(nextStep) + nextStep.object.CFrame:vectorToObjectSpace(change)
 	end
 end
 
@@ -3925,11 +4039,11 @@ return Climbing]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBXC0B1733C6C1C4B47AF1B2BE84A5972AF">
+				<Item class="ModuleScript" referent="RBXBDD99B15B92D4427B8A0572A187191DF">
 					<Properties>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">Ragdoll</string>
-						<string name="ScriptGuid">{7EC5D0C1-0C64-4A0F-9343-1F5F7BCAE2B5}</string>
+						<string name="ScriptGuid">{DAB13498-F91D-45AA-9B44-F60F8C4A8FEF}</string>
 						<ProtectedString name="Source"><![CDATA[local Animation = require(script.Parent.Parent.Animation)
 
 local Ragdoll = {}
@@ -3964,28 +4078,41 @@ return Ragdoll]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBXD04741C2ADF0460992DD9F1A361D085F">
+				<Item class="ModuleScript" referent="RBX35170293908246F98613E7B6254513D0">
 					<Properties>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">Walking</string>
-						<string name="ScriptGuid">{A9F586B7-ACC9-4213-A194-A0B4897E8075}</string>
+						<string name="ScriptGuid">{94561594-EF1D-4FFA-94CD-50E2B3753193}</string>
 						<ProtectedString name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
 
 local Animation = require(script.Parent.Parent.Animation)
+local castCylinder = require(script.Parent.Parent.castCylinder)
+local CollisionMask = require(script.Parent.Parent.CollisionMask)
 local getModelMass = require(script.Parent.Parent.getModelMass)
 local stepSpring = require(script.Parent.Parent.stepSpring)
-local castCylinder = require(script.Parent.Parent.castCylinder)
-local DebugHandle = require(script.Parent.Parent.DebugHandle)
 
 local FRAMERATE = 1 / 240
 local STIFFNESS = 170
 local DAMPING = 26
 local PRECISION = 0.001
 local TARGET_SPEED = 24
-local HIP_HEIGHT = 2.352
-local MAX_HOR_ACCEL = TARGET_SPEED / 0.25 -- velocity / time to reach it squared
-local MAX_VER_ACCEL = 50 / 0.1 -- massless max vertical force against gravity
+local HIP_HEIGHT = 3.1
 local POP_TIME = 0.05 -- target time to reach target height
+
+local COLLISION_MASK = {
+	LeftFoot = false,
+	LeftLowerLeg = false,
+	LeftUpperLeg = false,
+	LeftHand = false,
+	LeftLowerArm = false,
+	LeftUpperArm = false,
+	RightFoot = false,
+	RightLowerLeg = false,
+	RightUpperLeg = false,
+	RightHand = false,
+	RightLowerArm = false,
+	RightUpperArm = false,
+}
 
 local THETA = math.pi * 2
 
@@ -4060,6 +4187,8 @@ Walking.__index = Walking
 
 function Walking.new(simulation)
 	local steepestInclineAngle = 60*(math.pi/180)
+	local maxInclineTan = math.tan(steepestInclineAngle)
+	local maxInclineStartTan = math.tan(math.max(0, steepestInclineAngle - 2.5*(math.pi/180)))
 
 	local state = {
 		simulation = simulation,
@@ -4069,8 +4198,9 @@ function Walking.new(simulation)
 		accumulatedTime = 0,
 		currentAccelerationX = 0,
 		currentAccelerationY = 0,
+		maxInclineTan = maxInclineTan,
+		maxInclineStartTan = maxInclineStartTan,
 		debugAdorns = {},
-		debugPlane = nil,
 		forces = nil, -- Defined in enterState
 	}
 
@@ -4079,33 +4209,14 @@ function Walking.new(simulation)
 	return state
 end
 
-function Walking:enterState()
+function Walking:enterState(oldState, options)
 	self.forces = createForces(self.character)
 
-	-- Elegance? Never heard of it.
-	self.character.instance.LeftFoot.CanCollide = false
-	self.character.instance.LeftLowerLeg.CanCollide = false
-	self.character.instance.LeftUpperLeg.CanCollide = false
-	self.character.instance.RightFoot.CanCollide = false
-	self.character.instance.RightLowerLeg.CanCollide = false
-	self.character.instance.RightUpperLeg.CanCollide = false
+	CollisionMask.apply(self.character.instance, COLLISION_MASK)
 
-	self.character.instance.LeftHand.CanCollide = false
-	self.character.instance.LeftLowerArm.CanCollide = false
-	self.character.instance.LeftUpperArm.CanCollide = false
-	self.character.instance.RightHand.CanCollide = false
-	self.character.instance.RightLowerArm.CanCollide = false
-	self.character.instance.RightUpperArm.CanCollide = false
-
-	local debugPlane = Instance.new("BoxHandleAdornment")
-	debugPlane.Color3 = Color3.new(1, 1, 1)
-	debugPlane.AlwaysOnTop = true
-	debugPlane.ZIndex = 2
-	debugPlane.Transparency = 0.25
-	debugPlane.Size = Vector3.new(0.1, 0.1, 1)
-	debugPlane.Parent = Workspace.Terrain
-	debugPlane.Adornee = debugPlane.Parent
-	self.debugPlane = debugPlane
+	if options and options.biasImpulse then
+		self.biasImpulse = options.biasImpulse
+	end
 
 	self.animation:setState(Animation.State.Idle)
 end
@@ -4115,27 +4226,10 @@ function Walking:leaveState()
 		object:Destroy()
 	end
 
-	-- TODO: Be more robust in case joints are destroyed.
-	self.character.instance.LeftFoot.CanCollide = true
-	self.character.instance.LeftLowerLeg.CanCollide = true
-	self.character.instance.LeftUpperLeg.CanCollide = true
-	self.character.instance.RightFoot.CanCollide = true
-	self.character.instance.RightLowerLeg.CanCollide = true
-	self.character.instance.RightUpperLeg.CanCollide = true
-
-	self.character.instance.LeftHand.CanCollide = true
-	self.character.instance.LeftLowerArm.CanCollide = true
-	self.character.instance.LeftUpperArm.CanCollide = true
-	self.character.instance.RightHand.CanCollide = true
-	self.character.instance.RightLowerArm.CanCollide = true
-	self.character.instance.RightUpperArm.CanCollide = true
+	CollisionMask.revert(self.character.instance, COLLISION_MASK)
 
 	for _, adorn in pairs(self.debugAdorns) do
-		adorn.instance:Destroy()
-	end
-
-	if self.debugPlane then
-		self.debugPlane:Destroy()
+		adorn:destroy()
 	end
 
 	self.accumulatedTime = 0
@@ -4203,14 +4297,22 @@ function Walking:step(dt, input)
 	local radius = math.min(2, math.max(1.5, speed/TARGET_SPEED*2))
 	local biasVelicityFactor = 0.075 -- fudge constant
 	local biasRadius = math.max(speed/TARGET_SPEED*2, 1)
-	local onGround, groundHeight = castCylinder({
+	local biasCenter = Vector3.new(currentX*biasVelicityFactor, 0, currentY*biasVelicityFactor)
+
+	if self.biasImpulse then
+		biasCenter = biasCenter + self.biasImpulse
+		self.biasImpulse = self.biasImpulse * 0.9
+	end
+
+	local onGround, groundHeight, steepness, _, normal = castCylinder({
 		origin = self.character.castPoint.WorldPosition,
-		direction = Vector3.new(0, -5, 0),
+		direction = Vector3.new(0, -HIP_HEIGHT*2, 0),
+		steepTan = self.maxInclineTan,
+		steepStartTan = self.maxInclineStartTan,
 		radius = radius,
-		biasCenter = Vector3.new(currentX*biasVelicityFactor, 0, currentY*biasVelicityFactor),
+		biasCenter = biasCenter,
 		biasRadius = biasRadius,
 		adorns = self.debugAdorns,
-		debugPlane = self.debugPlane,
 		ignoreInstance = self.character.instance,
 		hipHeight = HIP_HEIGHT,
 	})
@@ -4222,29 +4324,47 @@ function Walking:step(dt, input)
 	self.character.instance.PrimaryPart.Color = bottomColor
 
 	if onGround then
-		local up
+		local aUp
 
 		local jumpHeight = 10
 		local jumpInitialVelocity = math.sqrt(Workspace.Gravity*2*jumpHeight)
 		if input.jump and currentVelocity.Y < jumpInitialVelocity then
-			up = 0
+			aUp = 0
 			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
 		else
 			local t = POP_TIME
-			-- counter gravity and then solve constant acceleration eq (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
-			up = Workspace.Gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
-			-- very low downward acceleration cuttoff (limited ability to push yourself down)
-			if up < -1 then
-				up = 0
-			end
-			up = up*characterMass
+			-- counter gravity and then solve constant acceleration eq
+			-- (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
+			aUp = Workspace.Gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
+		end
+		-- downward acceleration cuttoff (limited ability to push yourself down)
+		aUp = math.max(-1, aUp)
+
+		local aX = self.currentAccelerationX
+		local aY = self.currentAccelerationY
+		if normal and steepness > 0 then
+			-- deflect control acceleration off slope normal, discarding the parallell component
+			local aControl = Vector3.new(aX, 0, aY)
+			local dot = math.min(0, normal:Dot(aControl)) -- clamp below 0, don't subtract forces away from normal
+			local aInto = normal*dot
+			local aPerp = aControl - aInto
+			local aNew = aPerp
+			aNew = aControl:Lerp(aNew, steepness)
+			aX, aY = aNew.X, aNew.Z
+
+			-- mass on a frictionless incline: net acceleration = g * sin(incline angle)
+			local aGravity = Vector3.new(0, -Workspace.Gravity, 0)
+			dot = math.min(0, normal:Dot(aGravity))
+			aInto = normal*dot
+			aPerp = aGravity - aInto
+			aNew = aPerp
+			aX, aY = aX + aNew.X*steepness, aY + aNew.Z*steepness
+			aUp = aUp + aNew.Y*steepness
+
+			aUp = math.max(0, aUp)
 		end
 
-		self.forces.vectorForce.Force = Vector3.new(
-			self.currentAccelerationX * characterMass,
-			up,
-			self.currentAccelerationY * characterMass
-		)
+		self.forces.vectorForce.Force = Vector3.new(aX*characterMass, aUp*characterMass, aY*characterMass)
 	else
 		self.forces.vectorForce.Force = Vector3.new(0, 0, 0)
 	end
@@ -4382,6 +4502,7 @@ local RunService = game:GetService("RunService")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local Simulation = require(ReplicatedFirst.CharacterControllerCore.Simulation)
+local DebugVisualize = require(ReplicatedFirst.CharacterControllerCore.DebugVisualize)
 
 local Input = require(script.Input)
 local Api = require(script.Api)
@@ -4404,6 +4525,10 @@ RunService.Heartbeat:Connect(function(dt)
 		ragdoll = Input.keysDown[Enum.KeyCode.F],
 	}
 
+	if Input.keysDown[Enum.KeyCode.Y] and not Input.previousKeysDown[Enum.KeyCode.Y] then
+		DebugVisualize.enabled = not DebugVisualize.enabled
+	end
+
 	if Input.keysDown[Enum.KeyCode.W] then
 		input.movementY = input.movementY + 1
 	end
@@ -4422,6 +4547,7 @@ RunService.Heartbeat:Connect(function(dt)
 
 	simulation:step(dt, input)
 	Input.step()
+	DebugVisualize.step()
 end)
 
 Input.start()]]></ProtectedString>
