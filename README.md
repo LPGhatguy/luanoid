@@ -20,10 +20,10 @@ We do expect to need some engine changes to to properly handle of the more nuanc
 ## Known Limitations
 This project is meant to be an alternative to Humanoids, so it doesn't use Humanoids. That currently has some drawbacks that might make this controller unsuitable for your game in its current state.
 
-* Incompatible with Avatar clothing and accessories
-* Incompatible with control scripts that are dependent on Humanoids
+* Incompatible with avatar clothing and accessories
+* Incompatible with camera control scripts that are dependent on Humanoids
 
-Clothing and accessories is something we are hoping to support without Humanoids in the future.* Suitability for NPCs
+Clothing and accessories is something we are hoping to support without Humanoids in the future.
 
 ## License
 Luanoid is dual-licensed under the CC0 and MIT licenses. See [LICENSE-CC0](LICENSE-CC0) and [LICENSE-MIT](LICENSE-MIT) for details.
