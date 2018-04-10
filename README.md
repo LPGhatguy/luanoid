@@ -26,4 +26,4 @@ This project is meant to be an alternative to Humanoids, so it doesn't use Human
 Clothing and accessories is something we are hoping to support without Humanoids in the future.* Suitability for NPCs
 
 ## License
-Luanoid is available under the [TODO] license.
+Luanoid is dual-licensed under the CC0 and MIT licenses. See [LICENSE-CC0](LICENSE-CC0) and [LICENSE-MIT](LICENSE-MIT) for details.
