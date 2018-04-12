@@ -1,8 +1,8 @@
-local ANIMATIONS = {
-	idle = "http://www.roblox.com/asset/?id=507766666",
-	walk = "http://www.roblox.com/asset/?id=507767714",
-	climb = "http://www.roblox.com/asset/?id=507765644",
-	jump = "http://www.roblox.com/asset/?id=507765000",
+local ANIMATION_IDS = {
+	idle = "rbxassetid://507766666",
+	walk = "rbxassetid://507767714",
+	climb = "rbxassetid://507765644",
+	jump = "rbxassetid://507765000",
 }
 
 local Animation = {}
@@ -68,7 +68,7 @@ function Animation.new(simulation)
 	self.controller = Instance.new("AnimationController")
 	self.controller.Parent = simulation.character.instance
 
-	for name, id in pairs(ANIMATIONS) do
+	for name, id in pairs(ANIMATION_IDS) do
 		local animation = Instance.new("Animation")
 		animation.AnimationId = id
 		animation.Parent = self.controller
