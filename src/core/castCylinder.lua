@@ -8,22 +8,21 @@ local CAST_COUNT = 32
 -- http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 local function planeFromPoints(points, weights)
 	if #points < 3 then
-		-- at least three points required
-		return
+		error("planeFromPoints requires at least 3 points", 2)
 	end
 
-	local n = 0
-	local sumX, sumY, sumZ = 0, 0, 0
+	local pointSum = Vector3.new()
+	local weightSum = 0
 	for i, p in pairs(points) do
-		local w = weights[i]
-		n = n + w
-		sumX, sumY, sumZ = sumX + p.X*w, sumY + p.Y*w, sumZ + p.Z*w
+		local weight = weights[i]
+		weightSum = weightSum + weight
+		centroid = centroid + p*weight
 	end
-	local centroid = Vector3.new(sumX, sumY, sumZ) * (1.0/n)
+	local centroid = pointSum/weightSum
 
 	-- Calc full 3x3 covariance matrix, excluding symmetries:
-	local xx = 0.0 local xy = 0.0 local xz = 0.0
-	local yy = 0.0 local yz = 0.0 local zz = 0.0
+	local xx = 0 local xy = 0 local xz = 0
+	local yy = 0 local yz = 0 local zz = 0
 
 	for i, p in pairs(points) do
 		local w = weights[i]
@@ -41,9 +40,7 @@ local function planeFromPoints(points, weights)
 	local det_z = xx*yy - xy*xy
 
 	local det_max = math.max(det_x, det_y, det_z)
-	if det_max <= 0 then
-		return
-	end
+	assert(det_max > 0)
 
 	-- Pick path with best conditioning:
     local dir
@@ -77,23 +74,23 @@ end
 
 -- TODO: more appropriate cast distribution algorithm
 -- https://stackoverflow.com/a/28572551/367100
-local function radius(k,n,b)
-	if k > n - b then
+local function radius(i, n, b)
+	if i > n - b then
 		return 1 -- put on the boundary
 	else
-		return math.sqrt(k - 1/2)/math.sqrt(n - (b + 1)/2) -- apply square root
+		return math.sqrt((1 - 2*i)/(b - 2*n + 1))
 	end
 end
 
 local function sunflower(n, alpha) --  example: n=500, alpha=2
 	local b = math.ceil(alpha*math.sqrt(n)) -- number of boundary points
-	local phi = (math.sqrt(5) + 1)/2 -- golden ratio
+	local c = (3 - math.sqrt(5))*math.pi -- 2*pi/(phi*phi)
 	local i = 1
 	return function()
 		if i <= n then
 			i = i + 1
 			local r = radius(i, n, b)
-			local theta = 2*math.pi*i/(phi*phi)
+			local theta = c*i
 			return i - 1, r*math.cos(theta), r*math.sin(theta)
 		end
 		return
