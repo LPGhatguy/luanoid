@@ -8,7 +8,7 @@ local CAST_COUNT = 32
 -- http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 local function planeFromPoints(points, weights)
 	if #points < 3 then
-		error("planeFromPoints requires at least 3 points", 2)
+		return
 	end
 
 	local pointSum = Vector3.new()
@@ -40,7 +40,9 @@ local function planeFromPoints(points, weights)
 	local det_z = xx*yy - xy*xy
 
 	local det_max = math.max(det_x, det_y, det_z)
-	assert(det_max > 0)
+	if det_max <= 0 then
+		return
+	end
 
 	-- Pick path with best conditioning:
     local dir
