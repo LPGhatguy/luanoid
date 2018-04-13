@@ -13,10 +13,10 @@ local function planeFromPoints(points, weights)
 
 	local pointSum = Vector3.new()
 	local weightSum = 0
-	for i, p in pairs(points) do
+	for i, point in pairs(points) do
 		local weight = weights[i]
 		weightSum = weightSum + weight
-		centroid = centroid + p*weight
+		pointSum = pointSum + point*weight
 	end
 	local centroid = pointSum/weightSum
 
