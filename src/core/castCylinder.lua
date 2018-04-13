@@ -74,26 +74,22 @@ end
 
 -- TODO: more appropriate cast distribution algorithm
 -- https://stackoverflow.com/a/28572551/367100
-local function radius(i, n, b)
-	if i > n - b then
-		return 1 -- put on the boundary
-	else
-		return math.sqrt((1 - 2*i)/(b - 2*n + 1))
-	end
-end
-
-local function sunflower(n, alpha) --  example: n=500, alpha=2
-	local b = math.ceil(alpha*math.sqrt(n)) -- number of boundary points
+local function sunflower(n, alpha, maxRadius) --  example: n=500, alpha=2
+	local b = math.floor(0.5 + alpha*math.sqrt(n)) -- number of boundary points
 	local c = (3 - math.sqrt(5))*math.pi -- 2*pi/(phi*phi)
-	local i = 1
+	local i = 0
+
 	return function()
-		if i <= n then
+		if i < n then
 			i = i + 1
-			local r = radius(i, n, b)
-			local theta = c*i
-			return i - 1, r*math.cos(theta), r*math.sin(theta)
+
+			local radius = maxRadius
+			if i <= n - b then
+				radius = maxRadius*math.sqrt((1 - 2*i)/(b - 2*n + 1))
+			end
+
+			return Vector3.new(math.cos(c*i), 0, math.sin(c*i))*radius, radius
 		end
-		return
 	end
 end
 
@@ -121,10 +117,8 @@ local function castCylinder(options)
 
 	local weights = {}
 	local points = {}
-	for _, x, z in sunflower(CAST_COUNT, 2) do
-		local offset = Vector3.new(x*radius, 0, z*radius)
-		local offsetDist = offset.Magnitude
-
+	for offset, offsetDist in sunflower(CAST_COUNT, 2, radius) do
+		
 		local biasDist = (offset - biasCenter).Magnitude / biasRadius
 		local weight = 1 - biasDist*biasDist
 		-- weight = math.max(weight, 0.1)
