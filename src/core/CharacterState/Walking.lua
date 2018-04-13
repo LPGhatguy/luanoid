@@ -161,6 +161,8 @@ function Walking:step(dt, input)
 			local moveLocal = Vector2.new(input.movementX, input.movementY).Unit
 
 			local _, cameraYaw = Workspace.CurrentCamera.CFrame:toEulerAnglesYXZ()
+			cameraYaw = cameraYaw%(math.pi*2) - math.pi
+			
 			local c = math.cos(cameraYaw)
 			local s = math.sin(cameraYaw)
 
