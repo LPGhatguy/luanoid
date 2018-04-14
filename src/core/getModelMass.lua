@@ -1,20 +1,9 @@
 local function getModelMass(model)
+	local root = assert(model.PrimaryPart)
 	local mass = 0
-	local visited = {}
-	
-	local function sumMass(part)
+	for _, part in ipairs(root:GetConnectedParts(true)) do
 		mass = mass + part:GetMass()
-		visited[part] = true
-		
-		for _, p in ipairs(part:GetConnectedParts()) do
-			if not visited[p] then
-				sumMass(p)
-			end
-		end
 	end
-	
-	sumMass(assert(model.PrimaryPart))
-	
 	return mass
 end
 
