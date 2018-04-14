@@ -1,14 +1,9 @@
 local function getModelMass(model)
+	local root = assert(model.PrimaryPart)
 	local mass = 0
-
-	for _, child in ipairs(model:GetChildren()) do
-		if child:IsA("BasePart") then
-			mass = mass + child:GetMass()
-		else
-			mass = mass + getModelMass(child)
-		end
+	for _, part in ipairs(root:GetConnectedParts(true)) do
+		mass = mass + part:GetMass()
 	end
-
 	return mass
 end
 

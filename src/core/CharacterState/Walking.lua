@@ -29,8 +29,6 @@ local COLLISION_MASK = {
 	RightUpperArm = false,
 }
 
-local THETA = math.pi * 2
-
 local function createForces(character)
 	local orient0 = Instance.new("Attachment")
 	orient0.Name = "Align0"
@@ -67,21 +65,8 @@ local function createForces(character)
 	}
 end
 
--- loop between 0 - 2*pi
-local function angleAbs(angle)
-	while angle < 0 do
-		angle = angle + THETA
-	end
-	while angle > THETA do
-		angle = angle - THETA
-	end
-	return angle
-end
-
 local function angleShortest(a0, a1)
-	local d1 = angleAbs(a1 - a0)
-	local d2 = -angleAbs(a0 - a1)
-	return math.abs(d1) > math.abs(d2) and d2 or d1
+	return (a1 - a0 + math.pi)%(2*math.pi) - math.pi
 end
 
 local function lerpAngle(a0, a1, alpha)
@@ -89,21 +74,26 @@ local function lerpAngle(a0, a1, alpha)
 end
 
 local function makeCFrame(up, look)
-	local upu = up.Unit
-	local looku = (Vector3.new() - look).Unit
-	local rightu = upu:Cross(looku).Unit
+	local rY = up.Unit
+	local rZ = -look.Unit
+	local rX = rY:Cross(rZ).Unit
 	-- orthonormalize, keeping up vector
-	looku = -upu:Cross(rightu).Unit
-	return CFrame.new(0, 0, 0, rightu.x, upu.x, looku.x, rightu.y, upu.y, looku.y, rightu.z, upu.z, looku.z)
+	rZ = rX:Cross(rY).Unit
+	return CFrame.new(
+		0, 0, 0,
+		rX.x, rY.x, rZ.x,
+		rX.y, rY.y, rZ.y,
+		rX.z, rY.z, rZ.z
+	)
 end
 
 local Walking = {}
 Walking.__index = Walking
 
 function Walking.new(simulation)
-	local steepestInclineAngle = 60*(math.pi/180)
+	local steepestInclineAngle = math.rad(60)
 	local maxInclineTan = math.tan(steepestInclineAngle)
-	local maxInclineStartTan = math.tan(math.max(0, steepestInclineAngle - 2.5*(math.pi/180)))
+	local maxInclineStartTan = math.tan(math.max(0, steepestInclineAngle - math.rad(2.5)))
 
 	local state = {
 		simulation = simulation,
@@ -160,52 +150,55 @@ end
 function Walking:step(dt, input)
 	local characterMass = getModelMass(self.character.instance)
 
-	local targetX = 0
-	local targetY = 0
-
-	if input.movementX ~= 0 or input.movementY ~= 0 then
-		local cameraLook = Workspace.CurrentCamera.CFrame.lookVector
-		local cameraAngle = math.atan2(cameraLook.x, cameraLook.z)
-
-		local magnitude = math.sqrt(input.movementX^2 + input.movementY^2)
-		local unitX = input.movementX / magnitude
-		local unitY = input.movementY / magnitude
-
-		local relativeX = unitX * math.cos(cameraAngle) + unitY * math.sin(cameraAngle)
-		local relativeY = -unitX * math.sin(cameraAngle) + unitY * math.cos(cameraAngle)
-
-		targetX = TARGET_SPEED * relativeX
-		targetY = TARGET_SPEED * relativeY
-	end
-
-	self.accumulatedTime = self.accumulatedTime + dt
-
 	local currentVelocity = self.character.instance.PrimaryPart.Velocity;
 	local currentX = currentVelocity.X
 	local currentY = currentVelocity.Z
 
-	while self.accumulatedTime >= FRAMERATE do
-		self.accumulatedTime = self.accumulatedTime - FRAMERATE
+	do -- Handle character velocity
+		local targetVelocity = Vector2.new()
 
-		currentX, self.currentAccelerationX = stepSpring(
-			FRAMERATE,
-			currentX,
-			self.currentAccelerationX,
-			targetX,
-			STIFFNESS,
-			DAMPING,
-			PRECISION
-		)
+		if input.movementX ~= 0 or input.movementY ~= 0 then
+			local moveLocal = Vector2.new(input.movementX, input.movementY).Unit
 
-		currentY, self.currentAccelerationY = stepSpring(
-			FRAMERATE,
-			currentY,
-			self.currentAccelerationY,
-			targetY,
-			STIFFNESS,
-			DAMPING,
-			PRECISION
-		)
+			local _, cameraYaw = Workspace.CurrentCamera.CFrame:toEulerAnglesYXZ()
+			cameraYaw = cameraYaw%(math.pi*2) - math.pi
+			
+			local c = math.cos(cameraYaw)
+			local s = math.sin(cameraYaw)
+
+			local moveWorld = Vector2.new(
+				moveLocal.x*c + moveLocal.y*s,
+				moveLocal.y*c - moveLocal.x*s
+			)
+
+			targetVelocity = TARGET_SPEED*moveWorld
+		end
+
+		self.accumulatedTime = self.accumulatedTime + dt
+
+		while self.accumulatedTime >= FRAMERATE do
+			self.accumulatedTime = self.accumulatedTime - FRAMERATE
+
+			currentX, self.currentAccelerationX = stepSpring(
+				FRAMERATE,
+				currentX,
+				self.currentAccelerationX,
+				targetVelocity.x,
+				STIFFNESS,
+				DAMPING,
+				PRECISION
+			)
+
+			currentY, self.currentAccelerationY = stepSpring(
+				FRAMERATE,
+				currentY,
+				self.currentAccelerationY,
+				targetVelocity.y,
+				STIFFNESS,
+				DAMPING,
+				PRECISION
+			)
+		end
 	end
 
 	local speed = Vector3.new(currentX, 0, currentY).Magnitude
