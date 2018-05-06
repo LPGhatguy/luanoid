@@ -19,7 +19,7 @@ local simulation = Simulation.new(character)
 Workspace.CurrentCamera.CameraSubject = character.instance.PrimaryPart
 Workspace.CurrentCamera.CameraType = Enum.CameraType.Track
 
-RunService.Heartbeat:Connect(function(dt)
+RunService.Stepped:Connect(function(_, dt)
 	local input = {
 		movementX = 0,
 		movementY = 0,
