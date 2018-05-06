@@ -235,15 +235,28 @@ function Walking:step(dt, input)
 		local aUp
 
 		local jumpHeight = 10
-		local jumpInitialVelocity = math.sqrt(Workspace.Gravity*2*jumpHeight)
+		local jumpInitialVelocity = math.sqrt(2.0*Workspace.Gravity*jumpHeight)
 		if input.jump and currentVelocity.Y < jumpInitialVelocity then
 			aUp = 0
 			self.character.instance.PrimaryPart.Velocity = Vector3.new(currentX, jumpInitialVelocity, currentY)
 		else
-			local t = POP_TIME
 			-- counter gravity and then solve constant acceleration eq
 			-- (x1 = x0 + v*t + 0.5*a*t*t) for a to aproach target height over time
-			aUp = Workspace.Gravity + 2*((targetHeight-currentHeight) - currentVelocity.Y*t)/(t*t)
+			local t = POP_TIME
+			aUp = Workspace.Gravity + 2*((targetHeight - currentHeight) - currentVelocity.Y*t)/(t*t)
+
+			-- Don't go past a maxmium velocity or we'll overshoot our target height.
+			-- Calculate the intitial velocity that under constant acceleration would crest at the target height.
+			-- Humans can't really thrust downward, just allow gravity to pull us down. So if we go over this 
+			-- velocity we'll overshoot the target height and "jump." This is the physical limit for responsiveness.
+			local deltaHeight = math.max((targetHeight - currentHeight)*1.01, 0) -- 1% fudge factor to prevent jitter while idle
+			deltaHeight = math.min(deltaHeight, HIP_HEIGHT)
+			local maxUpVelocity = math.sqrt(2.0*Workspace.Gravity*deltaHeight)
+			-- Upward acceleration that would cause us to achieve this velocity in one step
+			-- Would /dt, but not using dt here. Our dt jumps is weird due to throttling and the physics solver using a 240Hz 
+			-- step rate internally, not always the right thing for us here. Having to deal with not having a proper step event...
+ 			local maxUpImpulse = math.max((maxUpVelocity - currentVelocity.Y)*60, 0)
+			aUp = math.min(aUp, maxUpImpulse)
 		end
 		-- downward acceleration cuttoff (limited ability to push yourself down)
 		aUp = math.max(-1, aUp)
